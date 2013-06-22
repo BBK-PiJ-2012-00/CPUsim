@@ -22,13 +22,11 @@ public class ControlLine implements BusControlLine {
 		return instance;
 	}
 	
-	public boolean writeToBus(int addr, int data) {
-		
-	}
-
-	public boolean setAddressLine(int addr) {
+	synchronized public boolean writeToBus(int addr, int data) { //An atomic operation, to preserve data integrity
 		if (!inUse) {
-			addrLine.put(addr);	
+			inUse = true;
+			addrLine.put(addr);
+			dataLine.put(data);
 			return true;
 		}
 		return false;
@@ -38,9 +36,6 @@ public class ControlLine implements BusControlLine {
 		return addrLine.read();
 	}
 	
-	public boolean setDataLine(int data) {
-		dataLine.put(data);
-	}
 	
 	public int readDataLine() {
 		return dataLine.read();
