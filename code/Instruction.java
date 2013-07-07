@@ -1,5 +1,13 @@
 package code;
 
+/*
+ * Instructions are 32 bits in length.  Representation is initiall in hexadecimal, but to ensure integrity,
+ * hexadecimal values for the instruction fields must not exceed the maximum value possible for a given length of bits.
+ * Opcodes currently occupy the first 4 bits of an instruction, permitting no more than 16 opcodes for the instruction set.
+ * Whilst the simulator would work fine if instruction fields were allowed to overflow their bit allocation, it would not
+ * be very realistic. 
+ */
+
 public interface Instruction {
 	
 	/*
