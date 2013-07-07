@@ -18,5 +18,17 @@ public class InstructionTest {
 		assertEquals(expected, output);
 		
 	}
+	
+	@Test 
+	public void TransferInstructionOpcodeTest() { //To test instruction not created with illegal opcode for format
+		Instruction instr = null; 
+		try {
+			instr = new TransferInstr(Opcode.ADD, 0, 0);
+		}
+		catch (IllegalStateException e) {
+			System.out.println(e.getMessage());
+		}
+		assertNull(instr);		
+	}
 
 }
