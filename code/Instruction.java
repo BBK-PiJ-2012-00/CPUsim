@@ -2,6 +2,9 @@ package code;
 
 public interface Instruction {
 	
+	/*
+	 * @return Opcode returns opcode field of instruction
+	 */
 	public Opcode getOpcode();
 	
 	/*

@@ -1,5 +1,16 @@
 package code;
 
+/*
+ * Synchronous, clock-based coordination of the Bus would result in a more complicated than necessary design, so
+ * it makes sense to adopt an asynchronous, handshaking-protocol method of sharing the Bus between the CPU and memory.
+ * Using the Observer pattern would again introduce more complexity; proposed is the use of methods such as memoryWrite / 
+ * memoryRead, and -- think about this, will memory ever "request" anything from the processor? Memory is idle, waiting
+ * for reqests from the processor.  The processor requests a read and then waits for data to arrive.
+ * 
+ * Processor issues read -> memory locates address and places contents on bus -> sends back to processor: processor
+ * is idle waiting for the results of the read.  Memory invokes a sendToCPU() method to signal returning data. 
+ */
+
 public interface BusControlLine {
 	
 	
@@ -13,30 +24,10 @@ public interface BusControlLine {
 	 * @param int data the data to be written to the data line.
 	 * @return boolean if the write is successful, returns true; otherwise, false.
 	 */
-	public boolean writeToBus(int addr, int data);
-
-		
-	/*
-	 * To enforce data integrity during pipelined operation, use of the bus is restricted to ensure write operations are 
-	 * followed by read operations by the receiver module.  If the bus is not already in use, the method will return true
-	 * to reflect a successful write, otherwise it returns false.
-	 * 
-	 * @return boolean if the write is successful, true; otherwise, false.
-	 * @param int addr the address to be put on the address line.
-	 */
-	public boolean setAddressLine(int addr);
+	public boolean writeToBus(int addr, int data); //This may not work -> addr and data come from MAR/MBR: separate objects
+	//This is where a port might come in -> MBR/MAR pass data to the port seperately, which then interacts with bus
 	
 	public int readAddressLine();
-	
-	/*
-	 * To enforce data integrity during pipelined operation, use of the bus is restricted to ensure write operations are 
-	 * followed by read operations by the receiver module.  If the bus is not already in use, the method will return true
-	 * to reflect a successful write, otherwise it returns false.
-	 * 
-	 * @return boolean if the write is successful, true; otherwise, false.
-	 * @param int data the data to be put on the data line.
-	 */
-	public boolean setDataLine(int data);
 	
 	public int readDataLine();
 	
