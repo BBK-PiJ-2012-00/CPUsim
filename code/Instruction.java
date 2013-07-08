@@ -11,7 +11,7 @@ package code;
  * be very realistic.  The same applies to other fields within an instruction. 
  */
 
-public interface Instruction {
+public interface Instruction extends Data {
 	
 	/*
 	 * @return Opcode returns opcode field of instruction

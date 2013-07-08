@@ -15,10 +15,12 @@ public class TransferInstr implements Instruction {
 		this.destination = destination;
 	}
 	
+	@Override
 	public Opcode getOpcode() {
 		return this.OPCODE;
 	}
 	
+	@Override
 	public String toMachineString() { //Think about format, leading 0s
 		String machineString = OPCODE.getValue() + " " + Integer.toHexString(source) + " " + Integer.toHexString(destination);
 		return machineString;		
@@ -27,6 +29,16 @@ public class TransferInstr implements Instruction {
 	@Override
 	public String toString() {
 		return OPCODE.toString() + " " + Integer.toHexString(source) + " " + Integer.toHexString(destination);
+	}
+
+	@Override
+	public boolean isInstruction() {		
+		return true;
+	}
+
+	@Override
+	public boolean isInteger() {
+		return false;
 	}
 
 }

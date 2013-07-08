@@ -26,5 +26,11 @@ public interface MainMemory {
 	//the data can be manipulated accordingly.
 	//Technically anything should be able to be stored in main memory, so Object might be appropriate.
 	
+	/*
+	 * A wrapper class can be employed for all other data types: IntegerWrapper, or IntegerOperand, and this can
+	 * implement Data.  The avoids using an array of Object, which would entail casting and no security with regard
+	 * to what can be added to the array.
+	 */
+	
 
 }
