@@ -32,5 +32,14 @@ public interface MainMemory {
 	 * to what can be added to the array.
 	 */
 	
+	/*
+	 * Includes a cast from type Data to type Instruction.
+	 */
+	public Instruction readInstruction();
+	
+	public int readInteger();
+	
+	public double readFloatingPoint();
+	
 
 }
