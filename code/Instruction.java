@@ -17,10 +17,17 @@ package code;
  * 			and getOpcode() to differentiate branch instructions and use only getField1().
  */
 
-public abstract class Instruction implements Data {
+public abstract class Instruction implements Data {	
+	protected final Opcode OPCODE; 
 	
-	private final Opcode OPCODE = null;
-
+	protected Instruction(Opcode opcode) {
+		this.OPCODE = opcode;
+	}
+	
+	protected Instruction() { //default constructor
+		OPCODE = null;
+	}
+	
 	@Override
 	public boolean isInstruction() {
 		return true;
@@ -61,7 +68,15 @@ public abstract class Instruction implements Data {
 	 * 
 	 * @return String hexadecimal representation of instruction.
 	 */
-	public abstract String toMachineString();
+	public String toMachineString() {
+		String machineString;
+		if (OPCODE.getValue() > 7) { //For branch instructions with only one field
+			machineString = OPCODE.getValue() + " " + Integer.toHexString(this.getField1());
+			return machineString;
+		}
+		machineString = OPCODE.getValue() + " " + Integer.toHexString(this.getField1()) + " " + Integer.toHexString(this.getField2());
+		return machineString;
+	}
 	
 	/*
 	 * Returns the first instruction field. For data transfer instructions, this is the source location (14 bits);

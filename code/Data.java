@@ -12,5 +12,7 @@ public interface Data {
 	public boolean isInstruction();
 	
 	public boolean isInteger();
+	
+	public boolean isFloatingPoint();
 
 }

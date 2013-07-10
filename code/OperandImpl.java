@@ -21,7 +21,7 @@ public class OperandImpl implements Operand {
 	public int unwrapInteger() {
 		try {
 			if (!isInteger) {
-				throw new IllegalStateException("Warning: The wrapped operand is not an integer.");
+				throw new IllegalStateException("Warning: The wrapped operand is not an integer."); //Not really illegal state...
 			}
 			return intOperand;
 		}
@@ -49,7 +49,6 @@ public class OperandImpl implements Operand {
 		
 	}
 	
-	
 
 	@Override
 	public boolean isInstruction() {
@@ -61,6 +60,7 @@ public class OperandImpl implements Operand {
 		return isInteger;
 	}
 	
+	@Override
 	public boolean isFloatingPoint() {
 		return isFloatingPoint;
 	}
