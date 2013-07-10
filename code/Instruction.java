@@ -24,7 +24,7 @@ public abstract class Instruction implements Data {
 		this.OPCODE = opcode;
 	}
 	
-	protected Instruction() { //default constructor
+	protected Instruction() { //default constructor, required by abstract class
 		OPCODE = null;
 	}
 	
@@ -96,7 +96,7 @@ public abstract class Instruction implements Data {
 	 * 
 	 * @return int the integer representation of the second instruction field.
 	 */
-	public abstract int getField2(); //Branch instructions don't have this: can return 0, or other meaningless value.
+	public abstract int getField2(); //Branch instructions don't have this: returns -1.
 
 }
 
