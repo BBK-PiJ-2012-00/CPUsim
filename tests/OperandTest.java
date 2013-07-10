@@ -35,7 +35,13 @@ public class OperandTest {
 		intOp = new OperandImpl(13);
 		double output = intOp.unwrapFloatingPoint();
 		double expected = 13.0;
-		assertEquals(expected, output, 13.0);		
+		assertEquals(expected, output, 0.0);		
+	}
+	
+	@Test
+	public void testIntOperand4() {
+		intOp = new OperandImpl(7);
+		assertFalse(intOp.isInstruction());
 	}
 
 }
