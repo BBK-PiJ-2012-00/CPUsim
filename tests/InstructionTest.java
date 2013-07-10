@@ -47,5 +47,13 @@ public class InstructionTest {
 		String expected = "STORE 0 0";
 		assertEquals(expected, output);
 	}
+	
+	@Test 
+	public void TransferInstrGetOpcodeTest() {
+		instr = new TransferInstr(Opcode.MOVE, 0, 0);
+		Opcode output = instr.getOpcode();
+		Opcode expected = Opcode.MOVE;
+		assertEquals(expected, output);
+	}
 
 }
