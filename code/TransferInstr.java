@@ -1,19 +1,27 @@
 package code;
 
+/*
+ * TO DO:
+ * 		Create checked exception for the construction; overflow / false opcode scenario.
+ */
+
 public class TransferInstr implements Instruction {
 	private final Opcode OPCODE; //Cannot be changed once set
 	private int source;
 	private int destination;
 	
-	public TransferInstr(Opcode opcode, int source, int destination) {
+	public TransferInstr(Opcode opcode, int source, int destination) {		
 		if (opcode.getValue() > 3) { //Only data transfer instruction opcodes can be an opcode field in TransferInstr class
-			throw new IllegalStateException("Illegal opcode"); //Should perhaps create checked exception to handle this
+			throw new IllegalStateException("Illegal opcode!"); //Should perhaps create checked exception to handle this
 		}
-		//if (source || destination > 2^14)... make sure no overflow!
+		if (source > 16384 || destination > 16384) { //Source/destination fields are 14 bits long, meaning max value of 16384 decimal.
+			throw new IllegalStateException("Overflow in source/destination operand!");
+		}
 		this.OPCODE = opcode;
 		this.source = source;
-		this.destination = destination;
+		this.destination = destination;		
 	}
+		
 	
 	@Override
 	public Opcode getOpcode() {
@@ -38,6 +46,11 @@ public class TransferInstr implements Instruction {
 
 	@Override
 	public boolean isInteger() {
+		return false;
+	}
+	
+	@Override 
+	public boolean isFloatingPoint() {
 		return false;
 	}
 
