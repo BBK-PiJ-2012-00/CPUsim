@@ -94,10 +94,10 @@ public abstract class Instruction implements Data {
 	public abstract int getField1(); //All instructions have at least one field
 	
 	/*
-	 * Returns the second field of an instruction. For branch instructions, the return value will be 0 as these instructions
-	 * have only one field (the branch target). For data transfer instructions, this field is the destination location;
-	 * for arithmetic instructions, this is the register location where one of the operands to the arithmetic operation
-	 * is stored.
+	 * Returns the second field of an instruction. For branch instructions, the return value will be -1 as these instructions
+	 * have only one field (the branch target), and memory addresses start at 0 (thus -1 is unused, and an invalide address). 
+	 * For data transfer instructions, this field is the destination location; for arithmetic instructions, this is the 
+	 * register location where one of the operands to the arithmetic operation is stored.
 	 * 
 	 * @return int the integer representation of the second instruction field.
 	 */
