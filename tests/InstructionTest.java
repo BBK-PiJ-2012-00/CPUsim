@@ -22,7 +22,7 @@ public class InstructionTest {
 	}
 	
 	@Test 
-	public void transferInstructionOpcodeTest() { //To test instruction not created with illegal opcode for format
+	public void transferInstructionOpcodeTest() { //To test instruction is not created with illegal opcode for format
 		try {
 			instr = new TransferInstr(Opcode.ADD, 0, 0);
 		}
@@ -74,6 +74,31 @@ public class InstructionTest {
 			System.out.println(e.getMessage());
 		}
 		assertNull(instr); //Checks instruction isn't created with invalid opcode for its format.
+	}
+	
+	@Test
+	public void arithmeticInstrMachineStringTest() { //Tests toMachineString()
+		instr = new ArithmeticInstr(Opcode.SUB, 0, 0);
+		String output = instr.toMachineString();
+		String expected = "5 0 0";
+		assertEquals(expected, output);
+		
+	}
+	
+	@Test
+	public void arithmeticInstrToStringTest() { //Tests toString()
+		instr = new ArithmeticInstr(Opcode.DIV, 0, 0);
+		String output = instr.toString();
+		String expected = "DIV 0 0";
+		assertEquals(expected, output);
+	}
+	
+	@Test 
+	public void arithmeticInstrGetOpcodeTest() { //Tests getOpcode()
+		instr = new ArithmeticInstr(Opcode.MUL, 0, 0);
+		Opcode output = instr.getOpcode();
+		Opcode expected = Opcode.MUL;
+		assertEquals(expected, output);
 	}
 		
 
