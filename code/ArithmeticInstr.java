@@ -3,7 +3,6 @@ package code;
 /*
  * TO DO:
  * 		Constructor: restrict field values to conform to no. of registers in CPU
- * 		Accessor methods
  * 		Should Instruction be a superclass as opposed to interface? Can hold opcode field, and the methods from Data
  * 			ArithmeticInstr etc can add their own relevant fields (i.e. registerDest vs source), and their own instructions.
  *			The toString() methods are the same for arithmetic and transfer; both have two fields besides opcode, so branch
@@ -23,28 +22,13 @@ public class ArithmeticInstr extends Instruction {
 	private int registerInput; //Register where the input operand is stored (the operand to be added/subtracted etc to the contents of registerDest).
 	
 	public ArithmeticInstr(Opcode opcode, int registerDest, int registerInput) {
+		super(opcode);
 		if (this.OPCODE.getValue() < 4 || this.OPCODE.getValue() > 7) {
 			throw new IllegalStateException("Invalid opcode for this instruction type.");//Ensures opcode supplied to constructor is an arithmetic opcode
 		}
 		//Insert code here to handle validation of registerDest/registerInput fields; should not be larger than no. of registers in CPU.
 		this.registerDest = registerDest;
 		this.registerInput = registerInput;
-	}
-	
-
-	@Override
-	public boolean isInstruction() {
-		return true;
-	}
-
-	@Override
-	public boolean isInteger() {
-		return false;
-	}
-
-	@Override
-	public boolean isFloatingPoint() {
-		return false;
 	}
 
 

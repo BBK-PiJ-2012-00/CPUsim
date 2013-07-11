@@ -14,7 +14,7 @@ public class TransferInstr extends Instruction {
 	
 	public TransferInstr(Opcode opcode, int source, int destination) {	
 		super(opcode);
-		if (opcode.getValue() > 3) { //Only data transfer instruction opcodes can be an opcode field in TransferInstr class
+		if (this.OPCODE.getValue() > 3) { //Only data transfer instruction opcodes can be an opcode field in TransferInstr class
 			throw new IllegalStateException("Illegal opcode!"); //Should perhaps create checked exception to handle this
 		}
 		if (source > 16384 || destination > 16384) { //Source/destination fields are 14 bits long, meaning max value of 16384 decimal.

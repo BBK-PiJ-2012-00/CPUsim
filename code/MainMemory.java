@@ -34,10 +34,20 @@ public interface MainMemory {
 	
 	/*
 	 * Includes a cast from type Data to type Instruction.
+	 * 
+	 * @param int index the address of the instruction to be read from memory.
+	 * @return Instruction the instruction read from the specified address.
 	 */
-	public Instruction readInstruction();
+	public Instruction readInstruction(int index);
 	
-	public int readInteger();
+	/*
+	 * Stored Operand type is accessed from location specified by index parameter; this is cast from Data
+	 * to Operand, which is then unwrapped to return the integer.
+	 * 
+	 * @param int index the memory location of the operand.
+	 * @return the integer stored at the specified location.
+	 */
+	public int readInteger(int index);
 	
 	public double readFloatingPoint();
 	

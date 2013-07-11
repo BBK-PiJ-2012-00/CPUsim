@@ -10,13 +10,17 @@ public class MemoryModule implements MainMemory {
 		if (memoryContents[index].isInstruction()) { //Check contents of address is of type Instruction
 			Instruction instr = (Instruction) memoryContents[index]; //Cast to instruction required; stored as type Data
 			return instr;
-		}		
+		}
+		//Perhaps throw exception if not of type instruction?
 		return null;
 	}
 
 	@Override
-	public int readInteger() {
-		// TODO Auto-generated method stub
+	public int readInteger(int index) {
+		if (memoryContents[index].isInteger()) {
+			Operand integer = (Operand) memoryContents[index];
+			return integer.unwrapInteger(); //Unwraps the integer from Operand wrapper class
+		}
 		return 0;
 	}
 

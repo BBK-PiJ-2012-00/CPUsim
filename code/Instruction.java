@@ -15,6 +15,11 @@ package code;
  * TO DO:
  * 		Could flesh out toString() methods in abstract class; can use getField() methods to achieve this,
  * 			and getOpcode() to differentiate branch instructions and use only getField1().
+ * 
+ * 		Add additional constructors/fields to allow floating point fields?
+ * 			Can have getField1AsInt() / getField1AsDouble()
+ * 			To start with, just work with integers.
+ * 
  */
 
 public abstract class Instruction implements Data {	
