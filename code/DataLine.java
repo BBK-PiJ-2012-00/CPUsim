@@ -1,16 +1,17 @@
 package code;
 
 public class DataLine implements BusLine {
-	private int data;
+	private Data data;
 
 	@Override
-	public void put(int value) {
+	public void put(Data value) {
 		data = value;
 	}
 
 	@Override
-	public int read() {
-		return data;
+	public int read() { //Currently assumes integers are only data to traverse data line
+		Operand intOperand = (Operand) data;
+		return intOperand.unwrapInteger();
 	}
 
 }

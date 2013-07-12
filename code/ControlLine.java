@@ -22,8 +22,22 @@ public class ControlLine implements BusControlLine {
 		return instance;
 	}
 	
-	synchronized public boolean writeToBus(int addr, int data) { //An atomic operation, to preserve data integrity
+	/*
+	 * Should this method also invoke the memory to read the bus? A write to the bus by the CPU should be
+	 * followed by memory reading from the bus, and vice versa. 
+	 * 
+	 *  CPUissue/memoryIssue booleans; both cannot be true or false at same time. Simplifies bus; two seperate
+	 *  methods would require more coordination (synchronization) issues. 
+	 * (non-Javadoc)
+	 * @see code.BusControlLine#writeToBus(int, int)
+	 */
+	synchronized public boolean writeToBus(boolean cpuIssue, boolean memoryIssue, int addr, Data data) { //An atomic operation, to preserve data integrity
 		if (!inUse) {
+			if (cpuIssue) { //this means CPU has issued the write and memory should read from the bus
+				inUse = true;
+				addrLine.put(addr);//The memory address where the data is to be stored
+				dataLine.put(data);
+			}
 			inUse = true;
 			addrLine.put(addr);
 			dataLine.put(data);
@@ -31,6 +45,8 @@ public class ControlLine implements BusControlLine {
 		}
 		return false;
 	}
+	
+	
 	
 	public int readAddressLine() {
 		return addrLine.read();
