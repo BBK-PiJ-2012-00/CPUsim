@@ -6,6 +6,9 @@ public class ControlLine implements BusControlLine {
 	private BusLine dataLine;
 	public boolean inUse; //To ensure a write is followed by a read operation.
 	
+	//References to CPU and memory
+	
+	
 	/*
 	 * The program must have one and only one System Bus so that all modules reference the exact same bus line objects.
 	 * (Singleton) 
@@ -31,12 +34,13 @@ public class ControlLine implements BusControlLine {
 	 * (non-Javadoc)
 	 * @see code.BusControlLine#writeToBus(int, int)
 	 */
-	synchronized public boolean writeToBus(boolean cpuIssue, boolean memoryIssue, int addr, Data data) { //An atomic operation, to preserve data integrity
+	synchronized public boolean writeToBus(boolean cpuIssue, boolean memoryIssue, int addr, int data) { //An atomic operation, to preserve data integrity
 		if (!inUse) {
 			if (cpuIssue) { //this means CPU has issued the write and memory should read from the bus
 				inUse = true;
 				addrLine.put(addr);//The memory address where the data is to be stored
 				dataLine.put(data);
+				//call method on memory to read from bus?
 			}
 			inUse = true;
 			addrLine.put(addr);
