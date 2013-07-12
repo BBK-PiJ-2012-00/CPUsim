@@ -16,7 +16,7 @@ public class MemoryModule implements MainMemory {
 	}
 
 	@Override
-	public int readInteger(int index) {
+	public int readInteger(int index) { //Index arrives via system bus address line
 		if (memoryContents[index].isInteger()) {
 			Operand integer = (Operand) memoryContents[index];
 			return integer.unwrapInteger(); //Unwraps the integer from Operand wrapper class
@@ -30,10 +30,17 @@ public class MemoryModule implements MainMemory {
 		return 0;
 	}
 	
-	public void writeInstruction(Instruction instr, int index) { //index will be specified by destination field in TransferInstr
-		
+	public void writeInstruction(Instruction instr, int index) { //For use by Loader to write instructions into memory
+		memoryContents[index] = instr;  
 	}
 	
-	public void writeInteger
+	/*
+	 * This may be a redundant method; re-think after system bus implementation complete.
+	 * Integers will be delivered via bus to memory, not by instructions!
+	 */
+	public void storeInteger(Instruction instr) { //index will be specified by destination field in TransferInstr
+		Operand intOperand = new OperandImpl(instr.getField1()); //field1 may refer to source ADDRESS as opposed to contents; fix this later.
+		memoryContents[instr.getField2()] = intOperand;
+	}
 
 }
