@@ -1,7 +1,7 @@
 package code;
 
 public class DataLine implements BusLine {
-	private int data;
+	private Data data; //DataLine will carry data of type Instruction and int at the very lease; Data required as supertype.
 
 	@Override
 	public void put(int value) {
@@ -9,7 +9,7 @@ public class DataLine implements BusLine {
 	}
 
 	@Override
-	public int read() { //Currently assumes integers are only data to traverse data line
+	public Data read() { //Integers aren't the only data type to traverse data line
 		return data;
 	}
 

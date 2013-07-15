@@ -4,8 +4,8 @@ package code;
  * Synchronous, clock-based coordination of the Bus would result in a more complicated than necessary design, so
  * it makes sense to adopt an asynchronous, handshaking-protocol method of sharing the Bus between the CPU and memory.
  * Using the Observer pattern would again introduce more complexity; proposed is the use of methods such as memoryWrite / 
- * memoryRead, and -- think about this, will memory ever "request" anything from the processor? Memory is idle, waiting
- * for reqests from the processor.  The processor requests a read and then waits for data to arrive.
+ * memoryRead. Memory is idle, waiting
+ * for requests from the processor.  The processor requests a read and then waits for data to arrive.
  * 
  * Processor issues read -> memory locates address and places contents on bus -> sends back to processor: processor
  * is idle waiting for the results of the read.  Memory invokes a sendToCPU() method to signal returning data. 
