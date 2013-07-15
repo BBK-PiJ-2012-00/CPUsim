@@ -15,8 +15,8 @@ public class ControlLineImpl implements ControlLine {
 	
 	/* 
 	 * ControlLine implements only a single writeToBus() method, purposefully not
-	 * differentiating between tranfers from CPU to memory, and memory to CPU. This is
-	 * because two seperate methods for these two operations would add complexity to
+	 * differentiating between transfers from CPU to memory, and memory to CPU. This is
+	 * because two separate methods for these two operations would add complexity to
 	 * the concurrency issues surrounding the use of the SystemBus when operating in
 	 * pipelined mode. It is important that all bus data's integrity is maintained,
 	 * and that two threads are prevented from accessing this method at the same time.
@@ -26,8 +26,15 @@ public class ControlLineImpl implements ControlLine {
 	 * transfer from CPU to the memory location specified.
 	 */
 	synchronized public boolean writeToBus(int address, Data data) {
-		if addres
-		
+		if (address == -1) { //Indicates transfer from memory to CPU
+			addressLine.put();
+			dataLine.put(data);
+			//Need to invoke memory to read the bus, as memory sits idle
+			//return Memory.alert() -> a method on memory that returns a boolean value
+		}
+		addressLine.put(address);
+		dataLine.put(data);
+		//return Memory.alert();		
 	}
 	
 	
@@ -41,22 +48,27 @@ public class ControlLineImpl implements ControlLine {
 	 * (non-Javadoc)
 	 * @see code.BusControlLine#writeToBus(int, int)
 	 */
-	synchronized public boolean writeToBus(boolean cpuIssue, boolean memoryIssue, int addr, int data) { //An atomic operation, to preserve data integrity
-		if (!inUse) {
-			if (cpuIssue) { //this means CPU has issued the write and memory should read from the bus
-				inUse = true;
-				addrLine.put(addr);//The memory address where the data is to be stored
-				dataLine.put(data);
-				//call method on memory to read from bus?
-			}
-			inUse = true;
-			addrLine.put(addr);
-			dataLine.put(data);
-			return true;
-		}
-		return false;
-	}
+//	synchronized public boolean writeToBus(boolean cpuIssue, boolean memoryIssue, int addr, int data) { //An atomic operation, to preserve data integrity
+//		if (!inUse) {
+//			if (cpuIssue) { //this means CPU has issued the write and memory should read from the bus
+//				inUse = true;
+//				addrLine.put(addr);//The memory address where the data is to be stored
+//				dataLine.put(data);
+//				//call method on memory to read from bus?
+//			}
+//			inUse = true;
+//			addrLine.put(addr);
+//			dataLine.put(data);
+//			return true;
+//		}
+//		return false;
+//	}
 	
+	
+	/*
+	 * The following methods may not be required
+	 *
+	 */
 	
 	
 	public int readAddressLine() {

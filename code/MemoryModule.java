@@ -2,8 +2,10 @@ package code;
 
 public class MemoryModule implements MainMemory {
 	private Data[] memoryContents = new Data[100]; //Array representing main memory itself
-	private int pointer; //Points to next available location
+	private int pointer = 0; //Points to next available location for storage
 	
+	private SystemBus systemBus = SystemBus.getInstance(); //Reference to system bus
+		
 	
 	@Override
 	public Instruction readInstruction(int index) {
@@ -34,13 +36,14 @@ public class MemoryModule implements MainMemory {
 		memoryContents[index] = instr;  
 	}
 	
-	/*
-	 * This may be a redundant method; re-think after system bus implementation complete.
-	 * Integers will be delivered via bus to memory, not by instructions!
-	 */
-	public void storeInteger(Instruction instr) { //index will be specified by destination field in TransferInstr
-		Operand intOperand = new OperandImpl(instr.getField1()); //field1 may refer to source ADDRESS as opposed to contents; fix this later.
-		memoryContents[instr.getField2()] = intOperand;
+	private void writeToMemory(Data data) {
+		
 	}
+	
+	public boolean notify() { //Method to prompt memory to receive data from system bus
+		
+	}
+	
+	
 
 }

@@ -30,6 +30,16 @@ public class SystemBus implements Bus {
 		}
 		return systemBus;
 	}
+
+	@Override
+	public boolean transferToMemory(int memoryAddress, Data data) {
+		return controlLine.writeToBus(memoryAddress, data);
+	}
+
+	@Override
+	public boolean transferToCPU(Data data) {
+		return controlLine.writeToBus(-1, data); //-1 to reflect transfer to CPU (non-existent memory address)
+	}
 	
 	
 
