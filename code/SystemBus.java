@@ -8,6 +8,8 @@ package code;
  * 
  * Should the SystemBus class reference only the control lines, which then handle activation of data/address lines?
  * Closer to reality.
+ * 
+ * TO DO: restrict size of data that can be transferred: no more than 2^32
  */
 public class SystemBus implements Bus {
 	private static SystemBus systemBus = null; //System Bus is a singleton. Should perhaps be referenced as type Bus.

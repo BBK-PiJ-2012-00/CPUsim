@@ -1,12 +1,11 @@
 package code;
 
 public class MemoryModule implements MainMemory {
-	private Data[] memoryContents = new Data[100]; //Array representing main memory itself
+	//Array full of null values to start with - should it be initialised to hold 0s?
+	private final Data[] MEMORY = new Data[100]; //Array representing main memory itself/
 	private int pointer = 0; //Points to next available location for storage
 	
 	private SystemBus systemBus = SystemBus.getInstance(); //Reference to system bus
-		
-	
 	
 	
 //	@Override
@@ -35,14 +34,14 @@ public class MemoryModule implements MainMemory {
 //	}
 	
 	public void writeInstruction(Instruction instr, int index) { //For use by Loader to write instructions into memory
-		memoryContents[index] = instr;  
+		MEMORY[index] = instr;  
 	}
 	
 	
 	public boolean notify(int address, Data data) { //Method to prompt memory to receive data from system bus (write)
 		//No checking of address being empty or not; up to programmer
 		if (address < 100 && address >= 0) {
-			memoryContents[address] = data;
+			MEMORY[address] = data;
 			return true;
 		}
 		//Throw an exception or simply return false?
@@ -51,8 +50,14 @@ public class MemoryModule implements MainMemory {
 	
 	public boolean notify(int address) { //Absence of data indicates requested memory read as opposed to write (as in reality)
 		//Must return data to system bus for transfer back to cpu
+		Data dataRead;
 		if (address < 100 && address >=0) {
-			Data dataRead = memoryContents[address];
+			if (MEMORY[address] == null) {
+				dataRead = new OperandImpl(0); //If the contents of address is null, read as 0 (as in reality)				
+			}
+			else {
+				dataRead = MEMORY[address];
+			}
 			systemBus.transferToCPU(dataRead);
 			return true;
 		}
