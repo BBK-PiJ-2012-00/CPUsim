@@ -1,11 +1,28 @@
 package code;
 
 public class MemoryModule implements MainMemory {
-	//Array full of null values to start with - should it be initialised to hold 0s?
-	private final Data[] MEMORY = new Data[100]; //Array representing main memory itself/
-	private int pointer = 0; //Points to next available location for storage
+	private static MainMemory memoryModule = null; //Ensures singleton
 	
-	private SystemBus systemBus = SystemBus.getInstance(); //Reference to system bus
+	//Array full of null values to start with - should it be initialised to hold 0s?
+	private final Data[] MEMORY; //Array representing main memory itself/
+	private int pointer; //Points to next available location for storage
+	
+	private SystemBus systemBus; //Reference to system bus
+	
+	private MemoryModule() { //Memory is a singleton to prevent duplicates and inconsistency
+		systemBus = SystemBus.getInstance();
+		MEMORY = new Data[100];
+		pointer = 0;
+	}
+	
+	public synchronized static MainMemory getInstance() {
+		if (memoryModule == null) {
+			memoryModule = new MemoryModule();
+		}
+		return memoryModule;
+	}
+	
+	
 	
 	
 //	@Override
