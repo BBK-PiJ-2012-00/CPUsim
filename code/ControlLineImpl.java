@@ -1,6 +1,6 @@
 package code;
 
-public class ControlLineImpl {
+public class ControlLineImpl implements ControlLine {
 	private static ControlLine instance = null; //Reference to the one instance of this class
 	private BusLine addrLine;
 	private BusLine dataLine;
@@ -11,9 +11,9 @@ public class ControlLineImpl {
 	
 	/*
 	 * The program must have one and only one System Bus so that all modules reference the exact same bus line objects.
-	 * (Singleton) 
+	 * (Singleton) --> singleton now implemented at higher level; one System Bus class with potential for multiple lines.
 	 */
-	private ControlLineImpl() {
+	public ControlLineImpl() {
 		addrLine = new AddressLine();
 		dataLine = new DataLine();
 	}
