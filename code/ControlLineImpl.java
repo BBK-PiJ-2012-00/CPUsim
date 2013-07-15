@@ -5,12 +5,15 @@ public class ControlLineImpl implements ControlLine {
 	private DataLine dataLine;
 	public boolean inUse; //To ensure a write is followed by a read operation.
 	
+	private MainMemory memory;
+	
 	//References to CPU and memory
 	
 	
 	public ControlLineImpl() {
 		addressLine = new AddressLineImpl();
 		dataLine = new DataLineImpl();
+		memory = MemoryModule.getInstance();
 	}
 	
 	/* 
@@ -26,43 +29,16 @@ public class ControlLineImpl implements ControlLine {
 	 * transfer from CPU to the memory location specified.
 	 */
 	synchronized public boolean writeToBus(int address, Data data) {
-		if (address == -1) { //Indicates transfer from memory to CPU
+		if (address == -1) { //Indicates transfer from memory to CPU (memory read)
 			addressLine.put();
 			dataLine.put(data);
 			//Need to invoke memory to read the bus, as memory sits idle
-			//return Memory.alert() -> a method on memory that returns a boolean value
+			return memory.notify(address);
 		}
 		addressLine.put(address);
 		dataLine.put(data);
 		//return Memory.alert();		
 	}
-	
-	
-	
-	/*
-	 * Should this method also invoke the memory to read the bus? A write to the bus by the CPU should be
-	 * followed by memory reading from the bus, and vice versa. 
-	 * 
-	 *  CPUissue/memoryIssue booleans; both cannot be true or false at same time. Simplifies bus; two seperate
-	 *  methods would require more coordination (synchronization) issues. 
-	 * (non-Javadoc)
-	 * @see code.BusControlLine#writeToBus(int, int)
-	 */
-//	synchronized public boolean writeToBus(boolean cpuIssue, boolean memoryIssue, int addr, int data) { //An atomic operation, to preserve data integrity
-//		if (!inUse) {
-//			if (cpuIssue) { //this means CPU has issued the write and memory should read from the bus
-//				inUse = true;
-//				addrLine.put(addr);//The memory address where the data is to be stored
-//				dataLine.put(data);
-//				//call method on memory to read from bus?
-//			}
-//			inUse = true;
-//			addrLine.put(addr);
-//			dataLine.put(data);
-//			return true;
-//		}
-//		return false;
-//	}
 	
 	
 	/*

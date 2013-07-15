@@ -10,7 +10,7 @@ package code;
  * separately, the SystemBus class handles all interaction with the lines and can implement any safeguards necessary.
  */
 public interface Bus {
-	
+		
 	/*
 	 * A method to transfer data from CPU to memory via the SystemBus.
 	 * 

@@ -10,6 +10,9 @@ package code;
  * Closer to reality.
  * 
  * TO DO: restrict size of data that can be transferred: no more than 2^32
+ * 			
+ * 		Sort out concurrency issues; ensure bus operations are atomic. Control line method is sychronized, but
+ * 			check that's sufficient.
  */
 public class SystemBus implements Bus {
 	private static SystemBus systemBus = null; //System Bus is a singleton. Should perhaps be referenced as type Bus.
