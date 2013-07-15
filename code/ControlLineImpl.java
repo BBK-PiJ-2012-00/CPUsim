@@ -37,7 +37,7 @@ public class ControlLineImpl implements ControlLine {
 		}
 		addressLine.put(address);
 		dataLine.put(data);
-		//return Memory.alert();		
+		return memory.notify(address, data);		
 	}
 	
 	
@@ -47,15 +47,15 @@ public class ControlLineImpl implements ControlLine {
 	 */
 	
 	
-	public int readAddressLine() {
-		return addrLine.read();
-	}
-	
-	
-	public int readDataLine() {
-		return dataLine.read();
-	}
-	
+//	public int readAddressLine() {
+//		return addrLine.read();
+//	}
+//	
+//	
+//	public int readDataLine() {
+//		return dataLine.read();
+//	}
+//	
 	public boolean isInUse() {
 		return inUse;
 	}

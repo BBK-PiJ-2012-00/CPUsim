@@ -1,5 +1,11 @@
 package code;
 
+/*
+ * TO DO: sort out concurrency issues surrounding bus and memory read operations. Should a read be atomic?
+ * Or should the bus be able to be used in between? This would create confusion pedagogically; thus, all read
+ * and write operations should be atomic and comandeer the bus for the duration of the operation.
+ */
+
 public class MemoryModule implements MainMemory {
 	private static MainMemory memoryModule = null; //Ensures singleton
 	
