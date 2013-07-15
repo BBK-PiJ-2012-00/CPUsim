@@ -1,16 +1,26 @@
 package code;
 
-public class DataLine implements BusLine {
-	private Data data; //DataLine will carry data of type Instruction and int at the very lease; Data required as supertype.
+/*
+ * An interface to represent a System Bus data line. Data lines carry data of type Data between main memory and 
+ * the CPU. Type Data is required because data lines will carry both Instructions as well as other formats, such as
+ * integers and possibly floating point in the future.
+ */
 
-	@Override
-	public void put(int value) {
-		data = value;
-	}
 
-	@Override
-	public Data read() { //Integers aren't the only data type to traverse data line
-		return data;
-	}
+public interface DataLine {
 
+	/*
+	 * A method used to put data on the data line.
+	 * 
+	 * @param Data value the data of type Data to be put on the data line.
+	 */
+	public void put(Data value);
+
+	/*
+	 * A method used to read data from the data line.
+	 * 
+	 * @return Data the data read from the line.
+	 */
+	public Data read();
+	
 }
