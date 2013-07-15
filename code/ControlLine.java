@@ -26,8 +26,28 @@ public interface ControlLine {
 	 * @param int data the data to be written to the data line.
 	 * @return boolean if the write is successful, returns true; otherwise, false.
 	 */
-	public boolean writeToBus(int addr, int data); //This may not work -> addr and data come from MAR/MBR: separate objects
+	//public boolean writeToBus(int addr, int data); //This may not work -> addr and data come from MAR/MBR: separate objects
 	//This is where a port might come in -> MBR/MAR pass data to the port seperately, which then interacts with bus
+	
+	/* 
+	 * ControlLine implements only a single writeToBus() method, purposefully not
+	 * differentiating between transfers from CPU to memory, and memory to CPU. This is
+	 * because two separate methods for these two operations would add complexity to
+	 * the concurrency issues surrounding the use of the SystemBus when operating in
+	 * pipelined mode. It is important that all bus data's integrity is maintained,
+	 * and that two threads are prevented from accessing this method at the same time.
+	 * 
+	 * An address value of -1 is used to signify a transfer from main memory to CPU, as
+	 * -1 is a non-existent memory address. Any other value (0 or greater) signifies a
+	 * transfer from CPU to the memory location specified.
+	 * 
+	 * This method's implementation must be synchronized.
+	 * 
+	 * @param int address the address to be written to the address line.
+	 * @param Data data the data to be written to the data line.
+	 * @return boolean true if the write is successful, false otherwise.
+	 */
+	public boolean writeToBus(int address, Data data);
 	
 	public int readAddressLine();
 	

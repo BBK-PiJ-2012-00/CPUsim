@@ -1,29 +1,36 @@
 package code;
 
 public class ControlLineImpl implements ControlLine {
-	private static ControlLine instance = null; //Reference to the one instance of this class
-	private BusLine addrLine;
-	private BusLine dataLine;
+	private AddressLine addressLine;
+	private DataLine dataLine;
 	public boolean inUse; //To ensure a write is followed by a read operation.
 	
 	//References to CPU and memory
 	
 	
-	/*
-	 * The program must have one and only one System Bus so that all modules reference the exact same bus line objects.
-	 * (Singleton) --> singleton now implemented at higher level; one System Bus class with potential for multiple lines.
-	 */
 	public ControlLineImpl() {
-		addrLine = new AddressLine();
-		dataLine = new DataLine();
+		addressLine = new AddressLineImpl();
+		dataLine = new DataLineImpl();
 	}
 	
-	public static ControlLine getInstance() { //May need to be synchronized depending on concurrency
-		if (instance == null) {
-			instance = new ControlLineImpl();
-		}
-		return instance;
+	/* 
+	 * ControlLine implements only a single writeToBus() method, purposefully not
+	 * differentiating between tranfers from CPU to memory, and memory to CPU. This is
+	 * because two seperate methods for these two operations would add complexity to
+	 * the concurrency issues surrounding the use of the SystemBus when operating in
+	 * pipelined mode. It is important that all bus data's integrity is maintained,
+	 * and that two threads are prevented from accessing this method at the same time.
+	 * 
+	 * An address value of -1 is used to signify a transfer from main memory to CPU, as
+	 * -1 is a non-existent memory address. Any other value (0 or greater) signifies a
+	 * transfer from CPU to the memory location specified.
+	 */
+	synchronized public boolean writeToBus(int address, Data data) {
+		if addres
+		
 	}
+	
+	
 	
 	/*
 	 * Should this method also invoke the memory to read the bus? A write to the bus by the CPU should be
