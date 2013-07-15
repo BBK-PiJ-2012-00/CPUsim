@@ -49,11 +49,12 @@ public interface ControlLine {
 	 */
 	public boolean writeToBus(int address, Data data);
 	
-	public int readAddressLine();
+	//public int readAddressLine();
 	
-	public int readDataLine();
+	//public int readDataLine();
 	
 	/*
+	 * Likely to become obsolete.
 	 * This pertains to a boolean inUse field in the ControlLine class; it is important to control the use of the
 	 * System Bus lines.  When one module has written to the bus lines, the information must be read by the other module
 	 * before anything subsequent can be written to the bus line.  The boolean flag should facilitate this.

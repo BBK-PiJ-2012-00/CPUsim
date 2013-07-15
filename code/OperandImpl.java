@@ -7,6 +7,7 @@ public class OperandImpl implements Operand {
 	private boolean isFloatingPoint;
 	
 	public OperandImpl(int intOperand) {
+		//Restrict size 2,147,483,647 and -2,147,483,648
 		this.intOperand = intOperand;
 		isInteger = true;
 		isFloatingPoint = false;		

@@ -7,9 +7,20 @@ public interface Register {
 	//There are then General Purpose registers
 	//Or, leave this as an interface, and have abstract classes at next level down
 	
-	public int getContents();
+	/*
+	 * MBR needs to hold type Data; it holds all data types that come into CPU from memory, and 
+	 * 	data that goes out to memory.
+	 * MAR holds integers only; address indexes.
+	 * 
+	 * PC has an increment method, set, read.
+	 * 
+	 * General purpose registers will be a register file of 16 registers to begin with
+	 * MBR as a register file? Or just the one slot? One slot would be simpler.
+	 */
 	
-	public int setContents();
+	public int read();
+	
+	public int write();
 	
 	
 
