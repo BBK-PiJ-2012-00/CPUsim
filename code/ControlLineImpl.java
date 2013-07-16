@@ -32,12 +32,13 @@ public class ControlLineImpl implements ControlLine {
 	synchronized public boolean writeToBus(int address, Data data) {
 		if (address == -1) { //Indicates transfer from memory to CPU (memory read)
 			addressLine.put();
-			dataLine.put(data);
+			dataLine.put(data); //This is functionally redundant, but will be useful for GUI animation of bus lines
 			//Need to invoke memory to read the bus, as memory sits idle
 			return mockMBR.write(data);//This line was wrong; the transfer is to the CPU. Calling memory.notify(address)
-			//will cause an error in memory with address of -1.  Need to load value into MBR.
+			//will cause an error in memory with address of -1.  Need to load value into MBR -> but should this be done
+			//directly? Do via SystemBus.
 		}
-		addressLine.put(address);
+		addressLine.put(address); //functionally redundant!
 		dataLine.put(data);
 		return memory.notify(address, data);		
 	}

@@ -1,6 +1,11 @@
 package code;
 
 /*
+ * Design consideration: should address and data lines simply be represented as int/Data fields respectively 
+ * in the SystemBus class? As opposed to having their own classes? 
+ */
+
+/*
  * There can only be one System Bus module, but the System Bus can have more than one of each line;
  * i.e. two ControlLines and corresponding Data/AddressLines for performance. These can be added as
  * fields as and when necessary.  Address and data lines are accessed via their corresponding control line,
@@ -42,10 +47,14 @@ public class SystemBus implements Bus {
 	}
 
 	@Override
-	public boolean transferToCPU(Data data) {
+	public boolean transferToCPU(Data data) { //Called by memory
 		return controlLine.writeToBus(-1, data); //-1 to reflect transfer to CPU (non-existent memory address)
 	}
 	
+	public boolean deliverToMBR(Data data) { //Called by control line
+		
+		return false;
+	}
 	
 
 }
