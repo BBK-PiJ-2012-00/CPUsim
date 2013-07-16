@@ -4,11 +4,21 @@ import static org.junit.Assert.*;
 
 import code.*;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class MainMemoryTest {
-	private MainMemory memory = MemoryModule.getInstance(); //Constructor is private, so getInstance() must be used
+	private MainMemory memory; 
 	private Instruction testInstr;
+	
+	@Before
+	public void setUp() {
+		memory = MemoryModule.getInstance(); //Constructor is private, so getInstance() must be used
+		testInstr = new TransferInstr(Opcode.STORE, 0, 0);
+		//Next line stores an ADD instruction to address index 7
+		memory.writeInstruction(new ArithmeticInstr(Opcode.ADD, 1, 1), 7); //Useful for testing memory read operations
+	}
+	
 
 	@Test
 	public void testSingleton() { //Test that only once instance of memory can be created
@@ -18,23 +28,41 @@ public class MainMemoryTest {
 	
 	@Test
 	public void writeInstructionTest() {
-		testInstr = new TransferInstr(Opcode.STORE, 0, 0);
 		memory.writeInstruction(testInstr, 0);//Writes STORE instruction to address 0
 		Data output = memory.accessAddress(0);
 		Data expected = testInstr;
 		assertEquals(expected, output);		
 	}
 	
-//	
-//	public boolean notify(int address, Data data) { //Method to prompt memory to receive data from system bus (write)
-//		//No checking of address being empty or not; up to programmer
-//		if (address < 100 && address >= 0) {
-//			MEMORY[address] = data;
-//			return true;
-//		}
-//		//Throw an exception or simply return false?
-//		return false;
-//	}
+	@Test
+	public void notifyTest() { //Tests notify(int address, Data data) method, to be used by SystemBus to prompt memory write
+		assertTrue(memory.notify(99, testInstr)); //Successful write should return true
+	}
+	
+	@Test
+	public void notifyTest2() { //Tests notify(int address, Data data) method, to be used by SystemBus to prompt memory write
+		memory.notify(99, testInstr);
+		Data expected = testInstr;
+		Data output = memory.accessAddress(99);
+		assertEquals(expected, output); //Assets that testInstr is written to address 99
+	}
+	
+	@Test
+	public void notifyTestFalseAddress() { //Tests invalid memory address; should return false
+		assertFalse(memory.notify(100, testInstr));		
+	}
+	
+	
+	@Test
+	public void readNotifyTest() { //Tests notify(int address), to be used by system bus (memory read).
+		//Uses instruction stored at address 7 (initialised at start of test class)
+		assertTrue(memory.notify(7)); //Should return true for a successful read		
+	}
+	
+	@Test
+	public void readNotifyTest2() {
+		
+	}
 //	
 //	public boolean notify(int address) { //Absence of data indicates requested memory read as opposed to write (as in reality)
 //		Data dataRead;
