@@ -15,12 +15,12 @@ public interface AddressLine {
 	 */
 	public void put(int address);
 	
-	/*
-	 * A method used to signify a transfer from memory back to MBR of CPU. 
-	 * May not be required long term. Sets address to -1, which is not a valid
-	 * main memory address location. 
-	 */
-	public void put();
+//	/*
+//	 * A method used to signify a transfer from memory back to MBR of CPU. 
+//	 * May not be required long term. Sets address to -1, which is not a valid
+//	 * main memory address location. 
+//	 */
+//	public void put();
 	
 	/*
 	 * A method for reading an address from the address line of the bus.

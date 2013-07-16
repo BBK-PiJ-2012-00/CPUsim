@@ -32,7 +32,8 @@ public class ControlLineImpl implements ControlLine {
 	synchronized public boolean writeToBus(int address, Data data) { //This method now is responsibly only for writing to bus, with accessing lines
 		//delegated to deliverTo...() methods below. Better encapsulation and separation of concerns, as well as better use of bus lines.
 		if (address == -1) { //Indicates transfer from memory to CPU (memory read)
-			addressLine.put(); //addressLine.put() can perhaps be got rid of -> obsolete
+			//addressLine.put(); //addressLine.put() can perhaps be got rid of -> if address field in AddressLine is null/0, this signifies delivery
+			//to CPU as opposed to memory (and is true to reality).
 			dataLine.put(data); //This is functionally redundant, but will be useful for GUI animation of bus lines
 			//Need to invoke memory to read the bus, as memory sits idle
 			return this.deliverToMBR(); //Complete read operation. 
