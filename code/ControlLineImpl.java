@@ -33,7 +33,8 @@ public class ControlLineImpl implements ControlLine {
 			addressLine.put();
 			dataLine.put(data);
 			//Need to invoke memory to read the bus, as memory sits idle
-			return memory.notify(address);
+			return memory.notify(address);//This line is wrong; the transfer is to the CPU. Calling memory.notify(address)
+			//will cause an error in memory with address of -1.  Need to load value into MBR.
 		}
 		addressLine.put(address);
 		dataLine.put(data);
