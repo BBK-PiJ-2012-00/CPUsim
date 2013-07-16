@@ -3,6 +3,12 @@ package code;
 /*
  * Design consideration: should address and data lines simply be represented as int/Data fields respectively 
  * in the SystemBus class? As opposed to having their own classes? 
+ * 
+ * SystemBus class used by modules to access bus, which prevents any ambiguity and synchronization issues over
+ * the multiple bus lines. However, the control line itself references MBR/MAR, as well as main memory.
+ * 
+ * Should SystemBus become a simple intermediary class which passes data in a more simple manner between memory 
+ * and CPU?
  */
 
 /*
