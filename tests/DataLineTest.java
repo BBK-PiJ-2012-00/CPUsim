@@ -4,14 +4,30 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import code.Data;
 import code.DataLine;
 import code.DataLineImpl;
+import code.Operand;
+import code.OperandImpl;
 
 public class DataLineTest {
+	private DataLine dLine;
 
 	@Test
-	public void test() {
-		fail("Not yet implemented");
+	public void testReadNull() { //Upon initial instantiation, data field should be null
+		dLine = new DataLineImpl();
+		assertNull(dLine.read());
+	}
+	
+	@Test
+	public void testPut() { //Test put method
+		dLine = new DataLineImpl();
+		dLine.put(new OperandImpl(5));
+		int expected = 5;
+		Operand dataOutput = (Operand) dLine.read();
+		//Data downcast to Operand and then integer for easier testing
+		int output = dataOutput.unwrapInteger();
+		assertEquals(expected, output);		
 	}
 
 }
