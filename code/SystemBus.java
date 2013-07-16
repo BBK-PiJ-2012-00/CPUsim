@@ -9,6 +9,12 @@ package code;
  * 
  * Should SystemBus become a simple intermediary class which passes data in a more simple manner between memory 
  * and CPU?
+ * 
+ * Keep as is and change name to SystemBusController? Control line does legwork and thus has direct access to
+ * memory and CPU; this class is an interface to the lines for memory and CPU to avoid ambiguity. Can improve
+ * functionality and structure by having addressline/dataline deliver their contents directly to memory/cpu?
+ * There isn't any issue with lines accessing memory/cpu, only with memory/cpu accessing lines which would leave
+ * room for error.
  */
 
 /*
