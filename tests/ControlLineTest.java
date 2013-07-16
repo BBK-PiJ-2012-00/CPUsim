@@ -13,11 +13,18 @@ import code.DataLineImpl;
 import org.junit.Test;
 
 public class ControlLineTest {
+	private ControlLine cLine = new ControlLineImpl();
 
 	@Test
-	public void testWriteToBus_TransferToMemory() { //Tests a memory write
-		fail("Not yet implemented");
+	public void testInitialisation() {
+		assertNotNull(cLine);
+		
 	}
+	
+//	@Test
+//	public void testWriteToBus_TransferToMemory() { //Tests a memory write
+//		fail("Not yet implemented");
+//	}
 	
 //	synchronized public boolean writeToBus(int address, Data data) {
 //		if (address == -1) { //Indicates transfer from memory to CPU (memory read)
