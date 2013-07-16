@@ -8,27 +8,28 @@ import code.AddressLineImpl;
 import code.AddressLine;
 
 public class AddressLineTest {
-	AddressLine aLine;
+	AddressLine aLine = new AddressLineImpl();
 	
 	@Test
-	public void test() {
-		fail("Not yet implemented");
+	public void readTest() {
+		assertEquals(aLine.read(), 0); //Should be 0 as address field is uninitialised and int has default value of 0
 	}
 	
-//	@Override
-//	public void put(int address) {
-//		//Check address validity?
-//		this.address = address;
-//	}
-//	
-//	@Override
-//	public void put() {
-//		this.address = -1; //-1 not a main memory address; used for transfers to MBR of CPU.
-//	}
-//	
-//	@Override
-//	public int read() {
-//		return this.address;
-//	}	
+	@Test
+	public void parameterizedPutTest() {
+		aLine.put(10);
+		int expected = 10;
+		int output = aLine.read();
+		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void putTest() {
+		aLine.put();
+		int expected = -1; //Address field should be assigned to -1 with use of put()
+		int output = aLine.read();
+		assertEquals(expected, output);
+	}
+
 
 }
