@@ -3,7 +3,7 @@ package code;
 /*
  * TO DO: sort out concurrency issues surrounding bus and memory read operations. Should a read be atomic?
  * Or should the bus be able to be used in between? This would create confusion pedagogically; thus, all read
- * and write operations should be atomic and comandeer the bus for the duration of the operation.
+ * and write operations should be atomic and commandeer the bus for the duration of the operation.
  */
 
 public class MemoryModule implements MainMemory {
@@ -13,10 +13,11 @@ public class MemoryModule implements MainMemory {
 	private final Data[] MEMORY; //Array representing main memory itself/
 	private int pointer; //Points to next available location for storage
 	
-	private SystemBus systemBus; //Reference to system bus
+	private Bus systemBus;//Reference to system bus
 	
 	private MemoryModule() { //Memory is a singleton to prevent duplicates and inconsistency
-		systemBus = SystemBus.getInstance();
+		//systemBus = SystemBus.getInstance(); //This causes stack overflow error; SystemBus creates new controlLine,
+		//which in turn creates new memory module, which creates a new systemBus... until call stack overflows.
 		MEMORY = new Data[100];
 		pointer = 0;
 	}
@@ -53,6 +54,9 @@ public class MemoryModule implements MainMemory {
 			else {
 				dataRead = MEMORY[address];
 			}
+			systemBus = SystemBus.getInstance(); //Putting this here breaks awkward chain, and is of no consequence 
+			//as there is only ever one system bus instance with global access point.
+			
 			//As this is all performed by the same thread, there should be no issue!!
 			//Don't issue this line here!! Return now, perform transferToCPU from control line?
 			//It may be an idea to have the methods memoryRead() and memoryWrite() in SystemBus instead,

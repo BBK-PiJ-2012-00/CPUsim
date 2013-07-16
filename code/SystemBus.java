@@ -11,7 +11,7 @@ package code;
  * 
  * TO DO: restrict size of data that can be transferred: no more than 2^32
  * 			
- * 		Sort out concurrency issues; ensure bus operations are atomic. Control line method is sychronized, but
+ * 		Sort out concurrency issues; ensure bus operations are atomic. Control line method is synchronized, but
  * 			check that's sufficient.
  */
 public class SystemBus implements Bus {

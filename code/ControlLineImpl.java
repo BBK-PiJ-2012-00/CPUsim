@@ -7,7 +7,7 @@ public class ControlLineImpl implements ControlLine {
 	
 	private MainMemory memory;
 	
-	//References to CPU and memory
+	//References to CPU (MBR/MAR) and memory
 	
 	
 	public ControlLineImpl() {
