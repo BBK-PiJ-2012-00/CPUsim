@@ -29,16 +29,13 @@ public class ControlLineImpl implements ControlLine {
 	 * -1 is a non-existent memory address. Any other value (0 or greater) signifies a
 	 * transfer from CPU to the memory location specified.
 	 */
-	synchronized public boolean writeToBus(int address, Data data) { //change name to better reflect function?
+	synchronized public boolean writeToBus(int address, Data data) { //This method now is responsibly only for writing to bus, with accessing lines
+		//delegated to deliverTo...() methods below. Better encapsulation and separation of concerns, as well as better use of bus lines.
 		if (address == -1) { //Indicates transfer from memory to CPU (memory read)
 			addressLine.put(); //addressLine.put() can perhaps be got rid of -> obsolete
 			dataLine.put(data); //This is functionally redundant, but will be useful for GUI animation of bus lines
 			//Need to invoke memory to read the bus, as memory sits idle
 			return this.deliverToMBR(); //Complete read operation. 
-			//return mockMBR.write(dataLine.read());//This line was wrong; the transfer is to the CPU. Calling memory.notify(address)
-			//will cause an error in memory with address of -1.  Need to load value into MBR -> but should this be done
-			//directly? Do via SystemBus. On the other hand, controlLine references memory directly, so why not MBR?
-			//Encapsulate in a deliverToMBR() method?
 		}
 		//Memory write code:
 		addressLine.put(address); //functionally redundant!
