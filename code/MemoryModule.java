@@ -7,13 +7,14 @@ package code;
  */
 
 public class MemoryModule implements MainMemory {
-	private static MainMemory memoryModule = null; //Ensures singleton
+	private static MainMemory memoryModule = null; //Keeps track of singleton
 	
 	//Array full of null values to start with - should it be initialised to hold 0s?
 	private final Data[] MEMORY; //Array representing main memory itself/
-	private int pointer; //Points to next available location for storage
+	private int pointer; //Points to next available location for storage	
+	private Bus systemBus; //Reference to system bus
 	
-	private Bus systemBus;//Reference to system bus
+	
 	
 	private MemoryModule() { //Memory is a singleton to prevent duplicates and inconsistency
 		//systemBus = SystemBus.getInstance(); //This causes stack overflow error; SystemBus creates new controlLine,
@@ -27,6 +28,10 @@ public class MemoryModule implements MainMemory {
 			memoryModule = new MemoryModule();
 		}
 		return memoryModule;
+	}
+	
+	public Data accessAddress(int index) { //Primarily for testing purposes, not for use by program.
+		return MEMORY[index];
 	}
 	
 	
@@ -54,7 +59,7 @@ public class MemoryModule implements MainMemory {
 			else {
 				dataRead = MEMORY[address];
 			}
-			systemBus = SystemBus.getInstance(); //Putting this here breaks awkward chain, and is of no consequence 
+			systemBus = SystemBus.getInstance(); //Putting this here breaks awkward creation chain, and is of no consequence 
 			//as there is only ever one system bus instance with global access point.
 			
 			//As this is all performed by the same thread, there should be no issue!!

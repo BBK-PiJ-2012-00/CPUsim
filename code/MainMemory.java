@@ -9,6 +9,8 @@ package code;
 
 public interface MainMemory {
 	
+	public Data accessAddress(int index); //For testing purposes; pending deletion. 
+	
 	/*
 	 * A method used by the Loader class for the purpose of writing instructions into memory before
 	 * program execution begins.
