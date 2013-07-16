@@ -7,6 +7,7 @@ public class ControlLineImpl implements ControlLine {
 	
 	private MainMemory memory;
 	
+	private MBR mockMBR = new MBR(); //Instantiation and reference will be handled properly later; mock MBR for testing.	
 	//References to CPU (MBR/MAR) and memory
 	
 	
@@ -33,7 +34,7 @@ public class ControlLineImpl implements ControlLine {
 			addressLine.put();
 			dataLine.put(data);
 			//Need to invoke memory to read the bus, as memory sits idle
-			return memory.notify(address);//This line is wrong; the transfer is to the CPU. Calling memory.notify(address)
+			return mockMBR.write(data);//This line was wrong; the transfer is to the CPU. Calling memory.notify(address)
 			//will cause an error in memory with address of -1.  Need to load value into MBR.
 		}
 		addressLine.put(address);
