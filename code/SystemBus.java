@@ -65,7 +65,7 @@ public class SystemBus implements Bus {
 
 	@Override
 	public boolean transferToCPU(Data data) { //Called by memory
-		return controlLine.writeToBus(-1, data); //-1 to reflect transfer to CPU (non-existent memory address)
+		return controlLine.writeToBus(-1, data); //-1 to reflect transfer to CPU (non-existent memory address) -> still necessary!?
 	}
 	
 	public boolean deliverToMBR(Data data) { //Called by control line

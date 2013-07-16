@@ -44,11 +44,11 @@ public class ControlLineImpl implements ControlLine {
 		return this.deliverToMemory();		
 	}
 	
-	private boolean deliverToMBR() { //Prompts dataLine to load its value into MBR, completing memory read operation
+	public boolean deliverToMBR() { //Prompts dataLine to load its value into MBR, completing memory read operation
 		return mockMBR.write(dataLine.read());		
 	}
 	
-	private boolean deliverToMemory() { //Prompts dataLine to load value into memory, completing memory write operation
+	public boolean deliverToMemory() { //Prompts dataLine to load value into memory, completing memory write operation
 		return memory.notify(addressLine.read(), dataLine.read());
 	}
 	

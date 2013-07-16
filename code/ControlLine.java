@@ -49,20 +49,27 @@ public interface ControlLine {
 	 */
 	public boolean writeToBus(int address, Data data);
 	
-	//public int readAddressLine();
-	
-	//public int readDataLine();
-	
 	/*
-	 * Likely to become obsolete.
-	 * This pertains to a boolean inUse field in the ControlLine class; it is important to control the use of the
-	 * System Bus lines.  When one module has written to the bus lines, the information must be read by the other module
-	 * before anything subsequent can be written to the bus line.  The boolean flag should facilitate this.
+	 * A method that prompts the data line of the system bus to load its value into the CPU's memory 
+	 * buffer register (MBR), as the final stage of a memory read operation.
+	 * 
+	 * @return boolean true if the method completed successfully, false otherwise.
 	 */
-	public boolean isInUse();
-
+	public boolean deliverToMBR(); //Prompts dataLine to load its value into MBR, completing memory read operation
+	
+	
 	/*
-	 * Think about concurrency! Bus is an object used to pass data and addresses - there should be multiple address/data
+	 * A method that prompts the data line to load its value into the memory location specified by the
+	 * address line, forming the final stage of a memory write operation.
+	 * 
+	 * @return boolean returns true if the method completed successfully, false otherwise.
+	 */
+	public boolean deliverToMemory(); //Prompts dataLine to load value into memory, completing memory write operation
+		
+	
+	
+	/*
+	 * Bus is an object used to pass data and addresses - there should be multiple address/data
 	 * lines, and corresponding control lines to allow pipelined access.
 	 * Race condition problem:
 	 * There must also be a way of ensuring that when one module has placed something on the bus, the other module must
