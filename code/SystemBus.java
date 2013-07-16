@@ -15,6 +15,11 @@ package code;
  * functionality and structure by having addressline/dataline deliver their contents directly to memory/cpu?
  * There isn't any issue with lines accessing memory/cpu, only with memory/cpu accessing lines which would leave
  * room for error.
+ * 
+ * Address/data lines should hold all values -> control line is responsible for coordination. Use aLine.read() and
+ * put() methods to achieve this.
+ * 
+ * Do refactor -> rename, and this is now a BusController class.
  */
 
 /*
