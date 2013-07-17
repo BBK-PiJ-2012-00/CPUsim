@@ -8,5 +8,16 @@ public class RegisterFile16 implements RegisterFile {
 	private Data[] generalPurposeRegisters = new Data[16]; //Enables general purpose registers to hold multiple data types
 	private int pointer = 0; //Likely unecessary.
 	
+	@Override
+	public void write(int index, Data data) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public Data read(int index) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 
 }

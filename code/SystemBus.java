@@ -23,7 +23,7 @@ package code;
  */
 
 /*
- * There can only be one System Bus module, but the System Bus can have more than one of each line;
+ * There can only be one system bus controller module, but the system bus can have more than one of each line;
  * i.e. two ControlLines and corresponding Data/AddressLines for performance. These can be added as
  * fields as and when necessary.  Address and data lines are accessed via their corresponding control line,
  * so that in the event of multiple lines, access is simplified and integrity is protected.
@@ -36,7 +36,7 @@ package code;
  * 		Sort out concurrency issues; ensure bus operations are atomic. Control line method is synchronized, but
  * 			check that's sufficient.
  */
-public class SystemBus implements Bus {
+public class SystemBus implements BusController {
 	private static SystemBus systemBus = null; //System Bus is a singleton. Should perhaps be referenced as type Bus.
 	
 	private ControlLine controlLine;
@@ -67,11 +67,6 @@ public class SystemBus implements Bus {
 	public boolean transferToCPU(Data data) { //Called by memory
 		return controlLine.writeToBus(-1, data); //-1 to reflect transfer to CPU (non-existent memory address) -> still necessary!?
 	}
-	
-	public boolean deliverToMBR(Data data) { //Called by control line
 		
-		return false;
-	}
-	
 
 }

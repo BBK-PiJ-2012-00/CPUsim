@@ -12,7 +12,7 @@ public class MemoryModule implements MainMemory {
 	//Array full of null values to start with - should it be initialised to hold 0s?
 	private final Data[] MEMORY; //Array representing main memory itself/
 	private int pointer; //Points to next available location for storage	
-	private Bus systemBus; //Reference to system bus
+	private BusController systemBus; //Reference to system bus
 	
 	
 	

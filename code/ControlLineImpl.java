@@ -3,7 +3,7 @@ package code;
 public class ControlLineImpl implements ControlLine {
 	private AddressLine addressLine;
 	private DataLine dataLine;
-	public boolean inUse; //To ensure a write is followed by a read operation.
+	//public boolean inUse; //To ensure a write is followed by a read operation.
 	
 	private MainMemory memory;
 	
@@ -39,7 +39,7 @@ public class ControlLineImpl implements ControlLine {
 			return this.deliverToMBR(); //Complete read operation. 
 		}
 		//Memory write code:
-		addressLine.put(address); //functionally redundant!
+		addressLine.put(address);
 		dataLine.put(data);
 		return this.deliverToMemory();		
 	}
@@ -51,27 +51,5 @@ public class ControlLineImpl implements ControlLine {
 	public boolean deliverToMemory() { //Prompts dataLine to load value into memory, completing memory write operation
 		return memory.notify(addressLine.read(), dataLine.read());
 	}
-	
-	
-	/*
-	 * The following methods may not be required
-	 *
-	 */
-	
-	
-//	public int readAddressLine() {
-//		return addrLine.read();
-//	}
-//	
-//	
-//	public int readDataLine() {
-//		return dataLine.read();
-//	}
-//	
-	public boolean isInUse() {
-		return inUse;
-	}
-
-
 
 }
