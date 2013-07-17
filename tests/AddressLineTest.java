@@ -12,7 +12,7 @@ public class AddressLineTest {
 	
 	@Test
 	public void readTest() {
-		assertEquals(aLine.read(), 0); //Should be 0 as address field is uninitialised and int has default value of 0
+		assertEquals(aLine.read(), -1); //Should be 0 as address field is uninitialised and has default value of -1
 	}
 	
 	@Test

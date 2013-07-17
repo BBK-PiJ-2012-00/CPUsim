@@ -26,6 +26,14 @@ public class ControlLineTest {
 	}
 	
 	@Test
+	public void deliverToMBRTest2() { //Uses method accessMockMBR() that exists only for testing; will be deleted/commented out.
+		cLine.writeToBus(-1, testInstr); //Need writeToBus() method to provide dummy data (writeToBus calls deliverToMBR()).
+		Data expected = testInstr;
+		Data output = ((ControlLineImpl) cLine).accessMockMBR();
+		assertEquals(expected, output);		
+	}
+	
+	@Test
 	public void deliverToMemoryTest() {
 		assertFalse(cLine.deliverToMemory()); //Should return false as no address or data has been specified
 		//A true return value is tested as part of writeToBus tests below
