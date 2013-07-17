@@ -6,6 +6,9 @@ public class MBR {
 	public boolean write(Data data) { //Successful write returns true
 		//Size is restricted in Instruction/Operand classes
 		registerContents = data;
+		if (registerContents == null) {
+			return false;
+		}
 		return true;
 	}
 	
