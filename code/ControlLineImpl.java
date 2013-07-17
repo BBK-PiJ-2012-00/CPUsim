@@ -8,7 +8,11 @@ public class ControlLineImpl implements ControlLine {
 	private MainMemory memory;
 	
 	private MBR mockMBR = new MBR(); //Instantiation and reference will be handled properly later; mock MBR for testing.	
-	//References to CPU (MBR/MAR) and memory	
+	//References to CPU (MBR/MAR) and memory
+	
+	public Data accessMockMBR() { //For testing purposes only
+		return mockMBR.read();
+	}
 	
 	public ControlLineImpl() {
 		addressLine = new AddressLineImpl();
