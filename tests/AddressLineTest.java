@@ -23,13 +23,5 @@ public class AddressLineTest {
 		assertEquals(expected, output);
 	}
 	
-	@Test
-	public void putTest() {
-		aLine.put();
-		int expected = -1; //Address field should be assigned to -1 with use of put()
-		int output = aLine.read();
-		assertEquals(expected, output);
-	}
-
 
 }
