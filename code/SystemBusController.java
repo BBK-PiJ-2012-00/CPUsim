@@ -37,7 +37,7 @@ package code;
  * 			check that's sufficient.
  */
 public class SystemBusController implements BusController {
-	private static SystemBusController systemBus = null; //System Bus is a singleton. Should perhaps be referenced as type Bus.
+	private static BusController systemBus = null; //System Bus is a singleton. Should perhaps be referenced as type Bus.
 	
 	private ControlLine controlLine;
 	
@@ -50,7 +50,7 @@ public class SystemBusController implements BusController {
 	/*
 	 * Singleton global access point.
 	 */
-	public synchronized static SystemBusController getInstance() { //Synchronized to ensure no concurrency issues with pipelining
+	public synchronized static BusController getInstance() { //Synchronized to ensure no concurrency issues with pipelining
 		if (systemBus == null) {
 			systemBus = new SystemBusController();
 			return systemBus;
