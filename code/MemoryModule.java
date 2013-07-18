@@ -12,7 +12,7 @@ public class MemoryModule implements MainMemory {
 	//Array full of null values to start with - should it be initialised to hold 0s?
 	private final Data[] MEMORY; //Array representing main memory itself/
 	private int pointer; //Points to next available location for storage	
-	private BusController systemBus; //Reference to system bus
+	private BusController systemBusController; //Reference to system bus
 	
 	
 	
@@ -59,7 +59,7 @@ public class MemoryModule implements MainMemory {
 			else {
 				dataRead = MEMORY[address];
 			}
-			systemBus = SystemBus.getInstance(); //Putting this here breaks awkward creation chain, and is of no consequence 
+			systemBusController = SystemBusController.getInstance(); //Putting this here breaks awkward creation chain, and is of no consequence 
 			//as there is only ever one system bus instance with global access point.
 			
 			//As this is all performed by the same thread, there should be no issue!!
@@ -67,7 +67,7 @@ public class MemoryModule implements MainMemory {
 			//It may be an idea to have the methods memoryRead() and memoryWrite() in SystemBus instead,
 			//which would allow both to be atomic and encapsulate all actions pertaining to those operations.
 			//Will the below line be executable? Bus is waiting on completion of this method!
-			systemBus.transferToCPU(dataRead);//Transfers read data to system bus, subsequently to CPU
+			systemBusController.transferToCPU(dataRead);//Transfers read data to system bus, subsequently to CPU
 			return true;
 		}
 		//Throw exception if address invalid? This would disrupt program flow (possibly)

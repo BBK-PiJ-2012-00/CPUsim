@@ -17,7 +17,7 @@ package code;
 
 public class ControlUnit {
 	
-	private SystemBus systemBus = SystemBus.getInstance();
+	private SystemBusController systemBus = SystemBusController.getInstance();
 	
 	private MBR mbr = new MBR(); //Reference these with their corresponding interfaces
 	private MAR mar = new MAR();
