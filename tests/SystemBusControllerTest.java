@@ -18,7 +18,6 @@ public class SystemBusControllerTest {
 		sysBusController = SystemBusController.getInstance();
 		memory = MemoryModule.getInstance();
 		testInstr = new BranchInstr(Opcode.BR, 0);
-		//memory.writeInstruction(new ArithmeticInstr(Opcode.SUB, 0, 100), 7); //Adds an arithmetic instruction to memory address 7, useful for testing mem. read
 	}
 
 	@Test

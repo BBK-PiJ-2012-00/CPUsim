@@ -8,7 +8,7 @@ import org.junit.Test;
 import code.*;
 
 public class MBRtest {
-	private MBR mbr;
+	private MemoryBufferRegister mbr;
 	private Instruction testInstr;
 	
 	@Before
