@@ -37,7 +37,7 @@ package code;
  * 			check that's sufficient.
  */
 public class SystemBusController implements BusController {
-	private static BusController systemBus = null; //System Bus is a singleton. Should perhaps be referenced as type Bus.
+	private static BusController systemBus = null; //System Bus is a singleton.
 	
 	private ControlLine controlLine;
 	
@@ -45,6 +45,10 @@ public class SystemBusController implements BusController {
 	
 	private SystemBusController() {
 		controlLine = new ControlLineImpl();
+	}
+	
+	public ControlLine accessControlLine() { //For testing purposes only.
+		return this.controlLine;
 	}
 	
 	/*
