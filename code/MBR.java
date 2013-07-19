@@ -6,7 +6,7 @@ public class MBR implements MemoryBufferRegister {
 	@Override
 	public boolean write(Data data) { //Successful write returns true
 		//Size is restricted in Instruction/Operand classes
-		registerContents = data;
+		registerContents = data;		
 		if (registerContents == null) {
 			return false;
 		}
@@ -14,7 +14,7 @@ public class MBR implements MemoryBufferRegister {
 	}
 	
 	@Override
-	public Data read() { //May need to employ readAsInt(), readAsInstr() etc, if necessary
+	public Data read() { 
 		return registerContents;
 	}
 

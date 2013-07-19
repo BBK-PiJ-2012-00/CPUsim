@@ -1,6 +1,6 @@
 package code;
 
-public class ControlUnitImpl {
+public class ControlUnitImpl implements ControlUnit {
 private BusController systemBus = SystemBusController.getInstance();
 	
 	private MBR mbr = new MBR(); //Reference these with their corresponding interfaces

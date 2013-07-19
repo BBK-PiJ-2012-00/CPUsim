@@ -69,6 +69,7 @@ public class SystemBusController implements BusController {
 
 	@Override
 	public boolean transferToCPU(Data data) { //Called by memory
+		System.out.println("Reached systemBusController transferToCPU: dataRead = " + data.toString());
 		return controlLine.writeToBus(-1, data); //-1 to reflect transfer to CPU (non-existent memory address) -> still necessary!?
 	}
 		

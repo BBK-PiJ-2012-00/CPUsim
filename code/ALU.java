@@ -5,5 +5,9 @@ package code;
  * addition unit, multiplication unit etc.
  */
 public class ALU {
+	
+	public static Operand useAdditionUnit(Operand operand) {
+		return null;
+	}
 
 }
