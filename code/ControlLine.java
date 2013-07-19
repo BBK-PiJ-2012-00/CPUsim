@@ -59,12 +59,17 @@ public interface ControlLine {
 	
 	
 	/*
-	 * A method that prompts the data line to load its value into the memory location specified by the
-	 * address line, forming the final stage of a memory write operation.
+	 * A method that prompts either the first phase of a memory read, or the final stage of a memory write.
+	 * For the first stage of a memory read, the address value on the address line is passed to main memory, 
+	 * so that the value held at that address may be loaded onto the address line (during the second stage of
+	 * a memory read). For the final stage of a memory write, the  data line is prompted to load its value into 
+	 * the memory location specified by the address line. These two operations are differentiated by the boolean
+	 * parameter passed into the method when it is called.
 	 * 
+	 * @param boolean isRead if the operation is to be a memory read, the value is true, otherwise false. 
 	 * @return boolean returns true if the method completed successfully, false otherwise.
 	 */
-	public boolean deliverToMemory(); //Prompts dataLine to load value into memory, completing memory write operation
+	public boolean deliverToMemory(boolean isRead); //Prompts dataLine to load value into memory, completing memory write operation
 		
 	
 	

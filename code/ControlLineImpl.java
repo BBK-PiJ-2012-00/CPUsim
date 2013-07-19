@@ -34,24 +34,33 @@ public class ControlLineImpl implements ControlLine {
 	 */
 	synchronized public boolean writeToBus(int address, Data data) { //This method now is responsibly only for writing to bus, with accessing lines
 		//delegated to deliverTo...() methods below. Better encapsulation and separation of concerns, as well as better use of bus lines.
-		if (address == -1) { //Indicates transfer from memory to CPU (memory read)
-			//addressLine.put(); //addressLine.put() can perhaps be got rid of -> if address field in AddressLine is null/0, this signifies delivery
+		if (address == -1) { //Indicates transfer from memory to CPU (2nd phase of memory read; delivery from memory to MBR)
+			//no need to place address on address bus -> if address field in AddressLine is null/0, this signifies delivery
 			//to CPU as opposed to memory (and is true to reality).
 			dataLine.put(data); //This is functionally redundant, but will be useful for GUI animation of bus lines
-			//Need to invoke memory to read the bus, as memory sits idle
+			
 			return this.deliverToMBR(); //Complete read operation. 
+		}
+		else if (data == null) { //Signifies first phase of a read; MAR places address on address line, prompting memory to
+			//place contents of the address on the address line onto data line for return to MBR.
+			return this.deliverToMemory(true);
 		}
 		//Memory write code:
 		addressLine.put(address);
 		dataLine.put(data);
-		return this.deliverToMemory();		
+		return this.deliverToMemory(false);	//False -> not a read operation (write operation)	
 	}
 	
 	public boolean deliverToMBR() { //Prompts dataLine to load its value into MBR, completing memory read operation
 		return mockMBR.write(dataLine.read());		
 	}
 	
-	public boolean deliverToMemory() { //Prompts dataLine to load value into memory, completing memory write operation
+	
+	
+	public boolean deliverToMemory(boolean isRead) { //Prompts dataLine to load value into memory, completing memory write operation
+		if (isRead) {
+			return memory.notify(addressLine.read());
+		}
 		return memory.notify(addressLine.read(), dataLine.read());
 	}
 
