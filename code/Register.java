@@ -2,10 +2,9 @@ package code;
 
 public interface Register {
 	
-	//For methods common to all registers
-	//This should perhaps be an abstract class, as all registers have a contents field
-	//There are then General Purpose registers
-	//Or, leave this as an interface, and have abstract classes at next level down
+	
+	
+	//For methods common to all control registers; may not be the case that they have much in common!
 	
 	/*
 	 * MBR needs to hold type Data; it holds all data types that come into CPU from memory, and 
@@ -20,7 +19,7 @@ public interface Register {
 	
 	public int read();
 	
-	public int write();
+	public int write(Data data);
 	
 	
 

@@ -15,29 +15,26 @@ package code;
  * Control unit can access contents of MAR/MBR, and pass these values as parameters to the system bus to start with.
  */
 
-public class ControlUnit {
+public interface ControlUnit {
 	
-	private BusController systemBus = SystemBusController.getInstance();
-	
-	private MBR mbr = new MBR(); //Reference these with their corresponding interfaces
-	private MAR mar = new MAR();
-	
-	private RegisterFile genRegisters = new RegisterFile16();
-	
+//	private BusController systemBus = SystemBusController.getInstance();
+//	
+//	private MBR mbr = new MBR(); //Reference these with their corresponding interfaces
+//	private MAR mar = new MAR();
+//	
+//	private RegisterFile genRegisters = new RegisterFile16();
+//	
 	//Stages represented by methods
 	
-	public void instructionFetch() {
+	public void instructionFetch(); 
 		//Code for instruction fetch stage
-	}
 	
-	public void instructionDecode() {
+	public void instructionDecode(); 
+	
+	public void instructionExecute();
+	
+	public void instructionStore(); //Not required in every cycle
 		
-	}
-	
-	public void instructionExecute() {
-		//Can call other, private methods depending on instruction opcode
-		//case switch statement: if arithmetic, call arithmeticInstrExecute(), etc
-	}
 	
 
 	
