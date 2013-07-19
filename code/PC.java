@@ -1,6 +1,6 @@
 package code;
 
-public class PC {
+public class PC implements ProgramCounter {
 	int nextInstructionPointer; //address of the next instruction to be fetched
 	
 	public int getValue() {
