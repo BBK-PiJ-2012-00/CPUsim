@@ -64,7 +64,6 @@ public class MemoryModule implements MainMemory {
 			}
 			else {
 				dataRead = MEMORY[address];
-				System.out.println("Memory module: dataRead variable = " + dataRead.toString());
 			}
 			systemBusController = SystemBusController.getInstance(); //Putting this here breaks awkward creation chain, and is of no consequence 
 			//as there is only ever one system bus instance with global access point.
@@ -74,7 +73,6 @@ public class MemoryModule implements MainMemory {
 			//It may be an idea to have the methods memoryRead() and memoryWrite() in SystemBus instead,
 			//which would allow both to be atomic and encapsulate all actions pertaining to those operations.
 			//Will the below line be executable? Bus is waiting on completion of this method!
-			System.out.println("dataRead variable passed as parameter to sysBus = " + dataRead.toString());
 			systemBusController.transferToCPU(dataRead);//Transfers read data to system bus, subsequently to CPU
 			return true;
 		}
