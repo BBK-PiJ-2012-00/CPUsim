@@ -13,8 +13,14 @@ public class MBRtest {
 	
 	@Before
 	public void setUp() {
-		mbr = new MBR();
+		mbr = MBR.getInstance();
 		testInstr = new TransferInstr(Opcode.MOVE, 0, 0);
+	}
+	
+	@Test
+	public void testIsSingleton() { //Test only once object of the class can ever be created
+		MemoryBufferRegister anotherMBR = MBR.getInstance();
+		assertEquals(mbr.hashCode(), anotherMBR.hashCode()); //Same objects have the same hashcode
 	}
 
 	@Test
