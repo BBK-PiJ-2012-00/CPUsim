@@ -7,6 +7,9 @@ public class IR {
 		this.contents = instr;
 	}
 	
+	public Instruction read() {
+		return this.contents;
+	}
 	//code for decoding instruction and executing it: for arithmetic, this involves passing it to ALU
 
 }

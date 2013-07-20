@@ -29,9 +29,6 @@ public class MAR implements MemoryAddressRegister {
 	 * or activation of system bus -> control unit can have micro-methods which handle
 	 * data flow. These can then be incorporated major methods representing stages.
 	 * Control unit is responsible for coordination.
-	 * An extra block in ControlLine's writeToBus() method can deal with the initial
-	 * setting of PC; an address only, with no data, signifies setting PC? Or, address
-	 * can take on -2!
 	 */
 	@Override
 	public void write(int address) {

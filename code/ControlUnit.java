@@ -17,12 +17,7 @@ package code;
 
 public interface ControlUnit {
 	
-//	private BusController systemBus = SystemBusController.getInstance();
-//	
-//	private MBR mbr = new MBR(); //Reference these with their corresponding interfaces
-//	private MAR mar = new MAR();
-//	
-//	private RegisterFile genRegisters = new RegisterFile16();
+
 //	
 	//Stages represented by methods
 	

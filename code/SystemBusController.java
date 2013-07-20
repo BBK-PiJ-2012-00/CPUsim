@@ -67,6 +67,11 @@ public class SystemBusController implements BusController {
 		return controlLine.writeToBus(memoryAddress, data);
 	}
 
+	/*
+	 * To avoid passing parameters to control line, memory can place -1 on address line instead
+	 * (non-Javadoc)
+	 * @see code.BusController#transferToCPU(code.Data)
+	 */
 	@Override
 	public boolean transferToCPU(Data data) { //Called by memory
 		return controlLine.writeToBus(-1, data); //-1 to reflect transfer to CPU (non-existent memory address) -> still necessary!?
