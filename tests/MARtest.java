@@ -13,7 +13,13 @@ public class MARtest {
 	
 	@Before
 	public void setUp() {
-		mar = new MAR();
+		mar = MAR.getInstance();
+	}
+	
+	@Test
+	public void testIsSingleton() {
+		MemoryAddressRegister anotherMAR = MAR.getInstance();
+		assertEquals(mar.hashCode(), anotherMAR.hashCode());
 	}
 
 	@Test
