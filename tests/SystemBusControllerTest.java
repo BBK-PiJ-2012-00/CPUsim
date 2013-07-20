@@ -44,18 +44,12 @@ public class SystemBusControllerTest {
 		assertTrue(sysBusController.transferToCPU(testInstr)); //Successful transfer from memory to CPU returns true	
 	}
 	
-	/*
-	 * This test relies on a method in SystemBusController accessControlLine(), which exists only for testing
-	 * this scenario. Once complete, this method will be commented out/deleted, so this test will fail in the future.
-	 * 
-	 * MBR may become a singleton in the future, at which point this test can be re-written accordingly.
-	 */
+
 	@Test 
 	public void testTransferToCPU2() { //A more thorough test, checking contents of MBR matches data transferred
 		sysBusController.transferToCPU(testInstr);
-		ControlLine cLine = ((SystemBusController) sysBusController).accessControlLine(); //MBR accessed only via control line
 		Data expected = testInstr;
-		Data output = ((ControlLineImpl) cLine).accessMockMBR();
+		Data output = MBR.getInstance().read(); //MBR accessed directly
 		assertEquals(expected, output);
 		
 		
