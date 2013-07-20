@@ -3,21 +3,18 @@ package code;
 public class ControlLineImpl implements ControlLine {
 	private AddressLine addressLine;
 	private DataLine dataLine;
-	//public boolean inUse; //To ensure a write is followed by a read operation.
+	//public boolean inUse; 
 	
 	private MainMemory memory;
 	
-	private MemoryBufferRegister mockMBR = new MBR(); //Instantiation and reference will be handled properly later; mock MBR for testing.	
-	//References to CPU (MBR/MAR) and memory
+	private MemoryBufferRegister mbr;//Reference to CPU's MBR
 	
-	public Data accessMockMBR() { //For testing purposes only
-		return mockMBR.read();
-	}
 	
 	public ControlLineImpl() {
 		addressLine = new AddressLineImpl();
 		dataLine = new DataLineImpl();
 		memory = MemoryModule.getInstance();
+		mbr = MBR.getInstance();
 	}
 	
 	/* 
@@ -53,12 +50,12 @@ public class ControlLineImpl implements ControlLine {
 	
 	public boolean deliverToMBR() { //Prompts dataLine to load its value into MBR, completing memory read operation
 		//System.out.println("in deliverToMBR(); dataLine value written to MBR will be: " + dataLine.read().toString());
-		return mockMBR.write(dataLine.read());		
+		return mbr.write(dataLine.read());		
 	}
 	
 	
 	
-	public boolean deliverToMemory(boolean isRead) { //Prompts dataLine to load value into memory, completing memory write operation
+	public boolean deliverToMemory(boolean isRead) { //If isRead, first stage of read operation, otherwise write.
 		if (isRead) {
 			return memory.notify(addressLine.read());
 		}
