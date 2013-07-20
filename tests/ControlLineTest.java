@@ -39,10 +39,10 @@ public class ControlLineTest {
 	}
 	
 	@Test
-	public void deliverToMBRTest2() { //Uses method accessMockMBR() that exists only for testing; will be deleted/commented out.
+	public void deliverToMBRTest2() {
 		cLine.writeToBus(-1, testInstr); //Need writeToBus() method to provide dummy data (writeToBus calls deliverToMBR()).
 		Data expected = testInstr;
-		Data output = ((ControlLineImpl) cLine).accessMockMBR();
+		Data output = MBR.getInstance().read();
 		assertEquals(expected, output);		
 	}
 	
@@ -63,16 +63,13 @@ public class ControlLineTest {
 		assertTrue(cLine.writeToBus(-1, testInstr)); //-1 to signify memory read, with delivery to CPU(MBR)
 	}
 	
-	/*
-	 * Will not work when test method accessMockMBR() of ControlLine is commented out/deleted after completion
-	 * of testing.
-	 */
+	
 	@Test
 	public void testWriteToBus_MemoryReadOperation2() { //Tests contents are actually delivered to MBR
 		cLine.writeToBus(10, testInstr); //Writes a value to memory
 		cLine.writeToBus(10, null); //Issues a read (as Data value is null)
 		Data expected = testInstr;
-		Data output = ((ControlLineImpl) cLine).accessMockMBR();
+		Data output = MBR.getInstance().read();
 		assertEquals(expected, output);
 	}
 	
@@ -89,35 +86,5 @@ public class ControlLineTest {
 		assertEquals(expected, output);
 		//Checks contents of memory address is loaded with correct instruction when loaded via system bus
 	}
-
-	
-	
-	//If MBR is a singleton, its contents can be checked for read operation
-	
-	
-	
-	
-//	synchronized public boolean writeToBus(int address, Data data) { //This method now is responsibly only for writing to bus, with accessing lines
-//		//delegated to deliverTo...() methods below. Better encapsulation and separation of concerns, as well as better use of bus lines.
-//		if (address == -1) { //Indicates transfer from memory to CPU (memory read)
-//			//addressLine.put(); //addressLine.put() can perhaps be got rid of -> if address field in AddressLine is null/0, this signifies delivery
-//			//to CPU as opposed to memory (and is true to reality).
-//			dataLine.put(data); //This is functionally redundant, but will be useful for GUI animation of bus lines
-//			//Need to invoke memory to read the bus, as memory sits idle
-//			return this.deliverToMBR(); //Complete read operation. 
-//		}
-//		//Memory write code:
-//		addressLine.put(address);
-//		dataLine.put(data);
-//		return this.deliverToMemory();		
-//	}
-//	
-//	public boolean deliverToMBR() { //Prompts dataLine to load its value into MBR, completing memory read operation
-//		return mockMBR.write(dataLine.read());		
-//	}
-//	
-//	public boolean deliverToMemory() { //Prompts dataLine to load value into memory, completing memory write operation
-//		return memory.notify(addressLine.read(), dataLine.read());
-//	}
 
 }
