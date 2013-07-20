@@ -12,7 +12,7 @@ package code;
  */
 
 public class MBR implements MemoryBufferRegister {
-	private MemoryBufferRegister MBRinstance;
+	private static MemoryBufferRegister MBRinstance;
 	
 	private Data registerContents;
 	
@@ -22,10 +22,10 @@ public class MBR implements MemoryBufferRegister {
 		super(); //Calls default Object constructor.
 	}
 	
-	public synchronized MemoryBufferRegister getInstance() {
-		if (this.MBRinstance == null) {
-			this.MBRinstance = new MBR();
-			return this.MBRinstance;
+	public synchronized static MemoryBufferRegister getInstance() {
+		if (MBRinstance == null) {
+			MBRinstance = new MBR();
+			return MBRinstance;
 		}
 		return MBRinstance;
 	}
