@@ -21,7 +21,7 @@ public class ControlUnitImpl implements ControlUnit {
 		ir = new IR();
 	}
 	
-	public void go() {
+	public void execute() {
 		InstructionCycleStage fetchStage = new FetchDecodeStage();
 
 	}
@@ -34,7 +34,16 @@ public class ControlUnitImpl implements ControlUnit {
 		
 		
 		private void instructionFetch() {
-			mar.write(pc.getValue());
+			mar.write(pc.getValue()); //Write address value in PC to MAR.
+			systemBus.transferToMemory(mar.read(), null); //Transfer address from MAR to system bus, prompting read
+			//A Data item should now be in MBR
+			ir.loadIR(mbr.read()); //what about data loaded into
+			//MBR that is data (operand) as opposed to instruction? Is this loaded straight to a register?
+			//http://comminfo.rutgers.edu/~muresan/201_JavaProg/11CPU/Lecture11.pdf
+			//have methods to represent storeExecuteCycle, loadExecuteCycle etc, depending on decode of fetched instruction
+			//This is instruction fetch -> only covers fetching of an instruction, not its execution; fetching data from memory
+			//will be part of executing a LOAD instruction, which occurs in execute. Decode determines nature of instruction; 
+			//instructionDecode() method.
 		}
 		
 	}
