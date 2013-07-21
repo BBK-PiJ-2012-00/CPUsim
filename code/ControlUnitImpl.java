@@ -80,6 +80,14 @@ public class ControlUnitImpl implements ControlUnit {
 		
 			case 1: //A LOAD instruction
 					mar.write(ir.read().getField1()); //Load mar with source address of instruction in IR
+					//Request a read from memory via system bus, with address contained in mar
+					systemBus.transferToMemory(mar.read(), null);
+					//Transfer data in mbr to destination field in instruction in ir (field2).
+					genRegisters.write(ir.read().getField2(), mbr.read());//getField2() gives reg. destination index, mbr.read()
+					//gives the operand to be moved from mbr to genRegisters at index given in getField2().
+					break;
+					
+			case 2: //A STORE instruction
 					
 				
 				
