@@ -3,6 +3,12 @@ package code;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 
+
+/*
+ * Take methods out ouf the stages; standard mode will not use the stages at all, and just work 
+ * through the methods. In pipelining mode, the stages are created, and these stages call methods
+ * from the main ControlUnitImpl container class. This allows code reuse, and simplifies things.
+ */
 public class ControlUnitImpl implements ControlUnit {
 	private boolean pipeliningMode;
 	private boolean active; //True while there are still instructions to fetch and execute; HALT instruction being decoded
