@@ -1,9 +1,13 @@
 package code;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 
 public class ControlUnitImpl implements ControlUnit {
 	private boolean pipeliningMode;
+	private boolean active; //True while there are still instructions to fetch and execute; HALT instruction being decoded
+							//should set this to false, stopping execution. (HALT is never executed; only decoded, and 
+							//never passed onto execution stage.
 	
 	private ProgramCounter pc;	
 	private InstructionRegister ir;	
@@ -17,10 +21,10 @@ public class ControlUnitImpl implements ControlUnit {
 	private InstructionCycleStage executeStage;
 	private InstructionCycleStage writeStage;
 	
-	private BlockingQueue fetchToExecuteQueue; //Queues that facilitate coordination of stages of instruction cycle
+	private BlockingQueue<Integer> fetchToExecuteQueue; //Queues that facilitate coordination of stages of instruction cycle
 	private BlockingQueue executeToWriteQueue; //Only during pipelining
 	
-	public ControlUnitImpl() {
+	public ControlUnitImpl(boolean pipeliningMode) {
 		systemBus = SystemBusController.getInstance();
 		
 		mbr = MBR.getInstance();
@@ -31,6 +35,10 @@ public class ControlUnitImpl implements ControlUnit {
 		
 		fetchDecodeStage = new FetchDecodeStage();
 		executeStage = new ExecuteStage();
+		
+		if (pipeliningMode) { //Queues only required if pipelining enabled
+			fetchToExecuteQueue = new SynchronousQueue<Integer>();
+		}
 		
 	}
 	
@@ -64,7 +72,13 @@ public class ControlUnitImpl implements ControlUnit {
 			switch (opcodeValue) {
 			
 				case 1: //A LOAD instruction: 1) Source address portion of instruction in IR loaded to MAR
-						
+						if (pipeliningMode) { //Pass opcode value via queue to next stage
+							fetchToExecuteQueue.add(opcodeValue); //"Passes" opcode value to queue for next stage's thread to take
+						}
+						else {
+							executeStage.receiveOpcode(opcodeValue);
+						}
+						break;
 						
 			//If pipelining mode enabled, don't use blocking queue to pass to next stage (won't work for a single thread)
 			}
@@ -74,9 +88,39 @@ public class ControlUnitImpl implements ControlUnit {
 		
 		
 	public class ExecuteStage implements InstructionCycleStage {
-			
+		private int opcodeValue;
+		private boolean active;//For pipelining mode; prompts the thread to keep attempting to retrieve an opcode from the queue
+		//while execution of a program continues
+		
 		public void run() {
+			if (pipeliningMode) {
+				while (active) {
+					this.accessBlockingQueue();
+					
+				}
 				
+			}
+			else { //For standard mode
+				
+			}
+			
+		}
+		
+		public void accessBlockingQueue() {
+			while (opcodeValue == 0) { //No opcode with value of 0; thread attempts to take from queue until it receives an opcode 
+				try {
+					opcodeValue = fetchToExecuteQueue.take();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			return;
+		}
+		
+		public void receiveOpcode(int opcodeValue) {
+			this.opcodeValue = opcodeValue;
+			this.run(); //Enter main execution of this stge
 		}
 			
 			
