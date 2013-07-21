@@ -6,16 +6,21 @@ package code;
  */
 public class RegisterFile16 implements RegisterFile {
 	private Data[] generalPurposeRegisters = new Data[16]; //Enables general purpose registers to hold multiple data types
-	private int pointer = 0; //Likely unecessary.
+	//Should this be of type Operand?
 	
 	@Override
 	public void write(int index, Data data) {
-		// TODO Auto-generated method stub
-		
+		if (index > -1 && index < 16) { //Ensure valid index (0-15)
+			generalPurposeRegisters[index] = data;
+		}
+		//Otherwise do nothing (throw exception?)
 	}
 	@Override
 	public Data read(int index) {
-		// TODO Auto-generated method stub
+		if (index < -1 && index < 16) { //Ensure valid index (0-15)
+			return generalPurposeRegisters[index];
+		}
+		//Throw exception?
 		return null;
 	}
 	
