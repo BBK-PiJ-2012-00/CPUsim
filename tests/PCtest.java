@@ -23,15 +23,22 @@ public class PCtest {
 		assertEquals(expected, output); //Default address value is 0, therefore 0 should be returned
 	}
 	
+	@Test
+	public void testIncrementPC() {
+		pc.incrementPC();
+		int output = pc.getValue();
+		int expected = 1; //If default PC value is 0, incrementing should mean it equals 1.
+		assertEquals(expected, output);
+	}
 	
+	@Test
+	public void testSetPC() {
+		pc.setPC(99);
+		int output = pc.getValue();
+		int expected = 99;
+		assertEquals(expected, output);
+	}
 	
-	
-//	public void incrementPC() {
-//		nextInstructionPointer++;
-//	}
-//	
-//	public void setPC(int address) { //Used to set PC pointer
-//		this.nextInstructionPointer = address;
-//	}
+
 
 }
