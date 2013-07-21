@@ -17,7 +17,7 @@ public class RegisterFile16 implements RegisterFile {
 	}
 	@Override
 	public Data read(int index) {
-		if (index < -1 && index < 16) { //Ensure valid index (0-15)
+		if (index > -1 && index < 16) { //Ensure valid index (0-15)
 			return generalPurposeRegisters[index];
 		}
 		//Throw exception?
