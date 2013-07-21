@@ -1,6 +1,6 @@
 package code;
 
-public class IR {
+public class IR implements InstructionRegister {
 	Instruction contents; //Instruction in the instruction register
 	
 	public void loadIR(Instruction instr) {

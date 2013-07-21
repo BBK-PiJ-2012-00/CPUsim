@@ -27,6 +27,7 @@ public class ControlUnitImpl implements ControlUnit {
 	}
 	
 	public class FetchDecodeStage implements InstructionCycleStage {
+		//BlockingQueue field -> can hold type Boolean as a marker
 		
 		public void run() {
 			this.instructionFetch();			
