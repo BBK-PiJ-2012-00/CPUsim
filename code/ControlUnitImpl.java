@@ -48,9 +48,49 @@ public class ControlUnitImpl implements ControlUnit {
 		
 	}
 	
-	public void execute() {
-		//InstructionCycleStage fetchStage = new FetchDecodeStage();
+	public void execute() { //The method that kick starts execution of a program, and manages it
+		if (!pipeliningMode) {
+			this.instructionFetch(); //Fetches instruction, then calls decode, which calls execute etc.
+			
+		}
+		
 
+	}
+	
+	public void instructionFetch() {
+		mar.write(pc.getValue()); //Write address value in PC to MAR.
+		systemBus.transferToMemory(mar.read(), null); //Transfer address from MAR to system bus, prompting read
+		//A Data item should now be in MBR
+		ir.loadIR((Instruction) mbr.read()); //Cast required as mbr holds type data, IR type Instruction; May need to handle exception
+		this.instructionDecode();
+	}
+	//Fetch ends with instruction being loaded into IR.
+	
+	
+	
+	public void instructionDecode() { //Returns int value of opcode
+		Instruction instr = ir.read();
+		int opcodeValue = instr.getOpcode().getValue(); //Gets instruction opcode as int value
+		this.instructionExecute(opcodeValue);
+		
+	}
+	
+	public void instructionExecute(int opcode) {
+		switch (opcode) {
+		
+			case 1: //A LOAD instruction
+					mar.write(ir.read().getField1()); //Load mar with source address of instruction in IR
+					
+				
+				
+	//If pipelining mode enabled, don't use blocking queue to pass to next stage (won't work for a single thread)
+		}
+		//Can call other, private methods depending on instruction opcode
+		//case switch statement: if arithmetic, call arithmeticInstrExecute(), etc
+	}
+	
+	public void instructionStore() { //Not required in every cycle
+		
 	}
 	
 	public class FetchDecodeStage implements InstructionCycleStage {
@@ -58,37 +98,12 @@ public class ControlUnitImpl implements ControlUnit {
 	
 		
 		public void run() {
-			this.instructionFetch();	
-			this.instructionDecode();
+			//this.instructionFetch();	
+			//this.instructionDecode();
 		}
 		
 		
-		public void instructionFetch() {
-			mar.write(pc.getValue()); //Write address value in PC to MAR.
-			systemBus.transferToMemory(mar.read(), null); //Transfer address from MAR to system bus, prompting read
-			//A Data item should now be in MBR
-			ir.loadIR((Instruction) mbr.read()); //Cast required as mbr holds type data, IR type Instruction; May need to handle exception
-		} //Fetch ends with instruction being loaded into IR.
 		
-		
-		public void instructionDecode() {
-			Instruction instr = ir.read();
-			int opcodeValue = instr.getOpcode().getValue(); //Gets instruction opcode as int value
-			
-			switch (opcodeValue) {
-			
-				case 1: //A LOAD instruction: 1) Source address portion of instruction in IR loaded to MAR
-						if (pipeliningMode) { //Pass opcode value via queue to next stage
-							fetchToExecuteQueue.add(opcodeValue); //"Passes" opcode value to queue for next stage's thread to take
-						}
-						else {
-							executeStage.receiveOpcode(opcodeValue);
-						}
-						break;
-						
-			//If pipelining mode enabled, don't use blocking queue to pass to next stage (won't work for a single thread)
-			}
-		}
 		
 	}
 		
@@ -149,22 +164,8 @@ public class ControlUnitImpl implements ControlUnit {
 	//Stages represented by methods --> these methods should be embedded within objects of type Stage
 	//This allows for pipelining to be more easily implemented later.
 	
-	public void instructionFetch() {
-		//Code for instruction fetch stage
-	}
 	
-	public void instructionDecode() {
-		
-	}
 	
-	public void instructionExecute() {
-		//Can call other, private methods depending on instruction opcode
-		//case switch statement: if arithmetic, call arithmeticInstrExecute(), etc
-	}
-	
-	public void instructionStore() { //Not required in every cycle
-		
-	}
 	
 
 
