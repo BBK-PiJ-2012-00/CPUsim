@@ -71,6 +71,7 @@ public class ControlUnitImpl implements ControlUnit {
 	public void instructionDecode() { //Returns int value of opcode
 		Instruction instr = ir.read();
 		int opcodeValue = instr.getOpcode().getValue(); //Gets instruction opcode as int value
+		pc.incrementPC(); //Increment PC; done here so that with pipelining, the next instruction can be fetched at this point
 		this.instructionExecute(opcodeValue);
 		
 	}
@@ -88,7 +89,13 @@ public class ControlUnitImpl implements ControlUnit {
 					break;
 					
 			case 2: //A STORE instruction
+					mar.write(ir.read().getField2()); //Load mar with destination (memory address)
+					mbr.write(genRegisters.read(ir.read().getField1())); //Write to mbr the data held in genRegisters at index
+					//given by field1(source) of instruction held in IR.
+					systemBus.transferToMemory(mar.read(), mbr.read()); //Transfer contents of mbr to address specified in mar
+					break;
 					
+			case 3: //A MOVE instruction (moving data between registers)
 				
 				
 	//If pipelining mode enabled, don't use blocking queue to pass to next stage (won't work for a single thread)
