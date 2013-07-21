@@ -26,7 +26,7 @@ public interface ControlUnit {
 	
 	public void instructionDecode(); 
 	
-	public void instructionExecute();
+	public void instructionExecute(int opcode); //int opcode is decoded opcode passed from decode()
 	
 	public void instructionStore(); //Not required in every cycle
 		
