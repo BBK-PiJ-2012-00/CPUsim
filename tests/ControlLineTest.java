@@ -24,7 +24,7 @@ public class ControlLineTest {
 		cLine = ((SystemBusController) busController).accessControlLine(); //This solves problem of duplicate MBR modules being
 		//created with the creation of more than one ControlLine; MBR is created upon creation of ControlLine, which would be created
 		//twice if instantiated in its own right in this test class; therefore, the solution is to access the same ControlLine
-		//object through the busController, which is required during these tests.
+		//object through the busController, which is required during these tests.  THIS IS NO LONGER A PROBLEM.
 	}
 
 	@Test
