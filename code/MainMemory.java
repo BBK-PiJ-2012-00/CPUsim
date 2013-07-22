@@ -48,48 +48,19 @@ public interface MainMemory {
 	//Memory addresses themselves are represented as indexes on an array(list)
 	//Simple array --> no ordering, no moving items up when items are deleted, no growth: fixed size
 	
-	//Ports are perhaps an added complication? Each module simply has one BusControlLine reference
-	
 	//Accessor/mutator methods can be synchronized to deal with concurrency issues brought about by
 	//pipelining
 	
-	//An int[] array as originally planned could be problematic; Instructions are to be stored in the array,
-	//as are ints to be used as variables in programs.  It would be complex to translate an instruction to
-	//an int to place in memory -> fields would become ambiguous as representation is not binary.
-	//One possible solution is to have an array of MemoryStorable items, which implement that interface.
-	//Another is to have a Data[] array, where a Data class is used to encapsulate thigns to be stored in 
-	//memory; Data class would have two fields; int and Instruction, one of which will always be null.  It
-	//then has a simple isInstruction() or isInt() method, to indicate what the data stored is; an int or
-	//an instruction.  Instructions will be stored sequentially, with instance variables as ints being stored
-	//"away" from the sequential instructions.
-	//The other alternative is to have main memory as an array of type String, and the Strings representing 
-	//the data can be manipulated accordingly.
-	//Technically anything should be able to be stored in main memory, so Object might be appropriate.
+	
 	
 	/*
-	 * A wrapper class can be employed for all other data types: IntegerWrapper, or IntegerOperand, and this can
-	 * implement Data.  The avoids using an array of Object, which would entail casting and no security with regard
+	 * A wrapper class (Operand) is employed for all other data types (i.e. data that isn't an instructions): This
+	 * avoids using an array of Object, which would entail casting and no security with regard
 	 * to what can be added to the array.
 	 */
 	
-	/*
-	 * Includes a cast from type Data to type Instruction.
-	 * 
-	 * @param int index the address of the instruction to be read from memory.
-	 * @return Instruction the instruction read from the specified address.
-	 */
-	//public Instruction readInstruction(int index);
 	
-	/*
-	 * Stored Operand type is accessed from location specified by index parameter; this is cast from Data
-	 * to Operand, which is then unwrapped to return the integer.
-	 * 
-	 * @param int index the memory location of the operand.
-	 * @return the integer stored at the specified location.
-	 */
-	//public int readInteger(int index);
 	
-	//public double readFloatingPoint();
 	
 
 }
