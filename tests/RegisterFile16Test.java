@@ -10,6 +10,7 @@ import code.Operand;
 import code.OperandImpl;
 import code.RegisterFile;
 import code.RegisterFile16;
+import code.ControlUnitImpl;
 
 public class RegisterFile16Test {
 	RegisterFile registers;
@@ -21,6 +22,7 @@ public class RegisterFile16Test {
 		registers = new RegisterFile16();
 		testOperand = new OperandImpl(10);
 	}
+	
 
 	@Test
 	public void testRead() {
