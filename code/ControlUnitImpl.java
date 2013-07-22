@@ -31,6 +31,8 @@ public class ControlUnitImpl implements ControlUnit {
 	private BlockingQueue executeToWriteQueue; //Only during pipelining
 	
 	public ControlUnitImpl(boolean pipeliningMode) {
+		this.pipeliningMode = pipeliningMode;
+		
 		systemBus = SystemBusController.getInstance();
 		
 		mbr = MBR.getInstance();
@@ -108,7 +110,7 @@ public class ControlUnitImpl implements ControlUnit {
 		//case switch statement: if arithmetic, call arithmeticInstrExecute(), etc
 	}
 	
-//	LOAD(1), STORE(2), MOVE(3),
+
 //	ADD(4), SUB(5), DIV(6), MUL(7),
 //	BR(8), BRZ(9), BRE(10), BRNE(11),
 //	SK(12), ISZ(13);
@@ -184,6 +186,13 @@ public class ControlUnitImpl implements ControlUnit {
 	//Stages represented by methods --> these methods should be embedded within objects of type Stage
 	//This allows for pipelining to be more easily implemented later.
 	
+	public InstructionRegister getIR() { //For testing
+		return this.ir;
+	}
+	
+	public ProgramCounter getPC() {
+		return this.pc;
+	}
 	
 	
 	
