@@ -6,20 +6,9 @@ package code;
  * 
  * Instructions are 32 bits in length.  Representation is initially in hexadecimal, but to ensure integrity,
  * hexadecimal values for the instruction fields must not exceed the maximum value possible for a given length of bits.
- * Opcodes currently occupy the first 4 bits of an instruction, permitting no more than 16 opcodes for the instruction set.
+ * Opcodes occupy the first 4 bits of an instruction, permitting no more than 16 opcodes for the instruction set.
  * Whilst the simulator would work fine if instruction fields were allowed to overflow their bit allocation, it would not
  * be very realistic.  The same applies to other fields within an instruction. 
- */
-
-/*
- * TO DO:
- * 		Could flesh out toString() methods in abstract class; can use getField() methods to achieve this,
- * 			and getOpcode() to differentiate branch instructions and use only getField1().
- * 
- * 		Add additional constructors/fields to allow floating point fields?
- * 			Can have getField1AsInt() / getField1AsDouble()
- * 			To start with, just work with integers.
- * 
  */
 
 public abstract class Instruction implements Data {	
@@ -95,7 +84,7 @@ public abstract class Instruction implements Data {
 	
 	/*
 	 * Returns the second field of an instruction. For branch instructions, the return value will be -1 as these instructions
-	 * have only one field (the branch target), and memory addresses start at 0 (thus -1 is unused, and an invalide address). 
+	 * have only one field (the branch target), and memory addresses start at 0 (thus -1 is unused, and an invalid address). 
 	 * For data transfer instructions, this field is the destination location; for arithmetic instructions, this is the 
 	 * register location where one of the operands to the arithmetic operation is stored.
 	 * 

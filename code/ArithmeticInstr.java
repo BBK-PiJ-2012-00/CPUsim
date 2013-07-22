@@ -3,12 +3,6 @@ package code;
 /*
  * TO DO:
  * 		Constructor: restrict field values to conform to no. of registers in CPU
- * 		Should Instruction be a superclass as opposed to interface? Can hold opcode field, and the methods from Data
- * 			ArithmeticInstr etc can add their own relevant fields (i.e. registerDest vs source), and their own instructions.
- *			The toString() methods are the same for arithmetic and transfer; both have two fields besides opcode, so branch
- *			instructions could override these methods. Could insert if statements to effect of if opcode is greater/less than 
- *			certain values to obtain instruction type, print this or that.  All data method bodies are common to all instructions.
- *			Avoids code duplication with same benefits of Instruction interface.
  */
 
 /*
