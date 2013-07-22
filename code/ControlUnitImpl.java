@@ -96,7 +96,11 @@ public class ControlUnitImpl implements ControlUnit {
 					break;
 					
 			case 3: //A MOVE instruction (moving data between registers)
-				
+					genRegisters.write(ir.read().getField2(), genRegisters.read(ir.read().getField1()));
+					//Write to the destination specified in field2 of instr held in ir, the instr held in the register
+					//specified by field1 of the instruction in the ir.
+					genRegisters.write(ir.read().getField1(), null); //Complete the move by resetting register source
+					break;
 				
 	//If pipelining mode enabled, don't use blocking queue to pass to next stage (won't work for a single thread)
 		}
