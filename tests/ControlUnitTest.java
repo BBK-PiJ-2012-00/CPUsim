@@ -121,37 +121,18 @@ public class ControlUnitTest {
 		Data output = controlUnit.getRegisters().read(15);
 		assertEquals(expected, output);
 	}
+	
+	@Test
+	public void testInstructionExecuteMOVE2() {//Test execution of MOVE instruction; check source register reset to null after move
+		Operand operand = new OperandImpl(5000);
+		//Load operand to r0
+		controlUnit.getRegisters().write(0, operand);
+		//Load MOVE instruction to memory address 0
+		memory.notify(0, testInstrMOVE);
+		//Fetch and execute the instruction; operand should end up in r15 (see testInstrMOVE in setup)
+		controlUnit.instructionFetch();
+		assertNull(controlUnit.getRegisters().read(0));//r0 should be null after move of operand to r15
+	}
 
 }
-
-//public void instructionExecute(int opcode) {
-//	switch (opcode) {
-//	
-//		case 1: //A LOAD instruction
-//				mar.write(ir.read().getField1()); //Load mar with source address of instruction in IR
-//				//Request a read from memory via system bus, with address contained in mar
-//				systemBus.transferToMemory(mar.read(), null);
-//				//Transfer data in mbr to destination field in instruction in ir (field2).
-//				genRegisters.write(ir.read().getField2(), mbr.read());//getField2() gives reg. destination index, mbr.read()
-//				//gives the operand to be moved from mbr to genRegisters at index given in getField2().
-//				break;
-//				
-//		case 2: //A STORE instruction
-//				mar.write(ir.read().getField2()); //Load mar with destination (memory address)
-//				mbr.write(genRegisters.read(ir.read().getField1())); //Write to mbr the data held in genRegisters at index
-//				//given by field1(source) of instruction held in IR.
-//				systemBus.transferToMemory(mar.read(), mbr.read()); //Transfer contents of mbr to address specified in mar
-//				break;
-//				
-//		case 3: //A MOVE instruction (moving data between registers)
-//				genRegisters.write(ir.read().getField2(), genRegisters.read(ir.read().getField1()));
-//				//Write to the destination specified in field2 of instr held in ir, the instr held in the register
-//				//specified by field1 of the instruction in the ir.
-//				genRegisters.write(ir.read().getField1(), null); //Complete the move by resetting register source
-//				break;
-//			
-////If pipelining mode enabled, don't use blocking queue to pass to next stage (won't work for a single thread)
-//	}
-
-
 
