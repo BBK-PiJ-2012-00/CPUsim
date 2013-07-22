@@ -5,24 +5,24 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 
-import code.DataLine;
-import code.DataLineImpl;
+import code.DataBus;
+import code.DataBusImpl;
 import code.Operand;
 import code.OperandImpl;
 
-public class DataLineTest {
-	private DataLine dLine = new DataLineImpl();
+public class DataBusTest {
+	private DataBus dBus = new DataBusImpl();
 
 	@Test
 	public void testReadNull() { //Upon initial instantiation, data field should be null
-		assertNull(dLine.read());
+		assertNull(dBus.read());
 	}
 	
 	@Test
 	public void testPut() { //Test put method
-		dLine.put(new OperandImpl(5));
+		dBus.put(new OperandImpl(5));
 		int expected = 5;
-		Operand dataOutput = (Operand) dLine.read();
+		Operand dataOutput = (Operand) dBus.read();
 		//Data downcast to Operand and then integer for easier testing
 		int output = dataOutput.unwrapInteger();
 		assertEquals(expected, output);		
