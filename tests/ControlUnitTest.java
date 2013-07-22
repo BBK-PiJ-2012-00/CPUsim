@@ -22,7 +22,7 @@ public class ControlUnitTest {
 		memory = MemoryModule.getInstance();
 		controlUnit = new ControlUnitImpl(false); //False parameter deactivates pipelining
 		
-		testInstrSTORE = new TransferInstr(Opcode.STORE, 0, 0);
+		testInstrSTORE = new TransferInstr(Opcode.STORE, 0, 99); //source r0, destination address 99
 		testInstrLOAD = new TransferInstr(Opcode.LOAD, 50, 0); //Load contents of address 50 to register 0
 		testInstrMOVE = new TransferInstr(Opcode.MOVE, 0, 15); //Move contents of r0 to r15
 		
@@ -81,17 +81,31 @@ public class ControlUnitTest {
 	
 	/*
 	 * A test operand has been loaded into memory address 50 in the setup. 
-	 * testInstrLOAD field is a LOAD instruction which loads the operand at address 50 to register 0
-	 * So it must be checked that register 0 contains the operand (1000) contained at address 50.
+	 * testInstrLOAD is a LOAD instruction which loads the operand at memory address 50 to register 0
+	 * So it must be checked that register 0 contains the operand (1000) contained at address 50, for the successful
+	 * execution of a LOAD instruction.
 	 */
 	@Test
 	public void testInstructionExecuteLOAD() { //Test execution of LOAD instruction
 		//Load a LOAD instruction into memory address, and prompt a fetch which will call decode, and then execute
 		memory.notify(0, testInstrLOAD); //load test instruction into address 0
-		controlUnit.instructionFetch(); //This should result in r0 containing 1000
+		controlUnit.instructionFetch(); //This should result in r0 containing 1000; fetch calls decode, which calls execute
 		Data dataOutput = controlUnit.getRegisters().read(0);
 		Operand output = (Operand) dataOutput;
 		assertEquals(1000, output.unwrapInteger());	
+	}
+	
+	@Test
+	public void testInstructionExecuteSTORE() { //Test execution of STORE instruction
+		Operand operand = new OperandImpl(5000);
+		//Firstly, load an operand (5000) into r0
+		controlUnit.getRegisters().write(0, operand);
+		//Now load a store instruction into memory address 0, ready for fetch
+		memory.notify(0, testInstrSTORE);
+		controlUnit.instructionFetch(); //Should result in operand 5000 being stored at address 99
+		Data expected = operand;
+		Data output = memory.accessAddress(99);
+		assertEquals(expected, output);		
 	}
 
 }
