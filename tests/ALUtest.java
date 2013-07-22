@@ -22,8 +22,31 @@ public class ALUtest {
 	}
 
 	@Test
-	public void test() {
-		fail("Not yet implemented");
+	public void testAddition() {
+		Operand expected = new OperandImpl(15);
+		Operand output = ALU.AdditionUnit(op1, op2);
+		assertEquals(expected.unwrapInteger(), output.unwrapInteger());
+	}
+	
+	@Test
+	public void testSubtraction() {
+		Operand expected = new OperandImpl(-5);
+		Operand output = ALU.SubtractionUnit(op1, op2);
+		assertEquals(expected.unwrapInteger(), output.unwrapInteger());
+	}
+	
+	@Test
+	public void testDivision() {
+		Operand expected = new OperandImpl(2000000);
+		Operand output = ALU.DivisionUnit(op3, op2);
+		assertEquals(expected.unwrapInteger(), output.unwrapInteger());
+	}
+	
+	@Test
+	public void testMultiplication() {
+		Operand expected = new OperandImpl(500000000);
+		Operand output = ALU.MultiplicationUnit(op4, op2);
+		assertEquals(expected.unwrapInteger(), output.unwrapInteger());
 	}
 
 }
