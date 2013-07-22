@@ -1,6 +1,6 @@
 package code;
 
-public class AddressLineImpl implements AddressLine {
+public class AddressBusImpl implements AddressBus {
 	private int address = -1;
 	
 	@Override

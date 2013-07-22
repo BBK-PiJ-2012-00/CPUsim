@@ -1,6 +1,6 @@
 package code;
 
-public class DataLineImpl implements DataLine {
+public class DataBusImpl implements DataBus {
 	private Data data;
 
 	@Override

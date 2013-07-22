@@ -2,7 +2,7 @@ package code;
 
 /*
  * 
- * DataLine pending change to DataBus; typically, a data line in a parallel channel carries one bit,
+ * DataLine changed to DataBus; typically, a data line in a parallel channel carries one bit,
  * and a data bus width of 32 lines is used to transmit a 32-bit word. Collectively these lines are called
  * a data bus.  DataBus would more accurately describe the function of this class; the DataBus class
  * can be interpreted as containing 32 data lines, enabling it to carry 32-bit words of data.  Thus, the data
@@ -14,7 +14,7 @@ package code;
  */
 
 
-public interface DataLine {
+public interface DataBus {
 
 	/*
 	 * A method used to put data on the data line.

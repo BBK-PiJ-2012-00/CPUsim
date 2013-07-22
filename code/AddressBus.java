@@ -1,7 +1,7 @@
 package code;
 
 /*
- * AddressLine pending change to AddressBus; typically, an address line in a parallel channel carries one bit,
+ * AddressLine now called AddressBus; typically, an address line in a parallel channel carries one bit,
  * and an address bus width of 32 lines is used to transmit a 32-bit word. Collectively these lines are called
  * an address bus.  AddressBus would more accurately describe the function of this class; the AddressBus class
  * can be interpreted as containing 32 address lines, enabling it to carry 32-bit addresses.  Thus, the address
@@ -12,7 +12,7 @@ package code;
  * System Bus is making a transfer from main memory to the CPU, as all data is delivered into the Memory Buffer
  * Register.
  */
-public interface AddressLine {
+public interface AddressBus {
 	
 	/*
 	 * A method to put a main memory address location on the address line.
