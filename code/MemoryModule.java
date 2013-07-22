@@ -1,15 +1,14 @@
 package code;
 
 /*
- * TO DO: sort out concurrency issues surrounding bus and memory read operations. Should a read be atomic?
- * Or should the bus be able to be used in between? This would create confusion pedagogically; thus, all read
- * and write operations should be atomic and commandeer the bus for the duration of the operation.
+ * All read and write operations should be atomic and commandeer the bus for the duration of the operation; this is 
+ * simpler for GUI and clarity.
  */
 
 public class MemoryModule implements MainMemory {
 	private static MainMemory memoryModule = null; //Keeps track of singleton
 	
-	//Array full of null values to start with - should it be initialised to hold 0s?
+	//Array full of null values to start with - should it be initialised to hold 0s (to avoid null pointer exception)?
 	private final Data[] MEMORY; //Array representing main memory itself/
 	private int pointer; //Points to next available location for storage	
 	private BusController systemBusController; //Reference to system bus
