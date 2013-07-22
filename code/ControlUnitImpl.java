@@ -194,6 +194,10 @@ public class ControlUnitImpl implements ControlUnit {
 		return this.pc;
 	}
 	
+	public RegisterFile getRegisters() {
+		return this.genRegisters;
+	}
+	
 	
 	
 
