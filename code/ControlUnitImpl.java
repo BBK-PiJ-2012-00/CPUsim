@@ -49,7 +49,7 @@ public class ControlUnitImpl implements ControlUnit {
 	}
 	
 	public void execute() { //The method that kick starts execution of a program, and manages it
-		if (!pipeliningMode) {
+		if (!pipeliningMode) { //Consider HALT instruction and how to terminate execution
 			this.instructionFetch(); //Fetches instruction, then calls decode, which calls execute etc.
 			
 		}
