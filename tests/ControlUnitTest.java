@@ -108,7 +108,19 @@ public class ControlUnitTest {
 		assertEquals(expected, output);		
 	}
 	
-	
+	@Test
+	public void testInstructionExecuteMOVE() { //Test execution of MOVE instruction
+		Operand operand = new OperandImpl(5000);
+		//Load operand to r0
+		controlUnit.getRegisters().write(0, operand);
+		//Load MOVE instruction to memory address 0
+		memory.notify(0, testInstrMOVE);
+		//Fetch and execute the instruction; operand should end up in r15 (see testInstrMOVE in setup)
+		controlUnit.instructionFetch();
+		Data expected = operand;
+		Data output = controlUnit.getRegisters().read(15);
+		assertEquals(expected, output);
+	}
 
 }
 
