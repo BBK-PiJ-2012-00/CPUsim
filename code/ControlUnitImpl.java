@@ -104,6 +104,17 @@ public class ControlUnitImpl implements ControlUnit {
 		//case switch statement: if arithmetic, call arithmeticInstrExecute(), etc
 	}
 	
+//	LOAD(1), STORE(2), MOVE(3),
+//	ADD(4), SUB(5), DIV(6), MUL(7),
+//	BR(8), BRZ(9), BRE(10), BRNE(11),
+//	SK(12), ISZ(13);
+		//what about data loaded into MBR that is data (operand) as opposed to instruction; loaded straight to a register
+		//http://comminfo.rutgers.edu/~muresan/201_JavaProg/11CPU/Lecture11.pdf
+		//have methods to represent storeExecuteCycle, loadExecuteCycle etc, depending on decode of fetched instruction
+		//This is instruction fetch -> only covers fetching of an instruction, not its execution; fetching data from memory
+		//will be part of executing a LOAD instruction, which occurs in execute. Decode determines nature of instruction; 
+		//instructionDecode() method.
+	
 	public void instructionStore() { //Not required in every cycle
 		
 	}
@@ -162,17 +173,7 @@ public class ControlUnitImpl implements ControlUnit {
 			
 	}
 		
-//		LOAD(1), STORE(2), MOVE(3),
-//		ADD(4), SUB(5), DIV(6), MUL(7),
-//		BR(8), BRZ(9), BRE(10), BRNE(11),
-//		SK(12), ISZ(13);
-			//what about data loaded into
-			//MBR that is data (operand) as opposed to instruction? Is this loaded straight to a register?
-			//http://comminfo.rutgers.edu/~muresan/201_JavaProg/11CPU/Lecture11.pdf
-			//have methods to represent storeExecuteCycle, loadExecuteCycle etc, depending on decode of fetched instruction
-			//This is instruction fetch -> only covers fetching of an instruction, not its execution; fetching data from memory
-			//will be part of executing a LOAD instruction, which occurs in execute. Decode determines nature of instruction; 
-			//instructionDecode() method.
+
 		
 		
 	
