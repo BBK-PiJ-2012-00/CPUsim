@@ -1,22 +1,5 @@
 package code;
 
-/*
- * Would it be more realistic to have memory write operations physically take the Data from the
- * MBR as opposed to it being passed to the dataLine via the SystemBusController? Should data / address lines
- * have references to MBR/MAR respectively?
- */
-
-/*
- * The passing of address/data values to ControlLine needs attention; either they all come
- * via the BusController, or the ControlLine is prompted to examine the MAR/MBR registers 
- * and act accordingly; BusController should in this case only be responsible for initiating
- * action (and, crucially, ensuring atomic operation of ControlLine; that one operation completes
- * before the next may begin.  Also, in the event of multiple control lines to facilitate performance,
- * the BusController is responsible for managing access to lines (for this to work, safeguards will have to
- * be in place to coordinate access to MAR/MBR).  
- * ControlLine would thus require direct access to MAR/MBR to obtain the values.
- */
-
 public class ControlLineImpl implements ControlLine {
 	private AddressLine addressLine;
 	private DataLine dataLine;
