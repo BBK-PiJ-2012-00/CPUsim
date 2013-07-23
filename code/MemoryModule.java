@@ -67,11 +67,7 @@ public class MemoryModule implements MainMemory {
 			systemBusController = SystemBusController.getInstance(); //Putting this here breaks awkward creation chain, and is of no consequence 
 			//as there is only ever one system bus instance with global access point.
 			
-			//As this is all performed by the same thread, there should be no issue!!
-			//Don't issue this line here!! Return now, perform transferToCPU from control line?
-			//It may be an idea to have the methods memoryRead() and memoryWrite() in SystemBus instead,
-			//which would allow both to be atomic and encapsulate all actions pertaining to those operations.
-			//Will the below line be executable? Bus is waiting on completion of this method!
+			//As this is all performed by the same thread, there should be no issue
 			systemBusController.transferToCPU(dataRead);//Transfers read data to system bus, subsequently to CPU
 			return true;
 		}
