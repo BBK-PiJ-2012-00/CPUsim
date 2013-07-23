@@ -16,7 +16,7 @@ public interface ControlUnit {
 	
 	public void instructionExecute(int opcode); //int opcode is decoded opcode passed from decode()
 	
-	public void instructionStore(); //Not required in every cycle
+	public void instructionWriteBack(); //Not required in every cycle
 	
 	public InstructionRegister getIR();//To access IR; for testing purposes
 	

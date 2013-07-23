@@ -16,7 +16,7 @@ public class ControlUnitImpl implements ControlUnit {
 							//never passed onto execution stage.
 	
 	private ProgramCounter pc;	
-	private InstructionRegister ir;	
+	private InstructionRegister ir;	//An instruction register file / cache (containing at least 2 registers) for pipelining mode?
 	private MemoryBufferRegister mbr;
 	private MemoryAddressRegister mar;	
 	private RegisterFile genRegisters;
@@ -69,7 +69,7 @@ public class ControlUnitImpl implements ControlUnit {
 	//Fetch ends with instruction being loaded into IR.
 	
 	
-	
+	//Should this also retrieve references to operand locations? (and pass them as parameters to instructionExecute())
 	public void instructionDecode() { //Returns int value of opcode
 		Instruction instr = ir.read();
 		int opcodeValue = instr.getOpcode().getValue(); //Gets instruction opcode as int value
@@ -103,6 +103,15 @@ public class ControlUnitImpl implements ControlUnit {
 					//specified by field1 of the instruction in the ir.
 					genRegisters.write(ir.read().getField1(), null); //Complete the move by resetting register source
 					break;
+					
+			case 4: //An ADD instruction (adding contents of one register to second (storing in the first).
+					Operand op1 = (Operand) genRegisters.read(ir.read().getField1()); //access operand stored in first register
+					Operand op2 = (Operand) genRegisters.read(ir.read().getField2());//access operand stored in second register
+					genRegisters.write(ir.read().getField1(), ALU.AdditionUnit(op1, op2));//Have ALU perform ADD, then store 
+					//result in register referenced by first field of instruction
+					break;
+			
+			case 5: //A SUB instruction (subracting contents of one register from a second (storing in the second).
 				
 	//If pipelining mode enabled, don't use blocking queue to pass to next stage (won't work for a single thread)
 		}
@@ -121,8 +130,8 @@ public class ControlUnitImpl implements ControlUnit {
 		//will be part of executing a LOAD instruction, which occurs in execute. Decode determines nature of instruction; 
 		//instructionDecode() method.
 	
-	public void instructionStore() { //Not required in every cycle
-		
+	public void instructionWriteBack() { //Not required in every cycle
+		//Writing of results to register file
 	}
 	
 	public class FetchDecodeStage implements InstructionCycleStage {
