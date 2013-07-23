@@ -75,6 +75,7 @@ public class ControlUnitImpl implements ControlUnit {
 		int opcodeValue = instr.getOpcode().getValue(); //Gets instruction opcode as int value
 		pc.incrementPC(); //Increment PC; done here so that with pipelining, the next instruction can be fetched at this point
 		this.instructionExecute(opcodeValue);
+		//Add interim references to operand locations, to pass to execute stage?
 		
 	}
 	
@@ -107,16 +108,17 @@ public class ControlUnitImpl implements ControlUnit {
 			case 4: //An ADD instruction (adding contents of one register to second (storing in the first).
 					Operand op1 = (Operand) genRegisters.read(ir.read().getField1()); //access operand stored in first register
 					Operand op2 = (Operand) genRegisters.read(ir.read().getField2());//access operand stored in second register
-					genRegisters.write(ir.read().getField1(), ALU.AdditionUnit(op1, op2));//Have ALU perform ADD, then store 
+					Operand result = ALU.AdditionUnit(op1, op2);
+					//genRegisters.write(ir.read().getField1(), ALU.AdditionUnit(op1, op2));//Have ALU perform ADD, then store 
 					//result in register referenced by first field of instruction
 					break;
+					//Need to move the result-writing stage to instructionWriteBack() method
 			
 			case 5: //A SUB instruction (subracting contents of one register from a second (storing in the second).
 				
 	//If pipelining mode enabled, don't use blocking queue to pass to next stage (won't work for a single thread)
 		}
-		//Can call other, private methods depending on instruction opcode
-		//case switch statement: if arithmetic, call arithmeticInstrExecute(), etc
+		
 	}
 	
 
@@ -130,8 +132,11 @@ public class ControlUnitImpl implements ControlUnit {
 		//will be part of executing a LOAD instruction, which occurs in execute. Decode determines nature of instruction; 
 		//instructionDecode() method.
 	
-	public void instructionWriteBack() { //Not required in every cycle
-		//Writing of results to register file
+	//Writing of results to register file
+	public void instructionWriteBack(Operand result) { //Not required in every cycle
+		//It is implicit in the nature of arithmetic instructions that the result is stored in the register
+		//referenced in the first field of the instruction after the opcode (field1)
+		genRegisters.write(ir.read().getField1(), result);
 	}
 	
 	public class FetchDecodeStage implements InstructionCycleStage {
