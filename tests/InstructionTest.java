@@ -104,9 +104,9 @@ public class InstructionTest {
 	
 	@Test
 	public void arithmeticInstrToStringTest() { //Tests toString()
-		instr = new ArithmeticInstr(Opcode.DIV, 0, 0);
+		instr = new ArithmeticInstr(Opcode.DIV, 0, 5);
 		String output = instr.toString();
-		String expected = "DIV 0 0";
+		String expected = "DIV 0 5";
 		assertEquals(expected, output);
 	}
 	
@@ -154,18 +154,18 @@ public class InstructionTest {
 	
 	@Test
 	public void branchInstrMachineStringTest() {
-		instr = new BranchInstr(Opcode.BRE, 0);
+		instr = new BranchInstr(Opcode.BR, 5);
 		String output = instr.toMachineString();
-		String expected = "10 0";
+		String expected = "8 5";
 		assertEquals(expected, output);
 		
 	}
 	
 	@Test
 	public void branchInstrToStringTest() {
-		instr = new BranchInstr(Opcode.BRNE, 0);
+		instr = new BranchInstr(Opcode.BRZ, 99);
 		String output = instr.toString();
-		String expected = "BRNE 0";
+		String expected = "BRZ 63"; //99 in decimal is 63 in hex
 		assertEquals(expected, output);
 	}
 	
@@ -192,6 +192,65 @@ public class InstructionTest {
 		int expected = -1; //-1 fixed return value for getField2() for branch instructions
 		assertEquals(expected, output);
 	}
+	
+	@Test
+	public void branchInstr_BREtest() { //BRE/BRNE need their own tests
+		instr = new BranchInstr(Opcode.BRE, 10, 5);
+		assertNotNull(instr);
+	}
+	
+	@Test
+	public void branchInstrInvalidOpcodeTest_BRE() { //Tests instruction isn't created with illegal opcode for format
+		try {
+			instr = new BranchInstr(Opcode.BRE, 0); //BRE requires 3 parameters; the third representing a register
+		}
+		catch (IllegalStateException e) {
+		System.out.println(e.getMessage());
+		}
+		assertNull(instr); //instr should be null if creation has failed, which it should because of invalid opcode
+	}
+	
+		
+	@Test
+	public void branchInstrMachineStringTest_BRNE() {
+		instr = new BranchInstr(Opcode.BRNE, 32, 10);
+		String output = instr.toMachineString();
+		String expected = "12 20 A"; //hexadecimal output
+		assertEquals(expected, output);		
+	}
+	
+	@Test
+	public void branchInstrToStringTest_BRE() {
+		instr = new BranchInstr(Opcode.BRE, 5, 14);
+		String output = instr.toString();
+		String expected = "BRE 5 E";
+		assertEquals(expected, output);
+	}
+	
+	@Test 
+	public void branchInstrGetOpcodeTest_BRNE() {
+		instr = new BranchInstr(Opcode.BRNE, 0, 0);
+		Opcode output = instr.getOpcode();
+		Opcode expected = Opcode.BRNE;
+		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void branchInstrGetField1Test_BRNE() {
+		instr = new BranchInstr(Opcode.BRNE, 45, 10);
+		int output = instr.getField1();
+		int expected = 45;
+		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void branchInstrGetField2Test_BRE() {
+		instr = new BranchInstr(Opcode.BRE, 70, 11);
+		int output = instr.getField2();
+		int expected = 11; 
+		assertEquals(expected, output);
+	}
+	
 	
 
 }
