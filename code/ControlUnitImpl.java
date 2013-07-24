@@ -125,6 +125,15 @@ public class ControlUnitImpl implements ControlUnit {
 					op2 = (Operand) genRegisters.read(ir.read().getField2()); //access second operand
 					result = ALU.DivisionUnit(op1, op2); //op1 / op2
 					this.instructionWriteBack(result);
+					break;
+					
+					
+			case 7: //A MUL instruction (multiplying contents of one register by contents of another (storing result in first).
+					op1 = (Operand) genRegisters.read(ir.read().getField1()); //access first operand
+					op2 = (Operand) genRegisters.read(ir.read().getField2()); //access second operand
+					result = ALU.MultiplicationUnit(op1, op2); //op1 * op2
+					this.instructionWriteBack(result);
+					break;
 				
 	//If pipelining mode enabled, don't use blocking queue to pass to next stage (won't work for a single thread)
 		}
@@ -132,7 +141,7 @@ public class ControlUnitImpl implements ControlUnit {
 	}
 	
 
-//	 MUL(7),
+
 //	BR(8), BRZ(9), BRE(10), BRNE(11),
 //	SK(12), ISZ(13);
 		//what about data loaded into MBR that is data (operand) as opposed to instruction; loaded straight to a register
