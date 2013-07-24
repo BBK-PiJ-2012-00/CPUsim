@@ -22,6 +22,7 @@ public class ControlUnitTest {
 	
 	private Instruction testInstrBR;
 	private Instruction testInstrBRZ;
+	private Instruction testInstrSKZ;
 	
 	
 
@@ -41,6 +42,7 @@ public class ControlUnitTest {
 		
 		testInstrBR = new BranchInstr(Opcode.BR, 10); //Branch to memory address 10
 		testInstrBRZ = new BranchInstr(Opcode.BRZ, 37); //Branch to memory address 37
+		testInstrSKZ = new BranchInstr(Opcode.SKZ); //Skip if zero
 		
 		memory.notify(50, new OperandImpl(1000)); //Load operand (integer) 1000 to memory address 50		
 	}
@@ -254,6 +256,26 @@ public class ControlUnitTest {
 		controlUnit.getStatusRegister().write(new OperandImpl(3)); //Set status register to hold 3
 		controlUnit.instructionFetch(); //Fetch and execute BRZ instruction
 		int expected = 1; //PC 1, as branch should not be taken
+		int output = controlUnit.getPC().getValue();
+		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void testInstructionExecuteSKZ() { //Test SKZ execution
+		memory.notify(0, testInstrSKZ); //Load memory address 0 with branch instruction
+		controlUnit.getStatusRegister().write(new OperandImpl(0)); //Set status register to hold 0
+		controlUnit.instructionFetch(); //Fetch and execute SKZZ instruction
+		int expected = 2; //PC should = 2, as branch should be taken (meaning PC is incremented)
+		int output = controlUnit.getPC().getValue();
+		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void testInstructionExecuteSKZ_branchNotTaken() { //Test SKZ execution
+		memory.notify(0, testInstrSKZ); //Load memory address 0 with branch instruction
+		controlUnit.getStatusRegister().write(new OperandImpl(1)); //Set status register to hold 1
+		controlUnit.instructionFetch(); //Fetch and execute SKZ instruction
+		int expected = 1; //PC should = 1, as branch should not be taken
 		int output = controlUnit.getPC().getValue();
 		assertEquals(expected, output);
 	}
