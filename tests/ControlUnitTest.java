@@ -20,6 +20,9 @@ public class ControlUnitTest {
 	private Instruction testInstrDIV;
 	private Instruction testInstrMUL;
 	
+	private Instruction testInstrBR;
+	private Instruction testInstrBRZ;
+	
 	
 
 	@Before
@@ -34,7 +37,10 @@ public class ControlUnitTest {
 		testInstrADD = new ArithmeticInstr(Opcode.ADD, 2, 4); //Add contents of r2 and r4, storing in r2
 		testInstrSUB = new ArithmeticInstr(Opcode.SUB, 9, 10); //Sub contents of r10 from r9, storing in r9
 		testInstrDIV = new ArithmeticInstr(Opcode.DIV, 3, 12); //Divide contents of r3 by contents of r12, storing in r3
-		testInstrMUL = new ArithmeticInstr(Opcode.MUL, 5, 8); //Multiply contents of r5 by contents of r8, storing in r5		
+		testInstrMUL = new ArithmeticInstr(Opcode.MUL, 5, 8); //Multiply contents of r5 by contents of r8, storing in r5
+		
+		testInstrBR = new BranchInstr(Opcode.BR, 10); //Branch to memory address 10
+		
 		memory.notify(50, new OperandImpl(1000)); //Load operand (integer) 1000 to memory address 50		
 	}
 
@@ -214,6 +220,18 @@ public class ControlUnitTest {
 		int expected = 77; //77 should be present in r5 (7 * 11)
 		Operand outputOp = (Operand) controlUnit.getRegisters().read(5);
 		int output = outputOp.unwrapInteger();
+		assertEquals(expected, output);
+	}
+	
+	
+	@Test
+	public void testInstructionExecuteBR() { //Test BR instruction execution
+		//testInstrBR = new BranchInstr(Opcode.BR, 10); //Branch to memory address 10
+		//Load testInstrBR to memory address 0 for fetching
+		memory.notify(0, testInstrBR);
+		controlUnit.instructionFetch();
+		int expected = 10; //Expect PC to now point to memory address 10
+		int output = controlUnit.getPC().getValue();
 		assertEquals(expected, output);
 	}
 
