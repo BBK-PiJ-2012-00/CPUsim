@@ -40,6 +40,7 @@ public class ControlUnitTest {
 		testInstrMUL = new ArithmeticInstr(Opcode.MUL, 5, 8); //Multiply contents of r5 by contents of r8, storing in r5
 		
 		testInstrBR = new BranchInstr(Opcode.BR, 10); //Branch to memory address 10
+		testInstrBRZ = new BranchInstr(Opcode.BRZ, 37); //Branch to memory address 37
 		
 		memory.notify(50, new OperandImpl(1000)); //Load operand (integer) 1000 to memory address 50		
 	}
@@ -234,6 +235,31 @@ public class ControlUnitTest {
 		int output = controlUnit.getPC().getValue();
 		assertEquals(expected, output);
 	}
+	
+	@Test
+	public void testInstructionExecuteBRZ_branchTaken() { //Test BRZ execution
+		//testInstrBRZ = new BranchInstr(Opcode.BRZ, 37); //Branch to memory address 37
+		memory.notify(0, testInstrBRZ); //Load memory address 0 with branch instruction
+		controlUnit.getStatusRegister().write(new OperandImpl(0)); //Set status register to hold 0
+		controlUnit.instructionFetch(); //Fetch and execute BRZ instruction
+		int expected = 37; //PC should hold 37, as the branch should be taken
+		int output = controlUnit.getPC().getValue();
+		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void testInstructionExecuteBRZ_branchNotTaken() { //Test BRZ execution
+		//testInstrBRZ = new BranchInstr(Opcode.BRZ, 37); //Branch to memory address 37
+		memory.notify(0, testInstrBRZ); //Load memory address 0 with branch instruction
+		controlUnit.getStatusRegister().write(new OperandImpl(3)); //Set status register to hold 3
+		controlUnit.instructionFetch(); //Fetch and execute BRZ instruction
+		int expected = 1; //PC 1, as branch should not be taken
+		int output = controlUnit.getPC().getValue();
+		assertEquals(expected, output);
+	}
+	
+	
+	
 
 }
 
