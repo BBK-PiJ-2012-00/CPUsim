@@ -15,6 +15,8 @@ public class ControlUnitTest {
 	private Instruction testInstrLOAD;
 	private Instruction testInstrMOVE;
 	
+	private Instruction testInstrADD;
+	
 	
 
 	@Before
@@ -25,6 +27,8 @@ public class ControlUnitTest {
 		testInstrSTORE = new TransferInstr(Opcode.STORE, 0, 99); //source r0, destination address 99
 		testInstrLOAD = new TransferInstr(Opcode.LOAD, 50, 0); //Load contents of address 50 to register 0
 		testInstrMOVE = new TransferInstr(Opcode.MOVE, 0, 15); //Move contents of r0 to r15
+		
+		testInstrADD = new ArithmeticInstr(Opcode.ADD, 2, 4); //Add contents of r2 and r4, storing in r2
 		
 		memory.notify(50, new OperandImpl(1000)); //Load operand (integer) 1000 to memory address 50		
 	}
@@ -133,6 +137,23 @@ public class ControlUnitTest {
 		controlUnit.instructionFetch();
 		assertNull(controlUnit.getRegisters().read(0));//r0 should be null after move of operand to r15
 	}
+	
+	/*
+	 * Test for instructionWriteBack() method; this forms the final stage of an arithmetic operation,
+	 * so should be tested before instructionExecute() is tested for arithmetic operations.
+	 */
+	@Test
+	public void testInstructionWriteBack() {
+		Operand operand = new OperandImpl(400); //This acts as a result operand, pending storage in a register
+		//Load an instruction into IR (this instruction stores result in r2
+		controlUnit.getIR().loadIR(testInstrADD);
+		controlUnit.instructionWriteBack(operand); //This should store the operand in r2
+		Data expected = operand;
+		Data output = controlUnit.getRegisters().read(2);
+		assertEquals(expected, output);
+	}
+	
+	
 
 }
 
