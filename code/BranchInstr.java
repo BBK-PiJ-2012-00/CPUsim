@@ -13,13 +13,22 @@ public class BranchInstr extends Instruction {
 	
 	public BranchInstr(Opcode opcode, int branchTarget) {
 		super(opcode);
-		if (this.OPCODE.getValue() < 8 || this.OPCODE.getValue() > 10) {
+		if (this.OPCODE.getValue() < 8 || this.OPCODE.getValue() > 9) {
 			throw new IllegalStateException("Illegal opcode for this instruction format!");
 		}
 		if (branchTarget > 99 || branchTarget < 0) { //100 memory addresses at present (0-99).
 			throw new IllegalStateException("Memory addresss out of bounds!");
 		}
 		this.branchTarget = branchTarget;
+		this.register = -1; //-1 to reflect that this field is unused (-1 refers to nothing)
+	}
+	
+	public BranchInstr(Opcode opcode) { //For SKZ branch instructions, which have no required fields other than opcode
+		super(opcode);
+		if (this.OPCODE.getValue() != 10) {
+			throw new IllegalStateException("Illegal opcode for this instruction format!");
+		}
+		this.branchTarget = -1; //field unused
 		this.register = -1; //-1 to reflect that this field is unused (-1 refers to nothing)
 	}
 	
@@ -31,7 +40,7 @@ public class BranchInstr extends Instruction {
 		if (branchTarget > 99 || branchTarget < 0) { //100 memory addresses at present (0-99).
 			throw new IllegalStateException("Memory addresss out of bounds!");
 		}
-		if (register < 0 || register > 15) { //16 general purpose registers available
+		if (register < 0 || register > 15) { //16 general purpose registers available, 
 			throw new IllegalStateException("Register address out of bounds!");
 		}
 		this.branchTarget = branchTarget;
