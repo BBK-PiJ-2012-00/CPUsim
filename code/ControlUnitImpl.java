@@ -109,6 +109,7 @@ public class ControlUnitImpl implements ControlUnit {
 					Operand op1 = (Operand) genRegisters.read(ir.read().getField1()); //access operand stored in first register
 					Operand op2 = (Operand) genRegisters.read(ir.read().getField2());//access operand stored in second register
 					Operand result = ALU.AdditionUnit(op1, op2);
+					this.instructionWriteBack(result);
 					//genRegisters.write(ir.read().getField1(), ALU.AdditionUnit(op1, op2));//Have ALU perform ADD, then store 
 					//result in register referenced by first field of instruction
 					break;
