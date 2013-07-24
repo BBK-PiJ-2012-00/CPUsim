@@ -16,6 +16,9 @@ public class ControlUnitTest {
 	private Instruction testInstrMOVE;
 	
 	private Instruction testInstrADD;
+	private Instruction testInstrSUB;
+	private Instruction testInstrDIV;
+	private Instruction testInstrMUL;
 	
 	
 
@@ -29,6 +32,7 @@ public class ControlUnitTest {
 		testInstrMOVE = new TransferInstr(Opcode.MOVE, 0, 15); //Move contents of r0 to r15
 		
 		testInstrADD = new ArithmeticInstr(Opcode.ADD, 2, 4); //Add contents of r2 and r4, storing in r2
+		testInstrSUB = new ArithmeticInstr(Opcode.SUB, 9, 10); //Sub contents of r10 from r9, storing in r9
 		
 		memory.notify(50, new OperandImpl(1000)); //Load operand (integer) 1000 to memory address 50		
 	}
@@ -164,6 +168,20 @@ public class ControlUnitTest {
 		controlUnit.instructionFetch();
 		int expected = 12; //12 should be present in r2 (5 + 7)
 		Operand outputOp = (Operand) controlUnit.getRegisters().read(2);
+		int output = outputOp.unwrapInteger();
+		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void testInstructionExecuteSUB() { //Test execution of SUB instruction
+		//Load operands into r9 and r10, for use by testInstrSUB
+		controlUnit.getRegisters().write(9, new OperandImpl(50));
+		controlUnit.getRegisters().write(10, new OperandImpl(25));
+		//Put the SUB instruction into memory for fetching
+		memory.notify(0, testInstrSUB);
+		controlUnit.instructionFetch();
+		int expected = 25; //25 should be present in r9 (50 - 25)
+		Operand outputOp = (Operand) controlUnit.getRegisters().read(9);
 		int output = outputOp.unwrapInteger();
 		assertEquals(expected, output);
 	}
