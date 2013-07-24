@@ -23,6 +23,8 @@ public interface ControlUnit {
 	public ProgramCounter getPC(); //To access PC; for testing purposes
 	
 	public RegisterFile getRegisters(); //To access general purpose registers, for testing.
+	
+	public Register getStatusRegister(); //To access status register, for testing.
 		
 	
 

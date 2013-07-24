@@ -138,11 +138,17 @@ public class ControlUnitImpl implements ControlUnit {
 					break;
 					
 					
+					
 			case 8: //A BR instruction (unconditional branch to memory location in instruction field 1).
 					pc.setPC(ir.read().getField1());
 					//A branch instruction updates PC to new memory location
 					break;
 				
+			case 9: //A BRZ instruction (branch if value in status register is zero).
+					if (statusRegister.read().unwrapInteger() == 0) {
+						pc.setPC(ir.read().getField1()); //If statusRegister holds 0, set PC to new address held in instruction
+					}
+					break; //If not 0, do nothing
 	
 		}
 		
@@ -239,6 +245,10 @@ public class ControlUnitImpl implements ControlUnit {
 	
 	public RegisterFile getRegisters() {
 		return this.genRegisters;
+	}
+	
+	public Register getStatusRegister() {
+		return this.statusRegister;
 	}
 	
 	
