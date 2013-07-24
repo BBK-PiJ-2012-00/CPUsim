@@ -20,6 +20,7 @@ public class ControlUnitImpl implements ControlUnit {
 	private MemoryBufferRegister mbr;
 	private MemoryAddressRegister mar;	
 	private RegisterFile genRegisters;
+	private Register statusRegister;
 	
 	private BusController systemBus;
 	
@@ -40,6 +41,7 @@ public class ControlUnitImpl implements ControlUnit {
 		genRegisters = new RegisterFile16();
 		pc = new PC();
 		ir = new IR();
+		statusRegister = new StatusRegister();
 		
 		fetchDecodeStage = new FetchDecodeStage();
 		executeStage = new ExecuteStage();
@@ -149,8 +151,9 @@ public class ControlUnitImpl implements ControlUnit {
 
 	//If pipelining mode enabled, don't use blocking queue to pass to next stage (won't work for a single thread)
 
-//	BR(8), BRZ(9), BRE(10), BRNE(11),
-//	SKZ(12), HALT(13;
+
+//	BR(8), BRZ(9), SKZ(10), BRE(11), BRNE(12), 
+//	HALT(13);
 		//what about data loaded into MBR that is data (operand) as opposed to instruction; loaded straight to a register
 		//http://comminfo.rutgers.edu/~muresan/201_JavaProg/11CPU/Lecture11.pdf
 		//have methods to represent storeExecuteCycle, loadExecuteCycle etc, depending on decode of fetched instruction
