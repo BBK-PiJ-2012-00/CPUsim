@@ -108,14 +108,15 @@ public class ControlUnitImpl implements ControlUnit {
 			case 4: //An ADD instruction (adding contents of one register to second (storing in the first).
 					Operand op1 = (Operand) genRegisters.read(ir.read().getField1()); //access operand stored in first register
 					Operand op2 = (Operand) genRegisters.read(ir.read().getField2());//access operand stored in second register
-					Operand result = ALU.AdditionUnit(op1, op2);
-					this.instructionWriteBack(result);
-					//genRegisters.write(ir.read().getField1(), ALU.AdditionUnit(op1, op2));//Have ALU perform ADD, then store 
-					//result in register referenced by first field of instruction
+					Operand result = ALU.AdditionUnit(op1, op2); //Have ALU perform operation
+					this.instructionWriteBack(result); //Call write back stage to store result of addition
 					break;
-					//Need to move the result-writing stage to instructionWriteBack() method
 			
 			case 5: //A SUB instruction (subracting contents of one register from a second (storing in the second).
+					op1 = (Operand) genRegisters.read(ir.read().getField1()); //access first operand
+					op2 = (Operand) genRegisters.read(ir.read().getField2()); //access second operand
+					result = ALU.SubtractionUnit(op1, op2);
+					this.instructionWriteBack(result);
 				
 	//If pipelining mode enabled, don't use blocking queue to pass to next stage (won't work for a single thread)
 		}
