@@ -51,11 +51,15 @@ public abstract class Instruction implements Data {
 	 * is in mnemonic form. 
 	 */
 	public String toString() {
-		if (OPCODE.getValue() > 7) { //For branch instructions, which only have one instruction field besides opcode
+		if (OPCODE.getValue() == 13) { //For HALT instruction
+			return OPCODE.toString();
+		}
+		if (OPCODE.getValue() > 7 && OPCODE.getValue() < 11) { //For branch instructions which only have one instruction field besides opcode
 			return OPCODE.toString() + " " + Integer.toHexString(this.getField1());
 		}
 		return OPCODE.toString() + " " + Integer.toHexString(this.getField1()) + " " + Integer.toHexString(this.getField2());
 	}
+	
 	
 	/*
 	 * Returns instruction in String format, in hexadecimal representation.
@@ -64,7 +68,10 @@ public abstract class Instruction implements Data {
 	 */
 	public String toMachineString() {
 		String machineString;
-		if (OPCODE.getValue() > 7) { //For branch instructions with only one field
+		if (OPCODE.getValue() == 13) { //For HALT instruction
+			return OPCODE.toString();
+		}
+		if (OPCODE.getValue() > 7 && OPCODE.getValue() < 11) { //For branch instructions with only one field
 			machineString = OPCODE.getValue() + " " + Integer.toHexString(this.getField1());
 			return machineString;
 		}
