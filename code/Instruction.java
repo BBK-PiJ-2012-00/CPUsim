@@ -55,9 +55,10 @@ public abstract class Instruction implements Data {
 			return OPCODE.toString();
 		}
 		if (OPCODE.getValue() > 7 && OPCODE.getValue() < 11) { //For branch instructions which only have one instruction field besides opcode
-			return OPCODE.toString() + " " + Integer.toHexString(this.getField1());
+			return OPCODE.toString() + " " + Integer.toHexString(this.getField1()).toUpperCase();
 		}
-		return OPCODE.toString() + " " + Integer.toHexString(this.getField1()) + " " + Integer.toHexString(this.getField2());
+		return OPCODE.toString() + " " + Integer.toHexString(this.getField1()).toUpperCase() + " " + 
+			Integer.toHexString(this.getField2()).toUpperCase();
 	}
 	
 	
@@ -72,10 +73,11 @@ public abstract class Instruction implements Data {
 			return OPCODE.toString();
 		}
 		if (OPCODE.getValue() > 7 && OPCODE.getValue() < 11) { //For branch instructions with only one field
-			machineString = OPCODE.getValue() + " " + Integer.toHexString(this.getField1());
+			machineString = OPCODE.getValue() + " " + Integer.toHexString(this.getField1()).toUpperCase();
 			return machineString;
 		}
-		machineString = OPCODE.getValue() + " " + Integer.toHexString(this.getField1()) + " " + Integer.toHexString(this.getField2());
+		machineString = OPCODE.getValue() + " " + Integer.toHexString(this.getField1()).toUpperCase() + " " + 
+				Integer.toHexString(this.getField2()).toUpperCase();
 		return machineString;
 	}
 	
