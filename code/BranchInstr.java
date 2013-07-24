@@ -10,7 +10,7 @@ public class BranchInstr extends Instruction {
 	
 	public BranchInstr(Opcode opcode, int branchTarget) {
 		super(opcode);
-		if (this.OPCODE.getValue() < 8 || this.OPCODE.getValue() > 13) {
+		if (this.OPCODE.getValue() < 8 || this.OPCODE.getValue() > 12) {
 			throw new IllegalStateException("Illegal opcode for this instruction format!");
 		}
 		if (branchTarget > 99) { //100 memory addresses at present (0-99).
