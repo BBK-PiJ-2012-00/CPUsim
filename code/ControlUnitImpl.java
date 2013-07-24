@@ -149,7 +149,12 @@ public class ControlUnitImpl implements ControlUnit {
 						pc.setPC(ir.read().getField1()); //If statusRegister holds 0, set PC to new address held in instruction
 					}
 					break; //If not 0, do nothing
-	
+					
+			case 10: //A SKZ instruction (skip the next instruction (increment PC by one) if status register holds 0).
+					 if (statusRegister.read().unwrapInteger() == 0) {
+						 pc.incrementPC();
+					 }
+					 break; //If not 0, do nothing
 		}
 		
 	}
