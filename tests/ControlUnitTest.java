@@ -34,7 +34,7 @@ public class ControlUnitTest {
 		testInstrADD = new ArithmeticInstr(Opcode.ADD, 2, 4); //Add contents of r2 and r4, storing in r2
 		testInstrSUB = new ArithmeticInstr(Opcode.SUB, 9, 10); //Sub contents of r10 from r9, storing in r9
 		testInstrDIV = new ArithmeticInstr(Opcode.DIV, 3, 12); //Divide contents of r3 by contents of r12, storing in r3
-		
+		testInstrMUL = new ArithmeticInstr(Opcode.MUL, 5, 8); //Multiply contents of r5 by contents of r8, storing in r5		
 		memory.notify(50, new OperandImpl(1000)); //Load operand (integer) 1000 to memory address 50		
 	}
 
@@ -198,6 +198,21 @@ public class ControlUnitTest {
 		controlUnit.instructionFetch();
 		int expected = 4; //4 should be present in r3 (40 / 10)
 		Operand outputOp = (Operand) controlUnit.getRegisters().read(3);
+		int output = outputOp.unwrapInteger();
+		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void testInstructionExecuteMUL() { //Test execution of MUL instruction
+		//testInstrMUL = new ArithmeticInstr(Opcode.MUL, 5, 8); //Multiply contents of r5 by contents of r8, storing in r5
+		//Load operands into r5 and r8, for use by testInstrMUL
+		controlUnit.getRegisters().write(5, new OperandImpl(7));
+		controlUnit.getRegisters().write(8, new OperandImpl(11));
+		//Put the MUL instruction into memory for fetching
+		memory.notify(0, testInstrMUL);
+		controlUnit.instructionFetch();
+		int expected = 77; //77 should be present in r5 (7 * 11)
+		Operand outputOp = (Operand) controlUnit.getRegisters().read(5);
 		int output = outputOp.unwrapInteger();
 		assertEquals(expected, output);
 	}
