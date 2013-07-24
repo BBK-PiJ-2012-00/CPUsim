@@ -5,6 +5,7 @@ import code.Instruction;
 import code.Opcode;
 import code.TransferInstr;
 import code.ArithmeticInstr;
+import code.HaltInstr;
 
 import static org.junit.Assert.*;
 
@@ -248,6 +249,39 @@ public class InstructionTest {
 		instr = new BranchInstr(Opcode.BRE, 70, 11);
 		int output = instr.getField2();
 		int expected = 11; 
+		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void haltInstrTest() {
+		instr = new HaltInstr(Opcode.HALT);
+		assertNotNull(instr);
+	}
+	
+	@Test
+	public void haltInstrInvalidOpcodeTest() {
+		try {
+			instr = new HaltInstr(Opcode.LOAD);
+		}
+		catch (IllegalStateException e) {
+			e.getMessage();
+		}
+		assertNull(instr); //Instruction should only be instantiated with HALT opcode
+	}
+	
+	@Test
+	public void haltInstrGetField1Test() {
+		instr = new HaltInstr(Opcode.HALT);
+		int expected = -1;
+		int output = instr.getField1();
+		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void haltInstrGetField2Test() {
+		instr = new HaltInstr(Opcode.HALT);
+		int expected = -1;
+		int output = instr.getField2();
 		assertEquals(expected, output);
 	}
 	
