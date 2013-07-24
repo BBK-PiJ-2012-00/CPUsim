@@ -16,7 +16,7 @@ public class BranchInstr extends Instruction {
 		if (this.OPCODE.getValue() < 8 || this.OPCODE.getValue() > 10) {
 			throw new IllegalStateException("Illegal opcode for this instruction format!");
 		}
-		if (branchTarget > 99) { //100 memory addresses at present (0-99).
+		if (branchTarget > 99 || branchTarget < 0) { //100 memory addresses at present (0-99).
 			throw new IllegalStateException("Memory addresss out of bounds!");
 		}
 		this.branchTarget = branchTarget;
@@ -28,8 +28,11 @@ public class BranchInstr extends Instruction {
 		if (this.OPCODE.getValue() < 11 || this.OPCODE.getValue() > 12) {
 			throw new IllegalStateException("Illegal opcode for this instruction format!");
 		}
-		if (branchTarget > 99) { //100 memory addresses at present (0-99).
+		if (branchTarget > 99 || branchTarget < 0) { //100 memory addresses at present (0-99).
 			throw new IllegalStateException("Memory addresss out of bounds!");
+		}
+		if (register < 0 || register > 15) { //16 general purpose registers available
+			throw new IllegalStateException("Register address out of bounds!");
 		}
 		this.branchTarget = branchTarget;
 		this.register = register;
@@ -45,7 +48,7 @@ public class BranchInstr extends Instruction {
 	//a control register (say, r15 or separate control register) by default
 	@Override
 	public int getField2() {
-		return -1; //Branch instructions have only one field.
+		return register; //register will equal -1 for all branch instructions other than BRE/BRNE
 	}
 
 }
