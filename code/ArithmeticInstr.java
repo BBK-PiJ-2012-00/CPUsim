@@ -20,7 +20,13 @@ public class ArithmeticInstr extends Instruction {
 		if (this.OPCODE.getValue() < 4 || this.OPCODE.getValue() > 7) {
 			throw new IllegalStateException("Invalid opcode for this instruction type.");//Ensures opcode supplied to constructor is an arithmetic opcode
 		}
-		//Insert code here to handle validation of registerDest/registerInput fields; should not be larger than no. of registers in CPU.
+		//Restrictions on register reference fields of instruction; must comply with number of general purpose registers in CPU
+		if (registerDest < 0 || registerDest > 15) {
+			throw new IllegalStateException("Invalid register destination reference; must be between 0 and 15 inclusive.");
+		}
+		if (registerInput < 0 || registerInput > 15) {
+			throw new IllegalStateException("Invalid register input reference; must be between 0 and 15 inclusive.");
+		}
 		this.registerDest = registerDest;
 		this.registerInput = registerInput;
 	}
