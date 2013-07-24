@@ -153,7 +153,20 @@ public class ControlUnitTest {
 		assertEquals(expected, output);
 	}
 	
-	
+	@Test
+	public void testInstructionExecuteADD() { //Test execution of ADD instruction
+		//testInstrADD = new ArithmeticInstr(Opcode.ADD, 2, 4); //Add contents of r2 and r4, storing in r2
+		//Load operands into r2 and r4, for use by testInstrADD detailed in setUp.
+		controlUnit.getRegisters().write(2, new OperandImpl(5));
+		controlUnit.getRegisters().write(4, new OperandImpl(7));
+		//Put the ADD instruction into memory for fetching
+		memory.notify(0, testInstrADD);
+		controlUnit.instructionFetch();
+		int expected = 12; //12 should be present in r2 (5 + 7)
+		Operand outputOp = (Operand) controlUnit.getRegisters().read(2);
+		int output = outputOp.unwrapInteger();
+		assertEquals(expected, output);
+	}
 
 }
 
