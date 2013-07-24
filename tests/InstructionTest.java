@@ -76,7 +76,7 @@ public class InstructionTest {
 	
 	@Test
 	public void arithmeticInstrTest() {
-		instr = new ArithmeticInstr(Opcode.ADD, 10, 20);
+		instr = new ArithmeticInstr(Opcode.ADD, 10, 15);
 		Opcode output = instr.getOpcode();
 		Opcode expected = Opcode.ADD;
 		assertEquals(expected, output);
@@ -187,7 +187,7 @@ public class InstructionTest {
 	
 	@Test
 	public void branchInstrGetField2Test() {
-		instr = new BranchInstr(Opcode.ISZ, 70);
+		instr = new BranchInstr(Opcode.SKZ, 70);
 		int output = instr.getField2();
 		int expected = -1; //-1 fixed return value for getField2() for branch instructions
 		assertEquals(expected, output);
