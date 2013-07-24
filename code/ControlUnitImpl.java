@@ -112,10 +112,18 @@ public class ControlUnitImpl implements ControlUnit {
 					this.instructionWriteBack(result); //Call write back stage to store result of addition
 					break;
 			
-			case 5: //A SUB instruction (subracting contents of one register from a second (storing in the second).
+			case 5: //A SUB instruction (subtracting contents of one register from a second (storing in the first).
 					op1 = (Operand) genRegisters.read(ir.read().getField1()); //access first operand
 					op2 = (Operand) genRegisters.read(ir.read().getField2()); //access second operand
 					result = ALU.SubtractionUnit(op1, op2);
+					this.instructionWriteBack(result);
+					break;
+				
+					
+			case 6: //A DIV instruction (dividing contents of one register by contents of another (storing in the first).
+					op1 = (Operand) genRegisters.read(ir.read().getField1()); //access first operand
+					op2 = (Operand) genRegisters.read(ir.read().getField2()); //access second operand
+					result = ALU.DivisionUnit(op1, op2); //op1 / op2
 					this.instructionWriteBack(result);
 				
 	//If pipelining mode enabled, don't use blocking queue to pass to next stage (won't work for a single thread)
@@ -124,7 +132,7 @@ public class ControlUnitImpl implements ControlUnit {
 	}
 	
 
-//	ADD(4), SUB(5), DIV(6), MUL(7),
+//	 MUL(7),
 //	BR(8), BRZ(9), BRE(10), BRNE(11),
 //	SK(12), ISZ(13);
 		//what about data loaded into MBR that is data (operand) as opposed to instruction; loaded straight to a register
