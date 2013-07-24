@@ -16,7 +16,7 @@ public interface ControlUnit {
 	
 	public void instructionExecute(int opcode); //int opcode is decoded opcode passed from decode()
 	
-	public void instructionWriteBack(); //Not required in every cycle
+	public void instructionWriteBack(Operand result); //Only required for arithemtic instructions; store the result
 	
 	public InstructionRegister getIR();//To access IR; for testing purposes
 	

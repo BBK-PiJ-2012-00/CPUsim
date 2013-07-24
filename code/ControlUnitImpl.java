@@ -105,6 +105,8 @@ public class ControlUnitImpl implements ControlUnit {
 					genRegisters.write(ir.read().getField1(), null); //Complete the move by resetting register source
 					break;
 					
+					
+					
 			case 4: //An ADD instruction (adding contents of one register to second (storing in the first).
 					Operand op1 = (Operand) genRegisters.read(ir.read().getField1()); //access operand stored in first register
 					Operand op2 = (Operand) genRegisters.read(ir.read().getField2());//access operand stored in second register
@@ -117,16 +119,14 @@ public class ControlUnitImpl implements ControlUnit {
 					op2 = (Operand) genRegisters.read(ir.read().getField2()); //access second operand
 					result = ALU.SubtractionUnit(op1, op2);
 					this.instructionWriteBack(result);
-					break;
-				
+					break;				
 					
 			case 6: //A DIV instruction (dividing contents of one register by contents of another (storing in the first).
 					op1 = (Operand) genRegisters.read(ir.read().getField1()); //access first operand
 					op2 = (Operand) genRegisters.read(ir.read().getField2()); //access second operand
 					result = ALU.DivisionUnit(op1, op2); //op1 / op2
 					this.instructionWriteBack(result);
-					break;
-					
+					break;					
 					
 			case 7: //A MUL instruction (multiplying contents of one register by contents of another (storing result in first).
 					op1 = (Operand) genRegisters.read(ir.read().getField1()); //access first operand
@@ -134,6 +134,9 @@ public class ControlUnitImpl implements ControlUnit {
 					result = ALU.MultiplicationUnit(op1, op2); //op1 * op2
 					this.instructionWriteBack(result);
 					break;
+					
+					
+			case 8: //
 				
 	//If pipelining mode enabled, don't use blocking queue to pass to next stage (won't work for a single thread)
 		}
@@ -143,7 +146,7 @@ public class ControlUnitImpl implements ControlUnit {
 
 
 //	BR(8), BRZ(9), BRE(10), BRNE(11),
-//	SK(12), ISZ(13);
+//	SKZ(12), ISZ(13);
 		//what about data loaded into MBR that is data (operand) as opposed to instruction; loaded straight to a register
 		//http://comminfo.rutgers.edu/~muresan/201_JavaProg/11CPU/Lecture11.pdf
 		//have methods to represent storeExecuteCycle, loadExecuteCycle etc, depending on decode of fetched instruction

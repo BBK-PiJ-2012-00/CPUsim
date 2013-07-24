@@ -1,11 +1,6 @@
 package code;
 
 /*
- * TO DO:
- * 		Constructor: restrict field values to conform to no. of registers in CPU
- */
-
-/*
  * Class to represent arithmetic instructions; arithmetic instructions are register-register, using direct register addressing.
  * e.g. ADD r1, r2: add contents of r2 to contents of r1 and store in r1.
  * 
