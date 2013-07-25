@@ -309,6 +309,19 @@ public class ControlUnitTest {
 		
 		int expected = 92; //PC should = 92, as branch should be taken
 		int output = controlUnit.getPC().getValue();
+		assertEquals(expected, output);		
+	}
+	
+	@Test
+	public void testInstructionExecuteBRE_branchNotTaken() { //Test BRE execution
+		//testInstrBRE = new BranchInstr(Opcode.BRE, 92, 1); //Branch to address 92 if contents of r1 equals contents of status reg
+		memory.notify(0, testInstrBRE); //Load memory address 0 with branch instruction
+		controlUnit.getStatusRegister().write(new OperandImpl(23)); //Set status register to hold 23
+		controlUnit.getRegisters().write(1, new OperandImpl(20)); //Set r1 to hold 20
+		controlUnit.instructionFetch();
+		
+		int expected = 1; //PC should = 1, as branch should not be taken
+		int output = controlUnit.getPC().getValue();
 		assertEquals(expected, output);
 		
 	}
