@@ -163,6 +163,12 @@ public class ControlUnitImpl implements ControlUnit {
 					 }
 					 break; //If not equal, do nothing
 					 
+			case 12: //A BRNE instruction (branch if status reg. contents != contents of register ref. in instruction)
+					 genRegRef = ir.read().getField2(); //Reference to register referred to in instruction
+					 if (!(statusRegister.read().equals((Operand) genRegisters.read(genRegRef)))) { //If not equal
+						 pc.setPC(ir.read().getField1()); //Set PC to equal address in field1 of instruction in ir						 
+					 }
+					 break; //If equal, do nothing
 		
 		
 		}
