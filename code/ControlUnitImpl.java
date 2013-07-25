@@ -66,8 +66,13 @@ public class ControlUnitImpl implements ControlUnit {
 	public void instructionFetch() {
 		mar.write(pc.getValue()); //Write address value in PC to MAR.
 		systemBus.transferToMemory(mar.read(), null); //Transfer address from MAR to system bus, prompting read
+		mar.write(0);//Reset MAR (but is it more confusing to place 0 there, as 0 is valid memory address?
+		
 		//A Data item should now be in MBR
 		ir.loadIR((Instruction) mbr.read()); //Cast required as mbr holds type data, IR type Instruction; May need to handle exception
+		
+		mbr.write(null); //Clear MBR to reflect that instruction has moved to IR (should it be reset earlier, to better reflect
+		//movement?)
 		this.instructionDecode();
 	}
 	//Fetch ends with instruction being loaded into IR.
