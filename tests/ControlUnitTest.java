@@ -23,6 +23,7 @@ public class ControlUnitTest {
 	private Instruction testInstrBR;
 	private Instruction testInstrBRZ;
 	private Instruction testInstrSKZ;
+	private Instruction testInstrBRE;
 	
 	
 
@@ -43,6 +44,7 @@ public class ControlUnitTest {
 		testInstrBR = new BranchInstr(Opcode.BR, 10); //Branch to memory address 10
 		testInstrBRZ = new BranchInstr(Opcode.BRZ, 37); //Branch to memory address 37
 		testInstrSKZ = new BranchInstr(Opcode.SKZ); //Skip if zero
+		testInstrBRE = new BranchInstr(Opcode.BRE, 92, 1); //Branch to address 92 if contents of r1 equals contents of status reg
 		
 		memory.notify(50, new OperandImpl(1000)); //Load operand (integer) 1000 to memory address 50		
 	}
@@ -59,6 +61,7 @@ public class ControlUnitTest {
 	public void testInstructionFetch() { //Tests instruction fetch method
 		memory.writeInstruction(testInstrSTORE, 0);
 		controlUnit.instructionFetch();
+		
 		Instruction expected = testInstrSTORE;
 		Instruction output = controlUnit.getIR().read();
 		assertEquals(expected, output);		
@@ -70,6 +73,7 @@ public class ControlUnitTest {
 		controlUnit.getPC().setPC(19); //Need to manually set PC for testing; this will be set automatically when program loaded
 		//via loader into memory; this will send a signal to CPU to set PC to start address.
 		controlUnit.instructionFetch();
+		
 		Instruction expected = testInstrSTORE;
 		Instruction output = controlUnit.getIR().read();
 		assertEquals(expected, output);		
@@ -91,6 +95,7 @@ public class ControlUnitTest {
 	public void testInstructionDecode() {
 		memory.writeInstruction(testInstrSTORE, 0);
 		controlUnit.instructionFetch(); //Need to fetch an instruction before decoding
+		
 		int expected = 1; //PC starts at 0 by default (unless set otherwise)
 		int output = controlUnit.getPC().getValue();
 		assertEquals(expected, output);
@@ -108,6 +113,7 @@ public class ControlUnitTest {
 		//Load a LOAD instruction into memory address, and prompt a fetch which will call decode, and then execute
 		memory.notify(0, testInstrLOAD); //load test instruction into address 0
 		controlUnit.instructionFetch(); //This should result in r0 containing 1000; fetch calls decode, which calls execute
+		
 		Data dataOutput = controlUnit.getRegisters().read(0);
 		Operand output = (Operand) dataOutput;
 		assertEquals(1000, output.unwrapInteger());	
@@ -121,6 +127,7 @@ public class ControlUnitTest {
 		//Now load a store instruction into memory address 0, ready for fetch
 		memory.notify(0, testInstrSTORE);
 		controlUnit.instructionFetch(); //Should result in operand 5000 being stored at address 99
+		
 		Data expected = operand;
 		Data output = memory.accessAddress(99);
 		assertEquals(expected, output);		
@@ -135,6 +142,7 @@ public class ControlUnitTest {
 		memory.notify(0, testInstrMOVE);
 		//Fetch and execute the instruction; operand should end up in r15 (see testInstrMOVE in setup)
 		controlUnit.instructionFetch();
+		
 		Data expected = operand;
 		Data output = controlUnit.getRegisters().read(15);
 		assertEquals(expected, output);
@@ -149,6 +157,7 @@ public class ControlUnitTest {
 		memory.notify(0, testInstrMOVE);
 		//Fetch and execute the instruction; operand should end up in r15 (see testInstrMOVE in setup)
 		controlUnit.instructionFetch();
+		
 		assertNull(controlUnit.getRegisters().read(0));//r0 should be null after move of operand to r15
 	}
 	
@@ -162,6 +171,7 @@ public class ControlUnitTest {
 		//Load an instruction into IR (this instruction stores result in r2
 		controlUnit.getIR().loadIR(testInstrADD);
 		controlUnit.instructionWriteBack(operand); //This should store the operand in r2
+		
 		Data expected = operand;
 		Data output = controlUnit.getRegisters().read(2);
 		assertEquals(expected, output);
@@ -176,6 +186,7 @@ public class ControlUnitTest {
 		//Put the ADD instruction into memory for fetching
 		memory.notify(0, testInstrADD);
 		controlUnit.instructionFetch();
+		
 		int expected = 12; //12 should be present in r2 (5 + 7)
 		Operand outputOp = (Operand) controlUnit.getRegisters().read(2);
 		int output = outputOp.unwrapInteger();
@@ -190,6 +201,7 @@ public class ControlUnitTest {
 		//Put the SUB instruction into memory for fetching
 		memory.notify(0, testInstrSUB);
 		controlUnit.instructionFetch();
+		
 		int expected = 25; //25 should be present in r9 (50 - 25)
 		Operand outputOp = (Operand) controlUnit.getRegisters().read(9);
 		int output = outputOp.unwrapInteger();
@@ -205,6 +217,7 @@ public class ControlUnitTest {
 		//Put the DIV instruction into memory for fetching
 		memory.notify(0, testInstrDIV);
 		controlUnit.instructionFetch();
+		
 		int expected = 4; //4 should be present in r3 (40 / 10)
 		Operand outputOp = (Operand) controlUnit.getRegisters().read(3);
 		int output = outputOp.unwrapInteger();
@@ -220,6 +233,7 @@ public class ControlUnitTest {
 		//Put the MUL instruction into memory for fetching
 		memory.notify(0, testInstrMUL);
 		controlUnit.instructionFetch();
+		
 		int expected = 77; //77 should be present in r5 (7 * 11)
 		Operand outputOp = (Operand) controlUnit.getRegisters().read(5);
 		int output = outputOp.unwrapInteger();
@@ -233,6 +247,7 @@ public class ControlUnitTest {
 		//Load testInstrBR to memory address 0 for fetching
 		memory.notify(0, testInstrBR);
 		controlUnit.instructionFetch();
+		
 		int expected = 10; //Expect PC to now point to memory address 10
 		int output = controlUnit.getPC().getValue();
 		assertEquals(expected, output);
@@ -244,6 +259,7 @@ public class ControlUnitTest {
 		memory.notify(0, testInstrBRZ); //Load memory address 0 with branch instruction
 		controlUnit.getStatusRegister().write(new OperandImpl(0)); //Set status register to hold 0
 		controlUnit.instructionFetch(); //Fetch and execute BRZ instruction
+		
 		int expected = 37; //PC should hold 37, as the branch should be taken
 		int output = controlUnit.getPC().getValue();
 		assertEquals(expected, output);
@@ -255,6 +271,7 @@ public class ControlUnitTest {
 		memory.notify(0, testInstrBRZ); //Load memory address 0 with branch instruction
 		controlUnit.getStatusRegister().write(new OperandImpl(3)); //Set status register to hold 3
 		controlUnit.instructionFetch(); //Fetch and execute BRZ instruction
+		
 		int expected = 1; //PC 1, as branch should not be taken
 		int output = controlUnit.getPC().getValue();
 		assertEquals(expected, output);
@@ -265,6 +282,7 @@ public class ControlUnitTest {
 		memory.notify(0, testInstrSKZ); //Load memory address 0 with branch instruction
 		controlUnit.getStatusRegister().write(new OperandImpl(0)); //Set status register to hold 0
 		controlUnit.instructionFetch(); //Fetch and execute SKZZ instruction
+		
 		int expected = 2; //PC should = 2, as branch should be taken (meaning PC is incremented)
 		int output = controlUnit.getPC().getValue();
 		assertEquals(expected, output);
@@ -275,10 +293,33 @@ public class ControlUnitTest {
 		memory.notify(0, testInstrSKZ); //Load memory address 0 with branch instruction
 		controlUnit.getStatusRegister().write(new OperandImpl(1)); //Set status register to hold 1
 		controlUnit.instructionFetch(); //Fetch and execute SKZ instruction
+		
 		int expected = 1; //PC should = 1, as branch should not be taken
 		int output = controlUnit.getPC().getValue();
 		assertEquals(expected, output);
 	}
+	
+	@Test
+	public void testInstructionExecuteBRE_branchTaken() { //Test BRE execution
+		//testInstrBRE = new BranchInstr(Opcode.BRE, 92, 1); //Branch to address 92 if contents of r1 equals contents of status reg
+		memory.notify(0, testInstrBRE); //Load memory address 0 with branch instruction
+		controlUnit.getStatusRegister().write(new OperandImpl(23)); //Set status register to hold 23
+		controlUnit.getRegisters().write(1, new OperandImpl(23)); //Set r1 to hold 23
+		controlUnit.instructionFetch();
+		
+		int expected = 92; //PC should = 92, as branch should be taken
+		int output = controlUnit.getPC().getValue();
+		assertEquals(expected, output);
+		
+	}
+	
+	
+//	//A BRE instruction (branch if status reg. contents = contents of register ref. in instruction)
+//	 int genRegRef = ir.read().getField2(); //Reference to register referred to in instruction
+//	 if (statusRegister.read().equals((Operand) genRegisters.read(genRegRef))) { //If equal
+//		 pc.setPC(ir.read().getField1()); //Set PC to equal address in field1 of instruction in ir						 
+//	 }
+//	 break; //If not equal, do nothing
 	
 	
 	
