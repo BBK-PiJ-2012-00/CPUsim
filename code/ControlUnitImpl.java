@@ -155,6 +155,16 @@ public class ControlUnitImpl implements ControlUnit {
 						 pc.incrementPC();
 					 }
 					 break; //If not 0, do nothing
+					 
+			case 11: //A BRE instruction (branch if status reg. contents = contents of register ref. in instruction)
+					 int genRegRef = ir.read().getField2(); //Reference to register referred to in instruction
+					 if (statusRegister.read().equals((Operand) genRegisters.read(genRegRef))) { //If equal
+						 pc.setPC(ir.read().getField1()); //Set PC to equal address in field1 of instruction in ir						 
+					 }
+					 break; //If not equal, do nothing
+					 
+		
+		
 		}
 		
 	}
