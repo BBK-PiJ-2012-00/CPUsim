@@ -24,6 +24,9 @@ public class ControlUnitTest {
 	private Instruction testInstrBRZ;
 	private Instruction testInstrSKZ;
 	private Instruction testInstrBRE;
+	private Instruction testInstrBRNE;
+	
+	private Instruction testInstrHALT;
 	
 	
 
@@ -45,6 +48,7 @@ public class ControlUnitTest {
 		testInstrBRZ = new BranchInstr(Opcode.BRZ, 37); //Branch to memory address 37
 		testInstrSKZ = new BranchInstr(Opcode.SKZ); //Skip if zero
 		testInstrBRE = new BranchInstr(Opcode.BRE, 92, 1); //Branch to address 92 if contents of r1 equals contents of status reg
+		testInstrBRNE = new BranchInstr(Opcode.BRNE, 77, 6);//Branch to addr. 77 if contents of r6 doesn't equal contents of s. reg.
 		
 		memory.notify(50, new OperandImpl(1000)); //Load operand (integer) 1000 to memory address 50		
 	}
@@ -322,18 +326,34 @@ public class ControlUnitTest {
 		
 		int expected = 1; //PC should = 1, as branch should not be taken
 		int output = controlUnit.getPC().getValue();
-		assertEquals(expected, output);
-		
+		assertEquals(expected, output);		
 	}
 	
+	@Test
+	public void testInstructionExecuteBRNE_branchTaken() { //Test BRNE execution
+		//testInstrBRNE = new BranchInstr(Opcode.BRNE, 77, 6);//Branch to addr. 77 if contents of r6 doesn't equal contents of s. reg.
+		memory.notify(0, testInstrBRNE); //Load test Instr to address 0
+		controlUnit.getStatusRegister().write(new OperandImpl(14)); //Set status register to hold 14
+		controlUnit.getRegisters().write(6, new OperandImpl(11)); //Set r6 to hold 11
+		controlUnit.instructionFetch();
+		
+		int expected = 77; //PC should hold 77 (branch should be taken)
+		int output = controlUnit.getPC().getValue();
+		assertEquals(expected, output);
+	}
 	
-//	//A BRE instruction (branch if status reg. contents = contents of register ref. in instruction)
-//	 int genRegRef = ir.read().getField2(); //Reference to register referred to in instruction
-//	 if (statusRegister.read().equals((Operand) genRegisters.read(genRegRef))) { //If equal
-//		 pc.setPC(ir.read().getField1()); //Set PC to equal address in field1 of instruction in ir						 
-//	 }
-//	 break; //If not equal, do nothing
-	
+	@Test
+	public void testInstructionExecuteBRNE_branchNotTaken() { //Test BRNE execution
+		//testInstrBRNE = new BranchInstr(Opcode.BRNE, 77, 6);//Branch to addr. 77 if contents of r6 doesn't equal contents of s. reg.
+		memory.notify(0, testInstrBRNE); //Load test Instr to address 0
+		controlUnit.getStatusRegister().write(new OperandImpl(14)); //Set status register to hold 14
+		controlUnit.getRegisters().write(6, new OperandImpl(14)); //Set r6 to hold 14
+		controlUnit.instructionFetch();
+		
+		int expected = 1; //PC should hold 1 (branch should not be taken)
+		int output = controlUnit.getPC().getValue();
+		assertEquals(expected, output);
+	}
 	
 	
 
