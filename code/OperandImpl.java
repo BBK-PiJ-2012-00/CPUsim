@@ -65,5 +65,26 @@ public class OperandImpl implements Operand {
 	public boolean isFloatingPoint() {
 		return isFloatingPoint;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o == null) {
+			return false;
+		}
+		if (!(o instanceof Operand)) {
+			return false;
+		}
+		Operand operand = (Operand) o;
+		if (this.unwrapInteger() == operand.unwrapInteger()) {
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		Integer i = (Integer) this.unwrapInteger();
+		return i.hashCode();
+	}
 
 }
