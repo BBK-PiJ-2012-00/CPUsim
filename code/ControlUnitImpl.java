@@ -8,6 +8,8 @@ import java.util.concurrent.SynchronousQueue;
  * Take methods out ouf the stages; standard mode will not use the stages at all, and just work 
  * through the methods. In pipelining mode, the stages are created, and these stages call methods
  * from the main ControlUnitImpl container class. This allows code reuse, and simplifies things.
+ * 
+ * Clear registers after use; i.e. MBR should hold nothing once instruction passed to bus / ir
  */
 public class ControlUnitImpl implements ControlUnit {
 	private boolean pipeliningMode;
@@ -169,18 +171,20 @@ public class ControlUnitImpl implements ControlUnit {
 						 pc.setPC(ir.read().getField1()); //Set PC to equal address in field1 of instruction in ir						 
 					 }
 					 break; //If equal, do nothing
-		
-		
+					 
+			
+					 
+			case 13: //A HALT instruction (stops instruction cycle). For clarity, resets all registers.
+					 pc.setPC(0);
+					 statusRegister.write(null);
+					 ir.loadIR(null);					 
+					 break;		
 		}
-		
+		return;
 	}
 	
 
-	//If pipelining mode enabled, don't use blocking queue to pass to next stage (won't work for a single thread)
-
-
-//	BR(8), BRZ(9), SKZ(10), BRE(11), BRNE(12), 
-//	HALT(13);
+	
 		//what about data loaded into MBR that is data (operand) as opposed to instruction; loaded straight to a register
 		//http://comminfo.rutgers.edu/~muresan/201_JavaProg/11CPU/Lecture11.pdf
 		//have methods to represent storeExecuteCycle, loadExecuteCycle etc, depending on decode of fetched instruction
@@ -188,12 +192,19 @@ public class ControlUnitImpl implements ControlUnit {
 		//will be part of executing a LOAD instruction, which occurs in execute. Decode determines nature of instruction; 
 		//instructionDecode() method.
 	
+	
 	//Writing of results to register file
 	public void instructionWriteBack(Operand result) { //Not required in every cycle
 		//It is implicit in the nature of arithmetic instructions that the result is stored in the register
 		//referenced in the first field of the instruction after the opcode (field1)
 		genRegisters.write(ir.read().getField1(), result);
 	}
+	
+	
+	
+	
+	
+	
 	
 	public class FetchDecodeStage implements InstructionCycleStage {
 		//BlockingQueue field -> can hold type Boolean as a marker
