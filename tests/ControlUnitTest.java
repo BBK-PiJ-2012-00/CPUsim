@@ -50,6 +50,8 @@ public class ControlUnitTest {
 		testInstrBRE = new BranchInstr(Opcode.BRE, 92, 1); //Branch to address 92 if contents of r1 equals contents of status reg
 		testInstrBRNE = new BranchInstr(Opcode.BRNE, 77, 6);//Branch to addr. 77 if contents of r6 doesn't equal contents of s. reg.
 		
+		testInstrHALT = new HaltInstr(Opcode.HALT); //Halt instruction 
+		
 		memory.notify(50, new OperandImpl(1000)); //Load operand (integer) 1000 to memory address 50		
 	}
 
@@ -351,6 +353,16 @@ public class ControlUnitTest {
 		controlUnit.instructionFetch();
 		
 		int expected = 1; //PC should hold 1 (branch should not be taken)
+		int output = controlUnit.getPC().getValue();
+		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void testInstructionHALT() { //Check PC is reset to 0 upon execution of halt
+		memory.notify(0, testInstrHALT);
+		controlUnit.instructionFetch();
+		
+		int expected = 0;
 		int output = controlUnit.getPC().getValue();
 		assertEquals(expected, output);
 	}
