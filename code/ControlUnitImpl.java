@@ -14,8 +14,7 @@ import java.util.concurrent.SynchronousQueue;
 public class ControlUnitImpl implements ControlUnit {
 	private boolean pipeliningMode;
 	private boolean active; //True while there are still instructions to fetch and execute; HALT instruction being decoded
-							//should set this to false, stopping execution. (HALT is never executed; only decoded, and 
-							//never passed onto execution stage.
+							//should set this to false, stopping execution. 
 	
 	private ProgramCounter pc;	
 	private InstructionRegister ir;	//An instruction register file / cache (containing at least 2 registers) for pipelining mode?
@@ -54,10 +53,19 @@ public class ControlUnitImpl implements ControlUnit {
 		
 	}
 	
-	public void execute() { //The method that kick starts execution of a program, and manages it
+	public boolean isActive() {
+		return this.active;
+	}
+	
+	public void activate() { //Should be called when initial address is loaded into PC
+		this.active = true;
+	}
+	
+	public void launch() { //The method that kick starts execution of a program, and manages it
 		if (!pipeliningMode) { //Consider HALT instruction and how to terminate execution
-			this.instructionFetch(); //Fetches instruction, then calls decode, which calls execute etc.
-			
+			while (active) {
+				this.instructionFetch(); //Fetches instruction, then calls decode, which calls execute etc.
+			}
 		}
 		
 
@@ -188,7 +196,8 @@ public class ControlUnitImpl implements ControlUnit {
 			case 13: //A HALT instruction (stops instruction cycle). For clarity, resets all registers.
 					 pc.setPC(0);
 					 statusRegister.write(null);
-					 ir.loadIR(null);					 
+					 ir.loadIR(null);	
+					 active = false; //Signals end of instruction cycle
 					 break;		
 		}
 		return;
