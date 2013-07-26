@@ -3,6 +3,9 @@ package code;
 /*
  * 16 general purpose registers. Although RISC machines typically have 32, 16 is likely to be
  * adequate initially and is simpler from the pedagogical perspective.
+ * 
+ * It is possible that the last register (r15) could be reserved as a control/status register,
+ * for branch comparisons and other test conditions (could be marked as such on the GUI).
  */
 public class RegisterFile16 implements RegisterFile {
 	private Data[] generalPurposeRegisters = new Data[16]; //Enables general purpose registers to hold multiple data types

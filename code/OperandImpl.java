@@ -82,7 +82,7 @@ public class OperandImpl implements Operand {
 	}
 	
 	@Override
-	public int hashCode() {
+	public int hashCode() { //Operand is just a wrapper class for integers, so it makes sense to return the same hashCode
 		Integer i = (Integer) this.unwrapInteger();
 		return i.hashCode();
 	}

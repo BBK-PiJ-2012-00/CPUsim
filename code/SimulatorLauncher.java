@@ -6,10 +6,15 @@ public class SimulatorLauncher {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		//Will create instances of modules, and set off the running of the sim
-		//Create memory, cpu modules first, then pass these as references to system bus
-
+		
+		SimulatorLauncher simLauncher = new SimulatorLauncher();
+		simLauncher.run();
+		
+	}
+	
+	private void run() {
+		//Create assembler, loader -> initiate loading of a text file via assembler
+		ControlUnit controlUnit = new ControlUnitImpl(false);
 	}
 
 }
