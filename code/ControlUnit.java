@@ -12,7 +12,7 @@ public interface ControlUnit {
 	public void instructionFetch(); 
 		//Code for instruction fetch stage
 	
-	public void instructionDecode(); 
+	public int instructionDecode(); //Returns opcode value (numeric)
 	
 	public void instructionExecute(int opcode); //int opcode is decoded opcode passed from decode()
 	

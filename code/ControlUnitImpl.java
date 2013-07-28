@@ -65,6 +65,8 @@ public class ControlUnitImpl implements ControlUnit {
 		if (!pipeliningMode) { 
 			while (active) {
 				this.instructionFetch(); //Fetches instruction, then calls decode, which calls execute etc.
+				int opcode = this.instructionDecode();
+				this.instructionExecute(opcode);
 			}
 		}
 		
@@ -81,17 +83,21 @@ public class ControlUnitImpl implements ControlUnit {
 		
 		mbr.write(null); //Clear MBR to reflect that instruction has moved to IR (should it be reset earlier, to better reflect
 		//movement?)
-		this.instructionDecode();
+		
+		//this.instructionDecode();
 	}
 	//Fetch ends with instruction being loaded into IR.
 	
 	
 	//Should this also retrieve references to operand locations? (and pass them as parameters to instructionExecute())
-	public void instructionDecode() { //Returns int value of opcode
+	public int instructionDecode() { //Returns int value of opcode
 		Instruction instr = ir.read();
 		int opcodeValue = instr.getOpcode().getValue(); //Gets instruction opcode as int value
 		pc.incrementPC(); //Increment PC; done here so that with pipelining, the next instruction can be fetched at this point
-		this.instructionExecute(opcodeValue);
+		
+		return opcodeValue;
+		
+		//this.instructionExecute(opcodeValue);
 		//Add interim references to operand locations, to pass to execute stage?
 		
 	}
@@ -226,13 +232,11 @@ public class ControlUnitImpl implements ControlUnit {
 	
 	
 	
-	public class FetchDecodeStage implements InstructionCycleStage {
-		//BlockingQueue field -> can hold type Boolean as a marker
-	
+	public class FetchDecodeStage implements InstructionCycleStage {	
 		
 		public void run() {
-			//this.instructionFetch();	
-			//this.instructionDecode();
+			instructionFetch();	
+			fetchToExecuteQueue.offer((Integer) instructionDecode());
 		}
 		
 		
