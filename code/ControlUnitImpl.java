@@ -233,14 +233,28 @@ public class ControlUnitImpl implements ControlUnit {
 	
 	
 	public class FetchDecodeStage implements InstructionCycleStage {	
+		private boolean running;
 		
 		public void run() {
-			instructionFetch();	
-			fetchToExecuteQueue.offer((Integer) instructionDecode());
-		}
-		
-		
-		
+			running = true;
+			
+			while (running) { //Fetching/decoding must be in a loop, as this continues until HALT instruction
+			
+				instructionFetch();	
+				int opcode = instructionDecode();
+				
+				try {
+					fetchToExecuteQueue.put(opcode); //Program will wait until executeStage attempts take()
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				if (opcode == 13) { //A HALT instruction; another fetch after this should not be attempted
+					running = false;
+				}
+			}
+		}	
 		
 	}
 		
