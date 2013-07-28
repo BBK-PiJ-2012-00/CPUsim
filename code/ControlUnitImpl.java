@@ -62,7 +62,7 @@ public class ControlUnitImpl implements ControlUnit {
 	}
 	
 	public void launch() { //The method that kick starts execution of a program, and manages it
-		if (!pipeliningMode) { //Consider HALT instruction and how to terminate execution
+		if (!pipeliningMode) { 
 			while (active) {
 				this.instructionFetch(); //Fetches instruction, then calls decode, which calls execute etc.
 			}
