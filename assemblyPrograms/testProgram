@@ -1,3 +1,34 @@
 
-.DATA
+.DATA    #variable declarations are in this section
 
+var1     1
+var2     5
+var3     10
+
+#variables will be loaded to consecutive memory addresses, before or after the main program code
+
+
+.TEXT    #code to be translated to machine code in this section
+
+#The addresses are relative; 0 indicates address of first instruction, 1 implies the address of the first instruction + 1 etc.
+
+0: LOAD r1, <var1> # 
+1:
+2:
+
+
+
+
+.data  #variable declarations follow this line
+
+format: create storage for variable of specified type with given name and specified value
+
+name:    storage_type    value(s)
+
+var1:      .word                3
+
+array2:   .byte                 'a','b'  #create a two-element char array with elements initialised to a and b
+
+
+#Will the loader decide on addresses? Assembler just uses lables?
+#A map may help associate labels with addresses
