@@ -11,8 +11,11 @@ public abstract class ExecuteStage {
 	private RegisterFile genRegisters;
 	private Register statusRegister;
 	
+	private WriteBackStage writeBackStage;
 	
-	public ExecuteStage(InstructionRegister ir, ProgramCounter pc, RegisterFile genRegisters, Register statusRegister) {
+	
+	public ExecuteStage(InstructionRegister ir, ProgramCounter pc, RegisterFile genRegisters, Register statusRegister,
+			WriteBackStage writeBackStage) {
 		systemBus = SystemBusController.getInstance();
 		
 		mar = MAR.getInstance();
@@ -21,9 +24,11 @@ public abstract class ExecuteStage {
 		this.ir = ir;
 		this.pc = pc;
 		this.genRegisters = genRegisters;
+		
+		this.writeBackStage = writeBackStage;
 	}
 	
-	public void instructionExecute(int opcode) {
+	public boolean instructionExecute(int opcode) {
 		switch (opcode) {
 		
 			case 1: //A LOAD instruction
@@ -61,28 +66,28 @@ public abstract class ExecuteStage {
 					Operand op1 = (Operand) genRegisters.read(ir.read().getField1()); //access operand stored in first register
 					Operand op2 = (Operand) genRegisters.read(ir.read().getField2());//access operand stored in second register
 					Operand result = ALU.AdditionUnit(op1, op2); //Have ALU perform operation
-					this.instructionWriteBack(result); //Call write back stage to store result of addition
+					writeBackStage.receive(result); //Call write back stage to store result of addition
 					break;
 			
 			case 5: //A SUB instruction (subtracting contents of one register from a second (storing in the first).
 					op1 = (Operand) genRegisters.read(ir.read().getField1()); //access first operand
 					op2 = (Operand) genRegisters.read(ir.read().getField2()); //access second operand
 					result = ALU.SubtractionUnit(op1, op2);
-					this.instructionWriteBack(result);
+					writeBackStage.receive(result);;
 					break;				
 					
 			case 6: //A DIV instruction (dividing contents of one register by contents of another (storing in the first).
 					op1 = (Operand) genRegisters.read(ir.read().getField1()); //access first operand
 					op2 = (Operand) genRegisters.read(ir.read().getField2()); //access second operand
 					result = ALU.DivisionUnit(op1, op2); //op1 / op2
-					this.instructionWriteBack(result);
+					writeBackStage.receive(result);;
 					break;					
 					
 			case 7: //A MUL instruction (multiplying contents of one register by contents of another (storing result in first).
 					op1 = (Operand) genRegisters.read(ir.read().getField1()); //access first operand
 					op2 = (Operand) genRegisters.read(ir.read().getField2()); //access second operand
 					result = ALU.MultiplicationUnit(op1, op2); //op1 * op2
-					this.instructionWriteBack(result);
+					writeBackStage.receive(result);;
 					break;
 					
 					
@@ -124,11 +129,19 @@ public abstract class ExecuteStage {
 					 pc.setPC(0);
 					 statusRegister.write(null);
 					 ir.loadIR(null);	
-					 active = false; //Signals end of instruction cycle
-					 break;		
+					 return false; //Signals end of instruction cycle		
 		}
-		return;
+		return true;
 	}
+	
+	public WriteBackStage getWriteBackStage() {
+		return this.writeBackStage;
+	} 
+	
+	
+	public abstract void receive(int opcode);
+	
+	public abstract void forward(Operand result); //For forwarding execution to WriteBackStage
 	
 
 	

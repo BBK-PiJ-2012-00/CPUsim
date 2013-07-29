@@ -8,6 +8,11 @@ public class StandardExecuteStage extends ExecuteStage {
 		super(ir, pc, genRegisters, statusRegister, writeBackStage);
 		// TODO Auto-generated constructor stub
 	}
+	
+	@Override
+	public void receive(int opcode) {
+		this.instructionExecute(opcode);
+	}
 
 	@Override
 	public void forward(Operand result) {
