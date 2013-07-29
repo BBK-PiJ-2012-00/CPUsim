@@ -23,6 +23,10 @@ import code.ProgramCounter;
 import code.StandardFetchDecodeStage;
 import code.TransferInstr;
 
+/*
+ * Better than ControlUnitTest; can test each stage separately and more in-depth.
+ */
+
 public class FetchDecodeStageTest {
 	private FetchDecodeStage fetchDecodeStage;
 	private InstructionRegister ir;
@@ -122,11 +126,39 @@ public class FetchDecodeStageTest {
 		int output = pc.getValue();
 		assertEquals(expected, output);
 	}
-//
-//	
-//	@Test
-//	public void test() {
-//		fail("Not yet implemented");
-//	}
+	
+	/*
+	 * Not necessary to test every opcode, as opcode integer values have been tested in InstructionTest.
+	 */
+	@Test
+	public void testInstructionDecode_opcodeValueBR() { //Test correct opcode value for instruction is returned
+		memory.writeInstruction(testInstrBR, 0);
+		fetchDecodeStage.instructionFetch(); //Load an instruction into IR
+		
+		int output = fetchDecodeStage.instructionDecode();		
+		int expected = 8; //BR should decode to integer value of 8
+		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void testInstructionDecode_opcodeValueHALT() { //Test correct opcode value for instruction is returned
+		memory.writeInstruction(testInstrHALT, 0);
+		fetchDecodeStage.instructionFetch(); //Load an instruction into IR
+		
+		int output = fetchDecodeStage.instructionDecode();		
+		int expected = 13; //HALT should decode to integer value of 13
+		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void testInstructionDecode_opcodeValueADD() { //Test correct opcode value for instruction is returned
+		memory.writeInstruction(testInstrADD, 0);
+		fetchDecodeStage.instructionFetch(); //Load an instruction into IR
+		
+		int output = fetchDecodeStage.instructionDecode();		
+		int expected = 4; //HALT should decode to integer value of 4
+		assertEquals(expected, output);
+	}
+
 
 }
