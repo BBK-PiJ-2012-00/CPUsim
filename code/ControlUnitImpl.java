@@ -25,7 +25,7 @@ public class ControlUnitImpl implements ControlUnit {
 	
 	private BusController systemBus;
 	
-	private InstructionCycleStage fetchDecodeStage;
+	private FetchDecodeStage fetchDecodeStage;
 	private InstructionCycleStage executeStage;
 	private InstructionCycleStage writeStage;
 	
@@ -59,14 +59,15 @@ public class ControlUnitImpl implements ControlUnit {
 	
 	public void activate() { //Should be called when initial address is loaded into PC
 		this.active = true;
+		this.launch();
 	}
 	
 	public void launch() { //The method that kick starts execution of a program, and manages it
 		if (!pipeliningMode) { 
 			while (active) {
-				this.instructionFetch(); //Fetches instruction, then calls decode, which calls execute etc.
-				int opcode = this.instructionDecode();
-				this.instructionExecute(opcode);
+//				this.instructionFetch(); //Fetches instruction, then calls decode, which calls execute etc.
+//				int opcode = this.instructionDecode();
+//				this.instructionExecute(opcode);
 			}
 		}
 		
@@ -227,74 +228,6 @@ public class ControlUnitImpl implements ControlUnit {
 	}
 	
 	
-	
-	
-	
-	
-	
-	public class FetchDecodeStage implements InstructionCycleStage {	
-		private boolean running;
-		private int opcodeValue;
-		
-		public FetchDecodeStage() {
-			this.running = true;
-		}
-		
-		public void run() {
-			running = true;
-			
-			while (running) { //Fetching/decoding must be in a loop, as this continues until HALT instruction
-			
-				instructionFetch();	
-				opcodeValue = instructionDecode();
-				
-				try {
-					fetchToExecuteQueue.put(opcodeValue); //Program will wait until executeStage attempts take()
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-				if (opcodeValue == 13) { //A HALT instruction; another fetch after this should not be attempted
-					running = false;
-				}
-			}
-		}	
-		
-	}
-		
-		
-	public class ExecuteStage implements InstructionCycleStage {
-		private int opcodeValue;
-		private boolean running;//For pipelining mode; prompts the thread to keep attempting to retrieve an opcode from the queue
-		//while execution of a program continues
-		
-		public ExecuteStage() {
-			this.running = true;
-		}
-		
-		public void run() {
-			
-			while (running) {
-				
-				try {
-					opcodeValue = fetchToExecuteQueue.take();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-				instructionExecute(opcodeValue);
-				if (active == false) { //This would be the case after execution of HALT instruction
-					running = false; //Don't attempt to execute any further instructions
-				}
-				//Need to coordinate this stage with writeBack stage for arithmetic instructions
-			}
-			
-		}			
-			
-	}
-		
 
 		
 		
@@ -317,6 +250,79 @@ public class ControlUnitImpl implements ControlUnit {
 	public Register getStatusRegister() {
 		return this.statusRegister;
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+//	public class FetchDecodeStage implements InstructionCycleStage {	
+//		private boolean running;
+//		private int opcodeValue;
+//		
+//		public FetchDecodeStage() {
+//			this.running = true;
+//		}
+//		
+//		public void run() {
+//			running = true;
+//			
+//			while (running) { //Fetching/decoding must be in a loop, as this continues until HALT instruction
+//			
+//				instructionFetch();	
+//				opcodeValue = instructionDecode();
+//				
+//				try {
+//					fetchToExecuteQueue.put(opcodeValue); //Program will wait until executeStage attempts take()
+//				} catch (InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				
+//				if (opcodeValue == 13) { //A HALT instruction; another fetch after this should not be attempted
+//					running = false;
+//				}
+//			}
+//		}	
+//		
+//	}
+//		
+//		
+//	public class ExecuteStage implements InstructionCycleStage {
+//		private int opcodeValue;
+//		private boolean running;//For pipelining mode; prompts the thread to keep attempting to retrieve an opcode from the queue
+//		//while execution of a program continues
+//		
+//		public ExecuteStage() {
+//			this.running = true;
+//		}
+//		
+//		public void run() {
+//			
+//			while (running) {
+//				
+//				try {
+//					opcodeValue = fetchToExecuteQueue.take();
+//				} catch (InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				
+//				instructionExecute(opcodeValue);
+//				if (active == false) { //This would be the case after execution of HALT instruction
+//					running = false; //Don't attempt to execute any further instructions
+//				}
+//				//Need to coordinate this stage with writeBack stage for arithmetic instructions
+//			}
+//			
+//		}			
+//			
+//	}
+//		
 	
 	
 	
