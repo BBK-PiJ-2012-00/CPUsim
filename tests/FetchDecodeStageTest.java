@@ -96,39 +96,32 @@ public class FetchDecodeStageTest {
 		assertEquals(expected, output);		
 	}
 	
-//	@Test
-//	public void testInstructionFetch2() { //Test instruction with PC set to another value
-//		memory.writeInstruction(testInstrSTORE, 19);
-//		controlUnit.getPC().setPC(19); //Need to manually set PC for testing; this will be set automatically when program loaded
-//		//via loader into memory; this will send a signal to CPU to set PC to start address.
-//		controlUnit.instructionFetch();
-//		
-//		Instruction expected = testInstrSTORE;
-//		Instruction output = controlUnit.getIR().read();
-//		assertEquals(expected, output);		
-//	}
-//	
-//	//A test to see what happens if the fetched item is in fact an Operand and not an Instruction would be useful;
-//	//implement some exception handling first.
-//	
-//	
-//	/*
-//	 * Not much to test here; just that the PC is incremented by the end of the method; all this method does
-//	 * is read the contents of the IR (which has been validated in the fetch test) and extract the integer value of its opcode,
-//	 * which is tested in the InstructionTest class.
-//	 * 
-//	 * Important to note is that instructionDecode() is called by instructionFetch(), so there is no need to explicitly
-//	 * call it again here.
-//	 */
-//	@Test
-//	public void testInstructionDecode() {
-//		memory.writeInstruction(testInstrSTORE, 0);
-//		controlUnit.instructionFetch(); //Need to fetch an instruction before decoding
-//		
-//		int expected = 1; //PC starts at 0 by default (unless set otherwise)
-//		int output = controlUnit.getPC().getValue();
-//		assertEquals(expected, output);
-//	}
+	@Test
+	public void testInstructionFetch2() { //Test instruction with PC set to another value
+		memory.writeInstruction(testInstrSTORE, 19);
+		pc.setPC(19); //Need to manually set PC for testing; this will be set automatically when program loaded
+		//via loader into memory; this will send a signal to CPU to set PC to start address.
+		fetchDecodeStage.instructionFetch();
+		
+		Instruction expected = testInstrSTORE;
+		Instruction output = ir.read();
+		assertEquals(expected, output);		
+	}
+	
+	//A test to see what happens if the fetched item is in fact an Operand and not an Instruction would be useful;
+	//implement some exception handling first.
+	
+	
+	@Test
+	public void testInstructionDecode() { //Test that PC is incremented by the end of the method
+		memory.writeInstruction(testInstrSTORE, 0);
+		fetchDecodeStage.instructionFetch(); //Need to fetch an instruction before decoding
+		fetchDecodeStage.instructionDecode();
+		
+		int expected = 1; //PC starts at 0 by default (unless set otherwise)
+		int output = pc.getValue();
+		assertEquals(expected, output);
+	}
 //
 //	
 //	@Test
