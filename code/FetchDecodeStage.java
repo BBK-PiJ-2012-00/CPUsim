@@ -1,31 +1,36 @@
 package code;
 
+/*
+ * This may not need to be abstract; pipelined version can extend this class, implement runnable and add
+ * a forward() method.
+ */
+
 public abstract class FetchDecodeStage {
-	private BusController systemBusController;
+	private BusController systemBus;
 	
 	private MemoryAddressRegister mar;
 	private MemoryBufferRegister mbr;	
 	
 	private InstructionRegister ir;
 	private ProgramCounter pc;
-	private RegisterFile genRegisters;
+	//private RegisterFile genRegisters;
 	
 	
-	public FetchDecodeStage(InstructionRegister ir, ProgramCounter pc, RegisterFile genRegisters) {
-		systemBusController = SystemBusController.getInstance();
+	public FetchDecodeStage(InstructionRegister ir, ProgramCounter pc) {
+		systemBus = SystemBusController.getInstance();
 		
 		mar = MAR.getInstance();
 		mbr = MBR.getInstance();
 		
 		this.ir = ir;
 		this.pc = pc;
-		this.genRegisters = genRegisters;
+		//this.genRegisters = genRegisters;
 	}
 	
 	
 	public void instructionFetch() {
 		mar.write(pc.getValue()); //Write address value in PC to MAR.
-		systemBusController.transferToMemory(mar.read(), null); //Transfer address from MAR to system bus, prompting read
+		systemBus.transferToMemory(mar.read(), null); //Transfer address from MAR to system bus, prompting read
 		mar.write(0);//Reset MAR (but is it more confusing to place 0 there, as 0 is valid memory address?
 		
 		//A Data item should now be in MBR
