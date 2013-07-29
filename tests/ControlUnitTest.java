@@ -1,5 +1,10 @@
 package tests;
 
+/*
+ * Much of the testing code in this class will be moved and adjusted after the implementation of
+ * Stage classes (even if the methods i.e. instructionFetch() remain all but unchanged).
+ */
+
 import static org.junit.Assert.*;
 
 import org.junit.Before;
