@@ -9,10 +9,10 @@ public class StandardExecuteStage extends ExecuteStage {
 		// TODO Auto-generated constructor stub
 	}
 	
-	@Override
-	public void receive(int opcode) {
-		this.instructionExecute(opcode);
-	}
+//	@Override
+//	public void receive(int opcode) {
+//		this.instructionExecute(opcode);
+//	}
 
 	@Override
 	public void forward(Operand result) {

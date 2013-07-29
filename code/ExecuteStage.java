@@ -139,7 +139,7 @@ public abstract class ExecuteStage {
 	} 
 	
 	
-	public abstract void receive(int opcode);
+	//public abstract void receive(int opcode);
 	
 	public abstract void forward(Operand result); //For forwarding execution to WriteBackStage
 	
