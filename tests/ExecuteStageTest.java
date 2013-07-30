@@ -219,15 +219,26 @@ public class ExecuteStageTest {
 		assertEquals(expected, output);
 	}
 	
-
 	
-//			case 5: //A SUB instruction (subtracting contents of one register from a second (storing in the first).
-//					op1 = (Operand) genRegisters.read(ir.read().getField1()); //access first operand
-//					op2 = (Operand) genRegisters.read(ir.read().getField2()); //access second operand
-//					result = ALU.SubtractionUnit(op1, op2);
-//					writeBackStage.receive(result);;
-//					break;				
-//					
+	@Test
+	public void testInstructionExecuteDIV() { //Test execution of DIV instruction
+		//testInstrDIV -> Divide contents of r3 by contents of r12, storing in r3
+		//Load operands into r3 and r12, for use by testInstrDIV
+		genRegisters.write(3, new OperandImpl(40));
+		genRegisters.write(12, new OperandImpl(10));
+		//Put the DIV instruction into memory for fetching
+		memory.notify(0, testInstrDIV);
+		fetchDecodeStage.instructionFetch();
+		int opcode = fetchDecodeStage.instructionDecode();
+		
+		executeStage.instructionExecute(opcode);
+		
+		Operand expected = new OperandImpl(4); //4 should be present in r3 (40 / 10)
+		Operand output = (Operand) genRegisters.read(3);
+		assertEquals(expected, output);
+	}
+	
+		
 //			case 6: //A DIV instruction (dividing contents of one register by contents of another (storing in the first).
 //					op1 = (Operand) genRegisters.read(ir.read().getField1()); //access first operand
 //					op2 = (Operand) genRegisters.read(ir.read().getField2()); //access second operand
