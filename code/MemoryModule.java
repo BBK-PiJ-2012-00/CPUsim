@@ -33,6 +33,8 @@ public class MemoryModule implements MainMemory {
 		return MEMORY[index];
 	}
 	
+	//Should take Data type as parameter, not Instruction (what about Operands are not type Instruction!)
+	//May even be obsolete, as notify() below could be used
 	//May take an array as a parameter, depdening on Loader implementation
 	public void writeInstruction(Instruction instr, int index) { //For use by Loader to write instructions into memory
 		MEMORY[index] = instr; 
