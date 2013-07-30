@@ -16,12 +16,17 @@ import code.InstructionRegister;
 import code.MainMemory;
 import code.MemoryModule;
 import code.Opcode;
+import code.Operand;
 import code.OperandImpl;
 import code.PC;
 import code.ProgramCounter;
 import code.Register;
 import code.RegisterFile;
+import code.RegisterFile16;
+import code.StandardExecuteStage;
 import code.StandardFetchDecodeStage;
+import code.StandardWriteBackStage;
+import code.StatusRegister;
 import code.TransferInstr;
 import code.WriteBackStage;
 
@@ -61,8 +66,13 @@ public class ExecuteStageTest {
 	public void setUp() throws Exception {
 		pc = new PC();
 		ir = new IR();
+		genRegisters = new RegisterFile16();
+		statusRegister = new StatusRegister();
+		
 		
 		fetchDecodeStage = new StandardFetchDecodeStage(ir, pc);
+		writeBackStage = new StandardWriteBackStage(ir, genRegisters);
+		executeStage = new StandardExecuteStage(ir, pc, genRegisters, statusRegister, writeBackStage);
 		
 		memory = MemoryModule.getInstance();
 		
@@ -86,13 +96,18 @@ public class ExecuteStageTest {
 		memory.notify(50, new OperandImpl(1000)); //Load operand (integer) 1000 to memory address 50		
 	}
 
-	@Before
-	public void setUp() throws Exception {
-	}
 
 	@Test
-	public void test() {
-		fail("Not yet implemented");
+	public void testForward() { //Tests forward() method (forwards result of arithmetic operations to write back)
+		ir.loadIR(testInstrDIV); //Load instruction to IR (should store operand in r3)
+		executeStage.forward(new OperandImpl(300));
+		
+		Operand output = (Operand) genRegisters.read(3); //300 should be in r3 as result of calling forward()
+		Operand expected = new OperandImpl(300);
+		
+		assertEquals(expected, output);
+		
 	}
 
 }
+
