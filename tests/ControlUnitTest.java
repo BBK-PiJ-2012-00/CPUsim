@@ -14,7 +14,11 @@ import code.*;
 
 public class ControlUnitTest {
 	private ControlUnit controlUnit;
-	private MainMemory memory;	
+	private MainMemory memory;
+	
+	private Instruction testInstrLOAD_2;
+	private Instruction testInstrLOAD_4;
+	private Instruction testInstrSTORE_7;
 	
 	private Instruction testInstrSTORE;
 	private Instruction testInstrLOAD;
@@ -40,6 +44,10 @@ public class ControlUnitTest {
 		memory = MemoryModule.getInstance();
 		controlUnit = new ControlUnitImpl(false); //False parameter deactivates pipelining
 		
+		testInstrLOAD_2 = new TransferInstr(Opcode.LOAD, 5, 2); //Load contents of addr. 5 to r2
+		testInstrLOAD_4 = new TransferInstr(Opcode.LOAD, 6, 4); //Load contents of addr. 6 to r4
+		testInstrSTORE_7 = new TransferInstr(Opcode.STORE, 2, 7); //Store contents of r2 to addr. 7
+		
 		testInstrSTORE = new TransferInstr(Opcode.STORE, 0, 99); //source r0, destination address 99
 		testInstrLOAD = new TransferInstr(Opcode.LOAD, 50, 0); //Load contents of address 50 to register 0
 		testInstrMOVE = new TransferInstr(Opcode.MOVE, 0, 15); //Move contents of r0 to r15
@@ -57,8 +65,64 @@ public class ControlUnitTest {
 		
 		testInstrHALT = new HaltInstr(Opcode.HALT); //Halt instruction 
 		
-		memory.notify(50, new OperandImpl(1000)); //Load operand (integer) 1000 to memory address 50		
+		memory.notify(50, new OperandImpl(1000)); //Load operand (integer) 1000 to memory address 50
+		
+		memory.notify(0, testInstrLOAD_2); 
+		memory.notify(1, testInstrLOAD_4); 
+		memory.notify(2, testInstrADD); //Load instruction to addr 2
+		memory.notify(3, testInstrSTORE_7); //Load instruction to addr 3
+		memory.notify(4, testInstrHALT); //Load HALT instruction to addr 3
+		memory.notify(5, new OperandImpl(10)); //Load operand 10 to address 0
+		memory.notify(6, new OperandImpl(20)); //Load operand 20 to address 1
 	}
+	
+	/*
+	 * Test non-pipelined execution.
+	 */
+	@Test
+	public void activateTest() { //Test activate() of ControlUnit, which triggers instruction cycle
+		//Result of this instruction cycle should be that a value of 30 is stored in memory address 4
+		controlUnit.activate();
+		System.out.println("r2: " + controlUnit.getRegisters().read(2));
+		for (int i = 0; i < 8; i++) {
+			System.out.println(memory.accessAddress(i));
+		}
+		
+		Operand output = (Operand) memory.accessAddress(7);
+		Operand expected = new OperandImpl(30);
+		
+		assertEquals(expected, output);
+		
+	}
+	
+//	
+//	private void launch() { //The method that kick starts execution of a program, and manages it
+//		if (!pipeliningMode) { 
+//			while (active) {
+//				fetchDecodeStage.instructionFetch();
+//				int opcode = fetchDecodeStage.instructionDecode();
+//				
+//				this.active = executeStage.instructionExecute(opcode); //Returns false if HALT encountered
+//				//executeStage has a reference to, and calls if necessary, writeBackStage (only for arithmetic operations).
+//				
+////				this.instructionFetch(); //Fetches instruction, then calls decode, which calls execute etc.
+////				int opcode = this.instructionDecode();
+////				this.instructionExecute(opcode);
+//			}
+//		}
+//	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 	/*
 //	 * The result of an instruction fetch is that the IR should contain the instruction held
