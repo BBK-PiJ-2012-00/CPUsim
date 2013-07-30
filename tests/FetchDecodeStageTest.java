@@ -159,6 +159,8 @@ public class FetchDecodeStageTest {
 		int expected = 4; //HALT should decode to integer value of 4
 		assertEquals(expected, output);
 	}
+	
+	//Tests for pipelined version to follow once implemented
 
 
 }
