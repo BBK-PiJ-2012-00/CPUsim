@@ -238,14 +238,28 @@ public class ExecuteStageTest {
 		assertEquals(expected, output);
 	}
 	
+	
+	@Test
+	public void testInstructionExecuteMUL() { //Test execution of MUL instruction
+		//testInstrMUL -> Multiply contents of r5 by contents of r8, storing in r5
+		//Load operands into r5 and r8, for use by testInstrMUL
+		genRegisters.write(5, new OperandImpl(7));
+		genRegisters.write(8, new OperandImpl(11));
+		//Put the MUL instruction into memory for fetching
+		memory.notify(0, testInstrMUL);
+		fetchDecodeStage.instructionFetch();
+		int opcode = fetchDecodeStage.instructionDecode();
 		
-//			case 6: //A DIV instruction (dividing contents of one register by contents of another (storing in the first).
-//					op1 = (Operand) genRegisters.read(ir.read().getField1()); //access first operand
-//					op2 = (Operand) genRegisters.read(ir.read().getField2()); //access second operand
-//					result = ALU.DivisionUnit(op1, op2); //op1 / op2
-//					writeBackStage.receive(result);;
-//					break;					
-//					
+		executeStage.instructionExecute(opcode);
+		
+		Operand expected = new OperandImpl(77); //77 should be present in r5 (7 * 11)
+		Operand output = (Operand) genRegisters.read(5);
+		assertEquals(expected, output);
+	}
+	
+	
+
+	
 //			case 7: //A MUL instruction (multiplying contents of one register by contents of another (storing result in first).
 //					op1 = (Operand) genRegisters.read(ir.read().getField1()); //access first operand
 //					op2 = (Operand) genRegisters.read(ir.read().getField2()); //access second operand
