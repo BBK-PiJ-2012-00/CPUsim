@@ -166,6 +166,40 @@ public class ExecuteStageTest {
 	}
 	
 	
+	@Test
+	public void testInstructionExecuteMOVE2() {//Test execution of MOVE instruction; check source register reset to null after move
+		Operand operand = new OperandImpl(5000);
+		//Load operand to r0
+		genRegisters.write(0, operand);
+		//Load MOVE instruction to memory address 0
+		memory.notify(0, testInstrMOVE);
+		//Fetch and execute the instruction; operand should end up in r15 (see testInstrMOVE in setup)
+		fetchDecodeStage.instructionFetch();
+		int opcode = fetchDecodeStage.instructionDecode();
+		executeStage.instructionExecute(opcode);
+		
+		assertNull(genRegisters.read(0));//r0 should be null after move of operand to r15
+	}
+	
+	
+	
+	@Test
+	public void testInstructionExecuteADD() { //Test execution of ADD instruction
+		//testInstrADD -> Add contents of r2 and r4, storing in r2
+		//Load operands into r2 and r4, for use by testInstrADD detailed in setUp.
+		genRegisters.write(2, new OperandImpl(5));
+		genRegisters.write(4, new OperandImpl(7));
+		//Put the ADD instruction into memory for fetching
+		memory.notify(0, testInstrADD);
+		fetchDecodeStage.instructionFetch();
+		int opcode = fetchDecodeStage.instructionDecode();
+		
+		executeStage.instructionExecute(opcode);
+		
+		Operand expected = new OperandImpl(12); //12 should be present in r2 (5 + 7)
+		Operand output = (Operand) genRegisters.read(2);
+		assertEquals(expected, output);
+	}
 	
 
 	
