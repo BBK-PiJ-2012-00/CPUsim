@@ -201,15 +201,26 @@ public class ExecuteStageTest {
 		assertEquals(expected, output);
 	}
 	
+	
+	@Test
+	public void testInstructionExecuteSUB() { //Test execution of SUB instruction
+		//Load operands into r9 and r10, for use by testInstrSUB
+		genRegisters.write(9, new OperandImpl(50));
+		genRegisters.write(10, new OperandImpl(25));
+		//Put the SUB instruction into memory for fetching
+		memory.notify(0, testInstrSUB);
+		fetchDecodeStage.instructionFetch();
+		int opcode = fetchDecodeStage.instructionDecode();
+		
+		executeStage.instructionExecute(opcode);
+		
+		Operand expected = new OperandImpl(25); //25 should be present in r9 (50 - 25)
+		Operand output = (Operand) genRegisters.read(9);
+		assertEquals(expected, output);
+	}
+	
 
 	
-//			case 4: //An ADD instruction (adding contents of one register to second (storing in the first).
-//					Operand op1 = (Operand) genRegisters.read(ir.read().getField1()); //access operand stored in first register
-//					Operand op2 = (Operand) genRegisters.read(ir.read().getField2());//access operand stored in second register
-//					Operand result = ALU.AdditionUnit(op1, op2); //Have ALU perform operation
-//					writeBackStage.receive(result); //Call write back stage to store result of addition
-//					break;
-//			
 //			case 5: //A SUB instruction (subtracting contents of one register from a second (storing in the first).
 //					op1 = (Operand) genRegisters.read(ir.read().getField1()); //access first operand
 //					op2 = (Operand) genRegisters.read(ir.read().getField2()); //access second operand
