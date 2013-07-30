@@ -274,14 +274,28 @@ public class ExecuteStageTest {
 	}
 	
 	
+	@Test
+	public void testInstructionExecuteBRZ_branchTaken() { //Test BRZ execution
+		//testInstrBRZ -> Branch to memory address 37
+		memory.notify(0, testInstrBRZ); //Load memory address 0 with branch instruction
+		statusRegister.write(new OperandImpl(0)); //Set status register to hold 0
 
+		fetchDecodeStage.instructionFetch();
+		int opcode = fetchDecodeStage.instructionDecode();
+		
+		executeStage.instructionExecute(opcode);
+		
+		int expected = 37; //PC should hold 37, as the branch should be taken
+		int output = pc.getValue();
+		assertEquals(expected, output);
+	}
+	
+	
+	
+	
 	
 
-//			case 8: //A BR instruction (unconditional branch to memory location in instruction field 1).
-//					pc.setPC(ir.read().getField1());
-//					//A branch instruction updates PC to new memory location
-//					break;
-//				
+	
 //			case 9: //A BRZ instruction (branch if value in status register is zero).
 //					if (statusRegister.read().unwrapInteger() == 0) {
 //						pc.setPC(ir.read().getField1()); //If statusRegister holds 0, set PC to new address held in instruction
