@@ -78,11 +78,16 @@ public class MemoryModule implements MainMemory {
 	}
 	
 	
-	
+	//Fix so that numbers 1-10 display with extra space to align | character
 	public void display() { //Display memory on command line interface
 		System.out.println("  -- MAIN MEMORY --  ");
 		for (int i = 0; i < MEMORY.length; i++) {
-			System.out.println(i + "| " + MEMORY[i].toString());
+			if (MEMORY[i] == null) {
+				System.out.println(i + "| " + "--------");
+			}
+			else { 
+				System.out.println(i + "| " + MEMORY[i].toString());
+			}
 		}
 	}
 	
