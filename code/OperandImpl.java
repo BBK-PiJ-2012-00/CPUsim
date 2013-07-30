@@ -86,5 +86,18 @@ public class OperandImpl implements Operand {
 		Integer i = (Integer) this.unwrapInteger();
 		return i.hashCode();
 	}
+	
+	
+	@Override
+	public String toString() {
+		if (isInteger) {
+			return intOperand + ""; //Return int as String 	
+		}
+		if (isFloatingPoint) {
+			return floatingPointOperand + "";
+		}
+		return null;
+	}
+	
 
 }
