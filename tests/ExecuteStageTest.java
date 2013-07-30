@@ -338,7 +338,7 @@ public class ExecuteStageTest {
 	
 	@Test
 	public void testInstructionExecuteBRE_branchTaken() { //Test BRE execution
-		//testInstrBRE = new BranchInstr(Opcode.BRE, 92, 1); //Branch to address 92 if contents of r1 equals contents of status reg
+		//testInstrBRE -> Branch to address 92 if contents of r1 equals contents of status reg
 		memory.notify(0, testInstrBRE); //Load memory address 0 with branch instruction
 		statusRegister.write(new OperandImpl(23)); //Set status register to hold 23
 		genRegisters.write(1, new OperandImpl(23)); //Set r1 to hold 23
@@ -355,7 +355,7 @@ public class ExecuteStageTest {
 	
 	@Test
 	public void testInstructionExecuteBRE_branchNotTaken() { //Test BRE execution
-		//testInstrBRE = new BranchInstr(Opcode.BRE, 92, 1); //Branch to address 92 if contents of r1 equals contents of status reg
+		//testInstrBRE -> Branch to address 92 if contents of r1 equals contents of status reg
 		memory.notify(0, testInstrBRE); //Load memory address 0 with branch instruction
 		statusRegister.write(new OperandImpl(23)); //Set status register to hold 23
 		genRegisters.write(1, new OperandImpl(20)); //Set r1 to hold 20
@@ -367,21 +367,45 @@ public class ExecuteStageTest {
 		int expected = 1; //PC should = 1, as branch should not be taken
 		int output = pc.getValue();
 		assertEquals(expected, output);		
+	}	
+	
+	
+	
+	@Test
+	public void testInstructionExecuteBRNE_branchTaken() { //Test BRNE execution
+		//testInstrBRNE -> Branch to addr. 77 if contents of r6 doesn't equal contents of s. reg.
+		memory.notify(0, testInstrBRNE); //Load test Instr to address 0
+		statusRegister.write(new OperandImpl(14)); //Set status register to hold 14
+		genRegisters.write(6, new OperandImpl(11)); //Set r6 to hold 11
+		fetchDecodeStage.instructionFetch(); //Fetch and execute BRE instruction
+		int opcode = fetchDecodeStage.instructionDecode();
+		
+		executeStage.instructionExecute(opcode);
+		
+		int expected = 77; //PC should hold 77 (branch should be taken)
+		int output = pc.getValue();
+		assertEquals(expected, output);
 	}
 	
 	
+	@Test
+	public void testInstructionExecuteBRNE_branchNotTaken() { //Test BRNE execution
+		//testInstrBRNE -> Branch to addr. 77 if contents of r6 doesn't equal contents of s. reg.
+		memory.notify(0, testInstrBRNE); //Load test Instr to address 0
+		statusRegister.write(new OperandImpl(14)); //Set status register to hold 14
+		genRegisters.write(6, new OperandImpl(14)); //Set r6 to hold 14
+		fetchDecodeStage.instructionFetch(); //Fetch and execute BRE instruction
+		int opcode = fetchDecodeStage.instructionDecode();
+		
+		executeStage.instructionExecute(opcode);
+		
+		int expected = 1; //PC should hold 1 (branch should not be taken)
+		int output = pc.getValue();
+		assertEquals(expected, output);
+	}
 	
 	
-
-//					 
-//			case 12: //A BRNE instruction (branch if status reg. contents != contents of register ref. in instruction)
-//					 genRegRef = ir.read().getField2(); //Reference to register referred to in instruction
-//					 if (!(statusRegister.read().equals((Operand) genRegisters.read(genRegRef)))) { //If not equal
-//						 pc.setPC(ir.read().getField1()); //Set PC to equal address in field1 of instruction in ir						 
-//					 }
-//					 break; //If equal, do nothing
-//					 
-//			
+//		
 //					 
 //			case 13: //A HALT instruction (stops instruction cycle). For clarity, resets all registers.
 //					 pc.setPC(0);
