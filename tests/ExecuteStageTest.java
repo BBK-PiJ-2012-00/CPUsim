@@ -129,23 +129,26 @@ public class ExecuteStageTest {
 		assertEquals(expected, output);	
 	}
 	
-//	public boolean instructionExecute(int opcode) {
-//		switch (opcode) {
-//		
-//			case 1: //A LOAD instruction
-//					mar.write(ir.read().getField1()); //Load mar with source address of instruction in IR
-//					//Request a read from memory via system bus, with address contained in mar
-//					systemBus.transferToMemory(mar.read(), null);
-//					
-//					mar.write(0); //Reset MAR
-//					
-//					//Transfer data in mbr to destination field in instruction in ir (field2).
-//					genRegisters.write(ir.read().getField2(), mbr.read());//getField2() gives reg. destination index, mbr.read()
-//					//gives the operand to be moved from mbr to genRegisters at index given in getField2().
-//					
-//					mbr.write(null); //Reset MBR
-//					//Reset IR?
-//					break;
+	
+	@Test
+	public void testInstructionExecuteSTORE() { //Test execution of STORE instruction
+		Operand operand = new OperandImpl(5000);
+		//Firstly, load an operand (5000) into r0
+		genRegisters.write(0, operand);
+		//Now load a store instruction into memory address 0, ready for fetch
+		memory.notify(0, testInstrSTORE);
+		fetchDecodeStage.instructionFetch();
+		int opcode = fetchDecodeStage.instructionDecode();
+		executeStage.instructionExecute(opcode);
+		//Should result in operand 5000 being stored at address 99
+		
+		Data expected = operand;
+		Data output = memory.accessAddress(99);
+		assertEquals(expected, output);		
+	}
+	
+	
+	
 //					
 //			case 2: //A STORE instruction
 //					mar.write(ir.read().getField2()); //Load mar with destination (memory address)
