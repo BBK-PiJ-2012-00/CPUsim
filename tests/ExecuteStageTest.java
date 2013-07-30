@@ -148,24 +148,27 @@ public class ExecuteStageTest {
 	}
 	
 	
+	@Test
+	public void testInstructionExecuteMOVE() { //Test execution of MOVE instruction
+		Operand operand = new OperandImpl(5000);
+		//Load operand to r0
+		genRegisters.write(0, operand);
+		//Load MOVE instruction to memory address 0
+		memory.notify(0, testInstrMOVE);
+		//Fetch and execute the instruction; operand should end up in r15 (see testInstrMOVE in setup)
+		fetchDecodeStage.instructionFetch();
+		int opcode = fetchDecodeStage.instructionDecode();
+		executeStage.instructionExecute(opcode);
+		
+		Operand expected = operand;
+		Operand output = (Operand) genRegisters.read(15);
+		assertEquals(expected, output);
+	}
 	
-//					
-//			case 2: //A STORE instruction
-//					mar.write(ir.read().getField2()); //Load mar with destination (memory address)
-//					mbr.write(genRegisters.read(ir.read().getField1())); //Write to mbr the data held in genRegisters at index
-//					//given by field1(source) of instruction held in IR.
-//					systemBus.transferToMemory(mar.read(), mbr.read()); //Transfer contents of mbr to address specified in mar
-//					break;
-//					
-//			case 3: //A MOVE instruction (moving data between registers)
-//					genRegisters.write(ir.read().getField2(), genRegisters.read(ir.read().getField1()));
-//					//Write to the destination specified in field2 of instr held in ir, the instr held in the register
-//					//specified by field1 of the instruction in the ir.
-//					genRegisters.write(ir.read().getField1(), null); //Complete the move by resetting register source
-//					break;
-//					
-//					
-//					
+	
+	
+
+	
 //			case 4: //An ADD instruction (adding contents of one register to second (storing in the first).
 //					Operand op1 = (Operand) genRegisters.read(ir.read().getField1()); //access operand stored in first register
 //					Operand op2 = (Operand) genRegisters.read(ir.read().getField2());//access operand stored in second register
