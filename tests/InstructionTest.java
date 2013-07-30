@@ -188,7 +188,7 @@ public class InstructionTest {
 	
 	@Test
 	public void branchInstrGetField2Test() {
-		instr = new BranchInstr(Opcode.SKZ, 70);
+		instr = new BranchInstr(Opcode.BRZ, 70);
 		int output = instr.getField2();
 		int expected = -1; //-1 fixed return value for getField2() for branch instructions
 		assertEquals(expected, output);
