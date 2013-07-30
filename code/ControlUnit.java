@@ -19,7 +19,7 @@ public interface ControlUnit {
 	
 	//public void instructionWriteBack(Operand result); //Only required for arithemtic instructions; store the result
 	
-	public void launch(); //Launch execution
+	public void activate(); //Initiate instruction cycle execution
 	
 	public InstructionRegister getIR();//To access IR; for testing purposes
 	
