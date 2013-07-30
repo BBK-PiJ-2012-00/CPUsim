@@ -307,6 +307,21 @@ public class ExecuteStageTest {
 	}
 	
 	
+	@Test
+	public void testInstructionExecuteSKZ() { //Test SKZ execution
+		memory.notify(0, testInstrSKZ); //Load memory address 0 with branch instruction
+		statusRegister.write(new OperandImpl(0)); //Set status register to hold 0
+		fetchDecodeStage.instructionFetch(); //Fetch and execute SKZ instruction
+		int opcode = fetchDecodeStage.instructionDecode();
+		
+		executeStage.instructionExecute(opcode);
+		
+		int expected = 2; //PC should = 2, as branch should be taken (meaning PC is incremented)
+		int output = pc.getValue();
+		assertEquals(expected, output);
+	}
+	
+	
 	
 	
 	
