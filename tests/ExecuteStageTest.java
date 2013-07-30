@@ -377,7 +377,7 @@ public class ExecuteStageTest {
 		memory.notify(0, testInstrBRNE); //Load test Instr to address 0
 		statusRegister.write(new OperandImpl(14)); //Set status register to hold 14
 		genRegisters.write(6, new OperandImpl(11)); //Set r6 to hold 11
-		fetchDecodeStage.instructionFetch(); //Fetch and execute BRE instruction
+		fetchDecodeStage.instructionFetch(); //Fetch and execute BRNE instruction
 		int opcode = fetchDecodeStage.instructionDecode();
 		
 		executeStage.instructionExecute(opcode);
@@ -394,7 +394,7 @@ public class ExecuteStageTest {
 		memory.notify(0, testInstrBRNE); //Load test Instr to address 0
 		statusRegister.write(new OperandImpl(14)); //Set status register to hold 14
 		genRegisters.write(6, new OperandImpl(14)); //Set r6 to hold 14
-		fetchDecodeStage.instructionFetch(); //Fetch and execute BRE instruction
+		fetchDecodeStage.instructionFetch(); //Fetch and execute BRNE instruction
 		int opcode = fetchDecodeStage.instructionDecode();
 		
 		executeStage.instructionExecute(opcode);
@@ -402,6 +402,31 @@ public class ExecuteStageTest {
 		int expected = 1; //PC should hold 1 (branch should not be taken)
 		int output = pc.getValue();
 		assertEquals(expected, output);
+	}
+	
+	
+	@Test
+	public void testInstructionHALT_setPC0() { //Check PC is reset to 0 upon execution of halt
+		memory.notify(0, testInstrHALT);
+		fetchDecodeStage.instructionFetch(); //Fetch and execute HALT instruction
+		int opcode = fetchDecodeStage.instructionDecode();
+		
+		executeStage.instructionExecute(opcode);
+		
+		int expected = 0;
+		int output = pc.getValue();
+		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void testInstructionHALT_returnsFalse() { //Check HALT instruction returns false
+		memory.notify(0, testInstrHALT);
+		fetchDecodeStage.instructionFetch(); //Fetch and execute HALT instruction
+		int opcode = fetchDecodeStage.instructionDecode();
+		
+		boolean result = executeStage.instructionExecute(opcode);
+		
+		assertFalse(result);
 	}
 	
 	
