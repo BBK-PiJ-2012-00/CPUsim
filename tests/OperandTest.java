@@ -83,5 +83,17 @@ public class OperandTest {
 		floatOp = new OperandImpl(3.4);
 		assertFalse(floatOp.isInteger());
 	}
+	
+	@Test
+	public void testIntegerToString() {
+		intOp = new OperandImpl(5);
+		assertEquals("5", intOp.toString());
+	}
+	
+	@Test
+	public void testFloatingPointToString() {
+		floatOp = new OperandImpl(5.5);
+		assertEquals("5.5", floatOp.toString());
+	}
 
 }
