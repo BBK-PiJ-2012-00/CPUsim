@@ -19,6 +19,8 @@ public interface ControlUnit {
 	
 	//public void instructionWriteBack(Operand result); //Only required for arithemtic instructions; store the result
 	
+	public void launch(); //Launch execution
+	
 	public InstructionRegister getIR();//To access IR; for testing purposes
 	
 	public ProgramCounter getPC(); //To access PC; for testing purposes

@@ -69,7 +69,7 @@ public class ControlUnitImpl implements ControlUnit {
 		this.active = false;
 	}
 	
-	private void launch() { //The method that kick starts execution of a program, and manages it
+	public void launch() { //The method that kick starts execution of a program, and manages it
 		if (!pipeliningMode) { 
 			while (active) {
 				fetchDecodeStage.instructionFetch();
@@ -83,8 +83,6 @@ public class ControlUnitImpl implements ControlUnit {
 //				this.instructionExecute(opcode);
 			}
 		}
-		
-
 	}
 	
 //	public void instructionFetch() {
