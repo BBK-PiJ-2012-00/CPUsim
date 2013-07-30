@@ -258,17 +258,25 @@ public class ExecuteStageTest {
 	}
 	
 	
+	@Test
+	public void testInstructionExecuteBR() { //Test BR instruction execution
+		//testInstrBR -> Branch to memory address 10
+		//Load testInstrBR to memory address 0 for fetching
+		memory.notify(0, testInstrBR);
+		fetchDecodeStage.instructionFetch();
+		int opcode = fetchDecodeStage.instructionDecode();
+		
+		executeStage.instructionExecute(opcode);
+		
+		int expected = 10; //Expect PC to now point to memory address 10
+		int output = pc.getValue();
+		assertEquals(expected, output);
+	}
+	
+	
 
 	
-//			case 7: //A MUL instruction (multiplying contents of one register by contents of another (storing result in first).
-//					op1 = (Operand) genRegisters.read(ir.read().getField1()); //access first operand
-//					op2 = (Operand) genRegisters.read(ir.read().getField2()); //access second operand
-//					result = ALU.MultiplicationUnit(op1, op2); //op1 * op2
-//					writeBackStage.receive(result);;
-//					break;
-//					
-//					
-//					
+
 //			case 8: //A BR instruction (unconditional branch to memory location in instruction field 1).
 //					pc.setPC(ir.read().getField1());
 //					//A branch instruction updates PC to new memory location
