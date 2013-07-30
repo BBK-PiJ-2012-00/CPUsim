@@ -24,6 +24,7 @@ public abstract class ExecuteStage {
 		this.ir = ir;
 		this.pc = pc;
 		this.genRegisters = genRegisters;
+		this.statusRegister = statusRegister;
 		
 		this.writeBackStage = writeBackStage;
 	}
@@ -98,6 +99,7 @@ public abstract class ExecuteStage {
 					break;
 				
 			case 9: //A BRZ instruction (branch if value in status register is zero).
+					System.out.println("From stage:" + statusRegister.read().unwrapInteger());
 					if (statusRegister.read().unwrapInteger() == 0) {
 						pc.setPC(ir.read().getField1()); //If statusRegister holds 0, set PC to new address held in instruction
 					}
