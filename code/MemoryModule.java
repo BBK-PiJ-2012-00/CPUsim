@@ -55,17 +55,17 @@ public class MemoryModule implements MainMemory {
 	 * be put together into one large array to be passed to this method). 
 	 */
 	public void loadMemory(Data[] programCode) {
-		int pointerValue = pointer; //Pointer value before loading program code
-		if (pointer != 0) {
-			pointerValue = pointer; //Save value of pointer so that PC can be set to start address of program, if not 0
-		}
+	//	int pointerValue = pointer; //Pointer value before loading program code
+	//	if (pointer != 0) {
+	//		pointerValue = pointer; //Save value of pointer so that PC can be set to start address of program, if not 0
+	//	}
 		for (Data line : programCode) {
 			MEMORY[pointer] = line; //Load pointer location with line of program code
 			pointer++; //Increment pointer
 		}
-		if (pointerValue != 0) { //Set PC to start address, if not 0 (PC set to 0 by default)
+	//	if (pointerValue != 0) { //Set PC to start address, if not 0 (PC set to 0 by default)
 			
-		}
+	//	}
 	}
 	
 	public void setPC() { //Method to send start address of program code via system bus to set PC before execution begins
