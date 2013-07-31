@@ -47,6 +47,32 @@ public class MemoryModule implements MainMemory {
 	}
 	
 	
+	/*
+	 * Absolute addressing may be clearer pedagogically; will there ever be a need to start a program from a 
+	 * memory address other than 0? Even if data variables are declared first in the assembly language, it can
+	 * be assembled in such away that instructions are loaded first, with data following, thus execution will
+	 * always start from address 0 (array can be made of variables, then of instructions, and then the two can
+	 * be put together into one large array to be passed to this method). 
+	 */
+	public void loadMemory(Data[] programCode) {
+		int pointerValue = pointer; //Pointer value before loading program code
+		if (pointer != 0) {
+			pointerValue = pointer; //Save value of pointer so that PC can be set to start address of program, if not 0
+		}
+		for (Data line : programCode) {
+			MEMORY[pointer] = line; //Load pointer location with line of program code
+			pointer++; //Increment pointer
+		}
+		if (pointerValue != 0) { //Set PC to start address, if not 0 (PC set to 0 by default)
+			
+		}
+	}
+	
+	public void setPC() { //Method to send start address of program code via system bus to set PC before execution begins
+		//Can use systembus.transferToCPU(), 
+	}
+	
+	
 	public boolean notify(int address, Data data) { //Method to prompt memory to receive data from system bus (write)
 		//No checking of address being empty or not; up to programmer
 		if (address < 100 && address >= 0) {
