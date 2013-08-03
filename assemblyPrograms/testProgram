@@ -27,7 +27,7 @@ var3:    DATA 0 #The target location of a STORE instr. can be declared and initi
 The use of absolute addresses may be clearer pedagogically; symbolic addressing would be more realistic. However, once
 assembled, addressing will no longer be symbolic. Also, rather than assembling to full machine code, which is harder to 
 read and to follow through the execution, it might be an idea to display an assembled program with absolute addresses, 
-as in the first example.
+as in the first example (except that the first column won't show up, as the instructions will be in memory).
 
 Labels can be assigned to address values using a HashMap.
 
