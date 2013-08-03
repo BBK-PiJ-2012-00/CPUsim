@@ -3,6 +3,10 @@ package code;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+ * Initially, the Loader simply loads program code into memory and doesn't perform any address resolution,
+ * as addressing is initially absolute and not symbolic.
+ */
 public class LoaderImpl implements Loader {
 	private MainMemory memory = MemoryModule.getInstance();
 	private List<Data> codeBuffer = new ArrayList<Data>(); //To buffer code coming in from memory (amount not known in advance)
@@ -13,9 +17,9 @@ public class LoaderImpl implements Loader {
 		codeBuffer.add(dataItem);
 	}
 	
-	public void loadToMemory(Data[] programCode) {
-		this.programCode = programCode;
-		memory.loadMemory(programCode);
+	public void loadToMemory() {
+		this.programCode = codeBuffer.toArray(new Data[codeBuffer.size()]); //Convert codeBuffer to standard array
+		memory.loadMemory(programCode);		
 	}
 	
 	
