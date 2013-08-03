@@ -9,13 +9,14 @@ Following assembly language format outlined in Stallings CA: 499-500
 04         DATA 9  #Store operand value 9 in address 4
 05         DATA 13 #Store operand value 13 in address 5
 
-Or, to take a symbolic approach:
+Or, to take a symbolic address approach:
 
 <Label>  <Instruction>
 L1:      LOAD r0, var1  #Presence of a label before an instruction indicates it will likely be a branch target
          LOAD r1, var2
          ADD r2, r1
          STORE r1, var3
+         HALT
 
 var1:    DATA 9
 var2:    DATA 13
