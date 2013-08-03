@@ -1,9 +1,40 @@
 
+Following assembly language format outlined in Stallings CA: 499-500
+
+<Address>  <Instruction>
+00         LOAD r0, [5]  #Load register 0 with contents of memory address 5 (this instruction is to be located in addr. 0)
+01		   LOAD r1, [4]
+02         ADD r2, r1
+03         STORE r1, [7]  #Store the contents of r1 in memory address 7
+04         DATA 9  #Store operand value 9 in address 4
+05         DATA 13 #Store operand value 13 in address 5
+
+Or, to take a symbolic approach:
+
+<Label>  <Instruction>
+L1:      LOAD r0, var1  #Presence of a label before an instruction indicates it will likely be a branch target
+         LOAD r1, var2
+         ADD r2, r1
+         STORE r1, var3
+
+var1:    DATA 9
+var2:    DATA 13
+var3:    DATA 0 #The target location of a STORE instr. can be declared and initialised to 0
+         
+
+
+
+
+
+
+
+
+
 .DATA    #variable declarations are in this section
 
-var1     1
-var2     5
-var3     10
+10: var1     1
+11: var2     5
+12: var3     10
 
 #variables will be loaded to consecutive memory addresses, before or after the main program code
 
@@ -13,7 +44,7 @@ var3     10
 #The addresses are relative; 0 indicates address of first instruction, 1 implies the address of the first instruction + 1 etc.
 
 0: LOAD r1, <var1> # 
-1:
+1: LOAD r2, <var2>
 2:
 
 
@@ -30,5 +61,6 @@ var1:      .word                3
 array2:   .byte                 'a','b'  #create a two-element char array with elements initialised to a and b
 
 
-#Will the loader decide on addresses? Assembler just uses lables?
-#A map may help associate labels with addresses
+#Will the loader decide on addresses? Assembler just uses labels?
+#A map may help associate labels with addresses; the data directive could be stored in a map so <var1> can be easily looked up
+#May be useful to begin with absolute, fixed addressing; specify memory addresses in assembly
