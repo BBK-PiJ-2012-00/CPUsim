@@ -16,6 +16,7 @@ L1:      LOAD r0, var1  #Presence of a label before an instruction indicates it 
          LOAD r1, var2
          ADD r2, r1
          STORE r1, var3
+         BRZ L1 #Branch to L1, which is the LOAD r0, r1 instruction
          HALT
 
 var1:    DATA 9
@@ -23,7 +24,8 @@ var2:    DATA 13
 var3:    DATA 0 #The target location of a STORE instr. can be declared and initialised to 0
          
 
-
+The use of absolute addresses may be clearer pedagogically; symbolic addressing would be more realistic. 
+Labels can be assigned to address values using a HashMap.
 
 
 
@@ -61,7 +63,5 @@ var1:      .word                3
 
 array2:   .byte                 'a','b'  #create a two-element char array with elements initialised to a and b
 
-
-#Will the loader decide on addresses? Assembler just uses labels?
 #A map may help associate labels with addresses; the data directive could be stored in a map so <var1> can be easily looked up
 #May be useful to begin with absolute, fixed addressing; specify memory addresses in assembly
