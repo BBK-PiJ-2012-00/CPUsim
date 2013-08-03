@@ -34,6 +34,21 @@ public class MemoryModule implements MainMemory {
 		return this.pointer;
 	}
 	
+	public void resetPointer() {
+		this.pointer = 0;
+	}
+	
+	public void clearMemory() { //To reset memory contents when loading a new program
+		for (int i = 0; i < 100; i++) { //Resets each non-null address to null, effectively clearing memor contents
+			if (MEMORY[i] != null) {
+				MEMORY[i] = null;
+			}
+			else {
+				break;
+			}
+		}
+	}
+	
 	public Data accessAddress(int index) { //Primarily for testing purposes, not for use by program.
 		return MEMORY[index];
 	}
