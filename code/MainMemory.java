@@ -40,6 +40,16 @@ public interface MainMemory {
 	 */
 	public boolean notify(int address); //Absence of data indicates requested memory read as opposed to write (as in reality)
 		//Must return data to system bus for transfer back to cpu
+	
+	
+
+	public int getPointer(); 
+	
+	public void resetPointer();
+	
+	public void clearMemory(); //To reset memory contents when loading a new program
+		 //Resets each non-null address to null, effectively clearing memor contents
+			
 		
 	
 	//Has reference to memory port(s) -> one for input, one for output, or perhaps several for pipelining
