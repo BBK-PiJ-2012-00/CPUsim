@@ -29,6 +29,11 @@ public class MemoryModule implements MainMemory {
 		return memoryModule;
 	}
 	
+	
+	public int getPointer() {
+		return this.pointer;
+	}
+	
 	public Data accessAddress(int index) { //Primarily for testing purposes, not for use by program.
 		return MEMORY[index];
 	}
