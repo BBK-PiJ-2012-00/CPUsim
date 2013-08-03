@@ -9,12 +9,14 @@ import java.util.Scanner;
 
 public class AssemblerImpl implements Assembler {
 	private List<Data> programCode; //The assembly language program to be passed to the loader (arraylist expands to fit)
+	private List<String> programString; //Holds program code as string array list, for parsing into data array
 	//Reference to file
 	private String fileReference;
 	
 	
 	public AssemblerImpl() {
 		this.programCode = new ArrayList<Data>();
+		this.programString = new ArrayList<String>();
 	}
 	
 	
@@ -31,17 +33,23 @@ public class AssemblerImpl implements Assembler {
 	
 	        while (s.hasNextLine()) {
 	        	line = s.nextLine();
-	            System.out.println(line); //For testing
+	           // System.out.println(line); //For testing
+	            programString.add(line);
 	        }
 	    } 
 	    catch (FileNotFoundException ex) {
 	    	ex.printStackTrace();
+	    	//Display pop-up error
 	    }	    
 	    finally {
 	    	if (s != null) {
 	    		s.close();
 	        }
 	    }
+	}
+	
+	public List<String> getProgramString() {
+		return this.programString;
 	}
 	
 	
