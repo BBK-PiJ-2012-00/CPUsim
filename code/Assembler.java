@@ -6,5 +6,8 @@ package code;
  */
 
 public interface Assembler {
-
+	
+	public void selectFile(String fileName);
+	
+	public void readAssemblyFile();
 }
