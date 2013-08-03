@@ -49,7 +49,9 @@ public interface MainMemory {
 	
 	public void clearMemory(); //To reset memory contents when loading a new program
 		 //Resets each non-null address to null, effectively clearing memor contents
-			
+		
+	
+	public void loadMemory(Data[] programCode);
 		
 	
 	//Has reference to memory port(s) -> one for input, one for output, or perhaps several for pipelining
