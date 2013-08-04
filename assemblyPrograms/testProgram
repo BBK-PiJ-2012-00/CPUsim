@@ -29,7 +29,10 @@ assembled, addressing will no longer be symbolic. Also, rather than assembling t
 read and to follow through the execution, it might be an idea to display an assembled program with absolute addresses, 
 as in the first example (except that the first column won't show up, as the instructions will be in memory).
 
-Labels can be assigned to address values using a HashMap.
+Assembler: relative addresses, loader handles the actual addresses
+
+Labels can be assigned to address values using a HashMap. Could use a HashMap more extensively; key is the line number, or 
+relative address, and the value is the Data type (instruction/operand).
 
 
 
