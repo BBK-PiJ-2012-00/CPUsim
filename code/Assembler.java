@@ -23,7 +23,7 @@ public interface Assembler {
 	
 	public void assembleCode();
 	
-	public Data createData(List<String> splitData);
+	public Data createData(List<String> splitData, int lineNum);
 	
 	public void loadToLoader(Data[] programCode);
 
