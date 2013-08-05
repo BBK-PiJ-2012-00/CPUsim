@@ -97,49 +97,67 @@ public class AssemblerImpl implements Assembler {
 	public void assembleCode() {
 		for (int i = 1; i < programString.size(); i++) { //Start at 1 to skip header line of assembly program
 			List<String> lineComponents = this.splitCodeLine(programString.get(i)); //Break a line of code into parts
-			Data machineCodeLine = this.createData(lineComponents); //Create an instruction/operand from the line components
+			Data machineCodeLine = this.createData(lineComponents, i-1); //Create an instruction/operand from the line components
+			//i-1 gives the line number of the line of code, useful for mapping labels
 			programCode.add(machineCodeLine); //Add the instruction/operand to an array list, to be later passed into memory
 		}
 		
 		
 		
-		Scanner sc;
-		Pattern delimiterPattern = Pattern.compile("[\\,]?[\\s]+"); //splits a String on one or more whitespaces, or a comma
-		//followed by a whitespace -> this separates each line of assembly code into bits for processing into instructions.
-		
-		List<String> splitLine = new ArrayList<String>(); //Array to hold one line of code, split up into parts
-
-		for (int i = 1; i < programString.size(); i++) { //Start at 1 to avoid header line
-			//lineArray = delimiterPattern.split(line);
-			String line = programString.get(i);
-				if (line.contains("#")) { //If the line of code contains a comment, remove the comment part
-					String[] halvedLine = line.split("[\\#]");
-					line = halvedLine[0]; //Second half of the line always contains the comment, so this can be dropped
-//					for(int j = 0; j < lineParts.length; j++) {
-//						System.out.println(lineParts[j]);
-//					}
-				}
-			sc = new Scanner(line);
-			sc.useDelimiter(delimiterPattern);
-			while (sc.hasNext()) { //Add each part of an instruction/declaration to splitLine
-				splitLine.add(sc.next());
-			}
-			
-		}
-		for (String str : splitLine) {
-			System.out.println(str);
-		}
+//		Scanner sc;
+//		Pattern delimiterPattern = Pattern.compile("[\\,]?[\\s]+"); //splits a String on one or more whitespaces, or a comma
+//		//followed by a whitespace -> this separates each line of assembly code into bits for processing into instructions.
+//		
+//		List<String> splitLine = new ArrayList<String>(); //Array to hold one line of code, split up into parts
+//
+//		for (int i = 1; i < programString.size(); i++) { //Start at 1 to avoid header line
+//			//lineArray = delimiterPattern.split(line);
+//			String line = programString.get(i);
+//				if (line.contains("#")) { //If the line of code contains a comment, remove the comment part
+//					String[] halvedLine = line.split("[\\#]");
+//					line = halvedLine[0]; //Second half of the line always contains the comment, so this can be dropped
+////					for(int j = 0; j < lineParts.length; j++) {
+////						System.out.println(lineParts[j]);
+////					}
+//				}
+//			sc = new Scanner(line);
+//			sc.useDelimiter(delimiterPattern);
+//			while (sc.hasNext()) { //Add each part of an instruction/declaration to splitLine
+//				splitLine.add(sc.next());
+//			}
+//			
+//		}
+//		for (String str : splitLine) {
+//			System.out.println(str);
+//		}
 	}
 	
 	
-	public Data createData(List<String> splitData) {
+	public Data createData(List<String> splitData, int lineNum) {
+		Data data = null;
 		for (int i = 0; i < splitData.size(); i++) { //Go through the list of instruction/data parts
 			if (splitData.get(i).endsWith(":")) { //Indicates a label (i.e. L1: LOAD....
-				
+				String label = splitData.get(i).substring(0, splitData.get(i).length() - 2); //Trim the colon off the end
+				lookupTable.put(label, lineNum); //Map the label to the line number of the code
 			}
+			
+			else if (splitData.get(i) == "LOAD") { //This means a source and destination are specified
+				String sourceString = splitData.get(i+1).substring(1, (splitData.get(i+1).length() - 1)); //Trim leading 'r' off
+				//register source to leave an integer reference
+				int source = Integer.parseInt(sourceString);
+				
+				String destinationString = splitData.get(i+1).substring(1, (splitData.get(i+1).length() - 2));//Trim brackets off
+				//memory address reference, leaving an integer
+				int destination = Integer.parseInt(destinationString);
+				
+				data = new TransferInstr(Opcode.LOAD, source, destination);
+				return data;
+			}
+			
+			
 		}
 		
-		return line;
+		return data;
 	}
 	
 	public void loadToLoader(Data[] programCode) {
