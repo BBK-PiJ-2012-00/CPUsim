@@ -16,13 +16,14 @@ public class AssemblerImpl implements Assembler {
 	//Reference to file
 	private String fileReference;
 	private Map<String, Integer> lookupTable; //For associating labels with relative addresses
-	
+	private Loader loader;
 	
 	
 	public AssemblerImpl() {
 		this.programCode = new ArrayList<Data>();
 		this.programString = new ArrayList<String>();
 		this.lookupTable = new HashMap<String, Integer>();
+		this.loader = new LoaderImpl();
 	}
 	
 	
@@ -58,6 +59,10 @@ public class AssemblerImpl implements Assembler {
 		return this.programString;
 	}
 	
+	/*
+	 * Method takes a line of code and splits it into an array list of Strings, which can then be passed
+	 * to another method for interpretation (i.e. so that instructions or operands can be created).
+	 */
 	public List<String> splitCodeLine(String line) {
 		Scanner sc;
 		Pattern delimiterPattern = Pattern.compile("[\\,]?[\\s]+"); //splits a String on one or more whitespaces, or a comma
@@ -86,15 +91,16 @@ public class AssemblerImpl implements Assembler {
 		for (String str : splitLine) {
 			System.out.println(str);
 		}
-		return splitLine;
-		
+		return splitLine;		
 	}
 	
-	public void parseCode() {
+	public void assembleCode() {
 		for (int i = 1; i < programString.size(); i++) { //Start at 1 to skip header line of assembly program
 			List<String> lineComponents = this.splitCodeLine(programString.get(i)); //Break a line of code into parts
-			
+			Data machineCodeLine = this.createData(lineComponents); //Create an instruction/operand from the line components
+			programCode.add(machineCodeLine); //Add the instruction/operand to an array list, to be later passed into memory
 		}
+		
 		
 		
 		Scanner sc;
@@ -134,6 +140,10 @@ public class AssemblerImpl implements Assembler {
 		}
 		
 		return line;
+	}
+	
+	public void loadToLoader(Data[] programCode) {
+		
 	}
 	
 
