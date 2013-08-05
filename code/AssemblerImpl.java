@@ -58,25 +58,82 @@ public class AssemblerImpl implements Assembler {
 		return this.programString;
 	}
 	
-	public void parseCode() {
-		Scanner sc;;
-		Pattern delimiterPattern = Pattern.compile("[\\,]?[\\s]+");
+	public List<String> splitCodeLine(String line) {
+		Scanner sc;
+		Pattern delimiterPattern = Pattern.compile("[\\,]?[\\s]+"); //splits a String on one or more whitespaces, or a comma
+		//followed by a whitespace -> this separates each line of assembly code into bits for processing into instructions.
 		
-		String[] lineArray;
+		List<String> splitLine = new ArrayList<String>(); //Array to hold one line of code, split up into parts
 
-		for (String line : programString) {
+		//for (int i = 1; i < programString.size(); i++) { //Start at 1 to avoid header line
 			//lineArray = delimiterPattern.split(line);
+			//String line = programString.get(i);
+		if (line.contains("#")) { //If the line of code contains a comment, remove the comment part
+			String[] halvedLine = line.split("[\\#]");
+			line = halvedLine[0]; //Second half of the line always contains the comment, so this can be dropped
+//					for(int j = 0; j < lineParts.length; j++) {
+//						System.out.println(lineParts[j]);
+//					}
+		}
 			sc = new Scanner(line);
 			sc.useDelimiter(delimiterPattern);
-			while (sc.hasNext()) {
-				System.out.println(sc.next());
+			while (sc.hasNext()) { //Add each part of an instruction/declaration to splitLine
+				splitLine.add(sc.next());
 			}
+			sc.close();
 			
-//			for (String str : lineArray) {
-//				System.out.println(str);
-//			}
+		//}
+		for (String str : splitLine) {
+			System.out.println(str);
+		}
+		return splitLine;
+		
+	}
+	
+	public void parseCode() {
+		for (int i = 1; i < programString.size(); i++) { //Start at 1 to skip header line of assembly program
+			List<String> lineComponents = this.splitCodeLine(programString.get(i)); //Break a line of code into parts
 			
 		}
+		
+		
+		Scanner sc;
+		Pattern delimiterPattern = Pattern.compile("[\\,]?[\\s]+"); //splits a String on one or more whitespaces, or a comma
+		//followed by a whitespace -> this separates each line of assembly code into bits for processing into instructions.
+		
+		List<String> splitLine = new ArrayList<String>(); //Array to hold one line of code, split up into parts
+
+		for (int i = 1; i < programString.size(); i++) { //Start at 1 to avoid header line
+			//lineArray = delimiterPattern.split(line);
+			String line = programString.get(i);
+				if (line.contains("#")) { //If the line of code contains a comment, remove the comment part
+					String[] halvedLine = line.split("[\\#]");
+					line = halvedLine[0]; //Second half of the line always contains the comment, so this can be dropped
+//					for(int j = 0; j < lineParts.length; j++) {
+//						System.out.println(lineParts[j]);
+//					}
+				}
+			sc = new Scanner(line);
+			sc.useDelimiter(delimiterPattern);
+			while (sc.hasNext()) { //Add each part of an instruction/declaration to splitLine
+				splitLine.add(sc.next());
+			}
+			
+		}
+		for (String str : splitLine) {
+			System.out.println(str);
+		}
+	}
+	
+	
+	public Data createData(List<String> splitData) {
+		for (int i = 0; i < splitData.size(); i++) { //Go through the list of instruction/data parts
+			if (splitData.get(i).endsWith(":")) { //Indicates a label (i.e. L1: LOAD....
+				
+			}
+		}
+		
+		return line;
 	}
 	
 
