@@ -28,10 +28,18 @@ public class AssemblerTest {
 		String output = "";
 		for (int i = 0; i < ((AssemblerImpl) assembler).getProgramString().size(); i++) {
 			output += ((AssemblerImpl) assembler).getProgramString().get(i) + "\n";
-			System.out.println(((AssemblerImpl) assembler).getProgramString().get(i));
+			//System.out.println(((AssemblerImpl) assembler).getProgramString().get(i));
 		}
 		String expected = "<Label> <Instruction/Variable> <Comments>\nL1:  LOAD r0, [0] #Load r1 with contents of memory address 0\n";
 		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void testParseCode() {
+		assembler.selectFile(testFile);
+		assembler.readAssemblyFile();
+		((AssemblerImpl) assembler).parseCode();
+		
 	}
 
 }
