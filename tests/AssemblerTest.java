@@ -37,14 +37,26 @@ public class AssemblerTest {
 		assertEquals(expected, output);
 	}
 	
+	/*
+	 * Checks that comments are correctly omitted when a line of program code represented as a String is broken
+	 * up into an array list.
+	 */
 	@Test
-	public void testAssembleCode() {
+	public void testSplitCodeLine() {
 		assembler.selectFile(testFile);
 		assembler.readAssemblyFile();
-		String testLine = "<Label>  <Instruction/Variable>  <Comments>\n L0: LOAD r0, [0] #Comments to be ommitted.";
+		String testLine = "L0: LOAD r0, [0] #Comments to be omitted.";
 		List<String> output = assembler.splitCodeLine(testLine);
 		List<String> expected = new ArrayList<String>();
+		expected.add("L0:");
+		expected.add("LOAD");
+		expected.add("r0");
+		expected.add("[0]");
 		
+		//assertEquals(expected.size(), output.size());	//This tests correctly but is not as conclusive as the following
+		for (int i = 0; i < output.size(); i++) {
+			assertEquals(expected.get(i), output.get(i));
+		}
 		
 	}
 
