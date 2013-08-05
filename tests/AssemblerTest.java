@@ -2,6 +2,9 @@ package tests;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -35,10 +38,13 @@ public class AssemblerTest {
 	}
 	
 	@Test
-	public void testParseCode() {
+	public void testAssembleCode() {
 		assembler.selectFile(testFile);
 		assembler.readAssemblyFile();
-		((AssemblerImpl) assembler).parseCode();
+		String testLine = "<Label>  <Instruction/Variable>  <Comments>\n L0: LOAD r0, [0] #Comments to be ommitted.";
+		List<String> output = assembler.splitCodeLine(testLine);
+		List<String> expected = new ArrayList<String>();
+		
 		
 	}
 
