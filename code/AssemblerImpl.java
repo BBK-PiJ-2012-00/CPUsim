@@ -141,7 +141,7 @@ public class AssemblerImpl implements Assembler {
 				lookupTable.put(label, lineNum); //Map the label to the line number of the code
 			}
 			
-			else if (splitData.get(i) == "LOAD") { //This means a source and destination are specified
+			else if (splitData.get(i) == "LOAD") { //This means a memory source and register destination are specified
 				String sourceString = splitData.get(i+1).substring(1, (splitData.get(i+1).length() - 1)); //Trim leading 'r' off
 				//register source to leave an integer reference
 				int source = Integer.parseInt(sourceString);
@@ -154,7 +154,19 @@ public class AssemblerImpl implements Assembler {
 				return data;
 			}
 			
-			
+			else if (splitData.get(i) == "STORE") { //This means a register source and memory destination are specified
+				String sourceString = splitData.get(i+1).substring(1, (splitData.get(i+1).length() - 2));//Trim brackets off
+				//memory address reference, leaving an integer
+				int source = Integer.parseInt(sourceString);
+				
+				String destinationString = splitData.get(i+1).substring(1, (splitData.get(i+1).length() - 1)); //Trim leading 'r' off
+				//register destination to leave an integer reference
+				int destination = Integer.parseInt(destinationString);
+				
+				
+				data = new TransferInstr(Opcode.LOAD, source, destination);
+				return data;
+			}
 		}
 		
 		return data;
