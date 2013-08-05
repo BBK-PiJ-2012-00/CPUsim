@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public class AssemblerImpl implements Assembler {
 	private List<Data> programCode; //The assembly language program to be passed to the loader (arraylist expands to fit)
@@ -15,6 +16,7 @@ public class AssemblerImpl implements Assembler {
 	//Reference to file
 	private String fileReference;
 	private Map<String, Integer> lookupTable; //For associating labels with relative addresses
+	
 	
 	
 	public AssemblerImpl() {
@@ -54,6 +56,27 @@ public class AssemblerImpl implements Assembler {
 	
 	public List<String> getProgramString() {
 		return this.programString;
+	}
+	
+	public void parseCode() {
+		Scanner sc;;
+		Pattern delimiterPattern = Pattern.compile("[\\,]?[\\s]+");
+		
+		String[] lineArray;
+
+		for (String line : programString) {
+			//lineArray = delimiterPattern.split(line);
+			sc = new Scanner(line);
+			sc.useDelimiter(delimiterPattern);
+			while (sc.hasNext()) {
+				System.out.println(sc.next());
+			}
+			
+//			for (String str : lineArray) {
+//				System.out.println(str);
+//			}
+			
+		}
 	}
 	
 
