@@ -1,0 +1,4 @@
+<Label> <Instruction/Variable> <Comments>
+L1:  LOAD r0, [0] #Load r1 with contents of memory address 0
+
+var1: DATA 7
