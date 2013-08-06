@@ -147,6 +147,32 @@ public class AssemblerTest {
 	}
 	
 	
+	@Test
+	public void assembleCodeTest_LOADinstr() { //Test assembly of load instruction with an operand
+		assembler.readAssemblyFile();
+		assembler.assembleCode();
+		Data[] expectedArray = new Data[2];
+		expectedArray[1] = new OperandImpl(7);
+		expectedArray[0] = new TransferInstr(Opcode.LOAD, 0, 1);
+		
+		Data[] outputArray = assembler.getProgramCode();
+		
+		for (int i = 0; i < outputArray.length; i++) {
+			assertEquals(expectedArray[i].toString(), outputArray[i].toString());
+		}		
+	}
+	
+	@Test
+	public void assembleCodeTest_size() { //Test assembly of load instruction with an operand, this time checking by size
+		assembler.readAssemblyFile();
+		assembler.assembleCode();
+		
+		Data[] outputArray = assembler.getProgramCode();		
+		assertEquals(2, outputArray.length);
+			
+	}
+	
+	
 
 	
 //	@Test
