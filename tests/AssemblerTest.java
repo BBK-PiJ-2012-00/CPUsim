@@ -12,6 +12,7 @@ import code.Assembler;
 import code.AssemblerImpl;
 import code.Data;
 import code.Opcode;
+import code.OperandImpl;
 import code.TransferInstr;
 
 public class AssemblerTest {
@@ -22,6 +23,7 @@ public class AssemblerTest {
 	public void setUp() throws Exception {
 		assembler = new AssemblerImpl();
 		testFile = "src/assemblyPrograms/assemblerTestProgram.txt";
+		assembler.selectFile(testFile);
 	}
 
 	/*
@@ -29,7 +31,6 @@ public class AssemblerTest {
 	 */
 	@Test
 	public void testFileRead() {
-		assembler.selectFile(testFile);
 		assembler.readAssemblyFile();
 		String output = "";
 		for (int i = 0; i < ((AssemblerImpl) assembler).getProgramString().size(); i++) {
@@ -47,7 +48,6 @@ public class AssemblerTest {
 	 */
 	@Test
 	public void testSplitCodeLine() {
-		assembler.selectFile(testFile);
 		assembler.readAssemblyFile();
 		String testLine = "L0: LOAD r0, [0] #Comments to be omitted.";
 		List<String> output = assembler.splitCodeLine(testLine);
@@ -66,7 +66,6 @@ public class AssemblerTest {
 	
 	@Test
 	public void testSeparateOperands_OperandArray() { //Test that the operand section of code is added to operandArray
-		assembler.selectFile(testFile);
 		assembler.readAssemblyFile();
 		assembler.separateOperands();
 		
@@ -79,7 +78,6 @@ public class AssemblerTest {
 	
 	@Test
 	public void testSeparateOperands_OperandArraySize() {//Test that nothing unexpected (like an instruction) is added to operandArray
-		assembler.selectFile(testFile);
 		assembler.readAssemblyFile();
 		assembler.separateOperands();
 		
@@ -88,7 +86,6 @@ public class AssemblerTest {
 	
 	@Test
 	public void testSeparateOperands_InstructionArray() { //Test that the instruction section of code is added to operandArray
-		assembler.selectFile(testFile);
 		assembler.readAssemblyFile();
 		assembler.separateOperands();
 		
@@ -101,7 +98,6 @@ public class AssemblerTest {
 	
 	@Test
 	public void testSeparateOperands_InstructionArraySize() {//Test that nothing unexpected (i.e. an operand) is added to instructionArray
-		assembler.selectFile(testFile);
 		assembler.readAssemblyFile();
 		assembler.separateOperands();
 		
@@ -110,17 +106,46 @@ public class AssemblerTest {
 	
 	
 	@Test
-	public void testCreateData() {		
-		assembler.selectFile(testFile);
+	public void testAssembleOperand() { //Check that the operand is correctly assembled
+		//First, read the file, separate the operand and break it into parts ready for assembly
 		assembler.readAssemblyFile();
-		String testLine = "L0: LOAD r0, [0] #Comments to be omitted.";
-		List<String> splitCode = assembler.splitCodeLine(testLine);
-		Data output = assembler.createData(splitCode, 0);
-		Data expected = new TransferInstr(Opcode.LOAD, 0, 0);
+		assembler.separateOperands();
+		List<String> operandParts = assembler.splitCodeLine(assembler.getOperandArray().get(0));
 		
-		assertEquals(expected.toString(), output.toString());
+		Data expected = new OperandImpl(7);
+		Data output = assembler.assembleOperand(operandParts); //Create the operand
 		
+		assertEquals(expected, output);
 	}
+	
+	@Test
+	public void testAssembleOperand_MapAssignment() { //Checks that symbol is correctly added to lookupTable map
+		assembler.readAssemblyFile();
+		assembler.separateOperands();
+		List<String> operandParts = assembler.splitCodeLine(assembler.getOperandArray().get(0));
+		
+		assembler.assembleOperand(operandParts);
+		int output = assembler.getLookupTable().get("var1");
+		int expected = 1; //var1 should be mapped to 1 (an instruction would be at address 0 in the program code)
+		
+		assertEquals(expected, output);
+	}
+	
+	
+
+	
+//	@Test
+//	public void testCreateData() {		
+//		assembler.selectFile(testFile);
+//		assembler.readAssemblyFile();
+//		String testLine = "L0: LOAD r0, [0] #Comments to be omitted.";
+//		List<String> splitCode = assembler.splitCodeLine(testLine);
+//		Data output = assembler.createData(splitCode, 0);
+//		Data expected = new TransferInstr(Opcode.LOAD, 0, 0);
+//		
+//		assertEquals(expected.toString(), output.toString());
+//		
+//	}
 
 
 
