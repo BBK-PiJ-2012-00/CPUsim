@@ -153,6 +153,7 @@ public class AssemblerImpl implements Assembler {
 		//Operands assembled first so their symbolic references can be mapped to actual addresses
 		this.separateOperands();
 				
+		//Assemble the operands (represented as Strings) to real Operands and put them in programCode
 		for (int i = 0; i < operandArray.size(); i++) {
 			System.out.println(operandArray.get(i));
 			List<String> lineComponents = this.splitCodeLine(operandArray.get(i)); //Break line of code into parts
@@ -169,15 +170,12 @@ public class AssemblerImpl implements Assembler {
 			this.mapInstructionLabel(lineComponents, i);
 		}
 		
-		System.out.println("Program Code: ");
-		for (int i = 0; i < programCode.length; i++) {
-			System.out.println(programCode[i]);
-		}
-		
+
+		//Assemble the instructions represented as Strings into type Instruction, and put into programCode array
 		for (int i = 0; i < instructionArray.size(); i++) { 	
 			System.out.println(instructionArray.get(i));
 			List<String> lineComponents = this.splitCodeLine(instructionArray.get(i)); //Break a line of code into parts
-			Data instruction = this.assembleInstruction(lineComponents, i); //Create an instruction/operand from the line components
+			Data instruction = this.assembleInstruction(lineComponents); //Create an instruction/operand from the line components
 			System.out.println("Instruction value: " + instruction.toString());
 			programCode[i] = instruction; //Add the instruction/operand to an array list, to be later passed into memory
 		}
@@ -185,20 +183,10 @@ public class AssemblerImpl implements Assembler {
 	}
 	
 	@Override
-	public Data assembleInstruction(List<String> instructionParts, int lineNum) {
-		System.out.println("Linenum: " + lineNum);
+	public Data assembleInstruction(List<String> instructionParts) {
 		Data data = null;
 		for (int i = 0; i < instructionParts.size(); i++) { //Go through the list of instruction/data parts
-//			System.out.println("In for-loop");
-//			System.out.println("parts: " + instructionParts.get(i));
-//			if (instructionParts.get(i).endsWith(":")) { //Indicates a label (i.e. L1: LOAD....
-//				System.out.println("In if-statement for labels.");
-//				
-//				String label = instructionParts.get(i).substring(0, instructionParts.get(i).length() - 2); //Trim the colon off the end
-//				lookupTable.put(label, lineNum); //Map the label to the line number of the code
-//				//System.out.println(lookupTable.get(label));
-//			}
-			
+
 			//This means a memory source and register destination are specified (these opcodes all follow same format)
 			if (instructionParts.get(i).equals("LOAD") || instructionParts.get(i).equals("BRE") ||
 					instructionParts.get(i).equals("BRNE")) { 
@@ -266,7 +254,6 @@ public class AssemblerImpl implements Assembler {
 				}
 				
 				if (opcode.equals("SUB")) {
-					System.out.println("in sub");
 					data = new ArithmeticInstr(Opcode.SUB, source, destination);
 					return data;
 				}
@@ -317,8 +304,8 @@ public class AssemblerImpl implements Assembler {
 	}
 	
 	
-	public void loadToLoader(Data[] programCode) {
-		
+	public void loadToLoader() {
+		loader.load(this.programCode);
 	}
 	
 	public List<String> getProgramString() {
