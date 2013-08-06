@@ -26,5 +26,11 @@ public interface Assembler {
 	public Data createData(List<String> splitData, int lineNum);
 	
 	public void loadToLoader(Data[] programCode);
+	
+	public void separateOperands();
+	
+	public List<String> getInstructionArray();
+	
+	public List<String> getOperandArray();
 
 }

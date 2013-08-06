@@ -18,6 +18,9 @@ public class AssemblerImpl implements Assembler {
 	private Map<String, Integer> lookupTable; //For associating labels with relative addresses
 	private Loader loader;
 	
+	private List<String> instructionArray; //For intermediate stage where programString is split into two, instructions being stored
+	private List<String> operandArray; //in instructionArray, operands being stored in operandArray (as Strings)
+	
 	
 	public AssemblerImpl() {
 		this.programCode = new ArrayList<Data>();
@@ -55,6 +58,29 @@ public class AssemblerImpl implements Assembler {
 	    }
 	}
 	
+	
+	/*
+	 * This method splits the assembly program stored as an array of Strings in programString into
+	 * two distinct array lists (also of type String). The idea is that operand declarations are stored
+	 * separately from instructions, so that they may have their symbolic memory references mapped to 
+	 * real memory addresses before instructions are assembled. This means that when instructions come to be
+	 * interpreted and assembled, the symbolic references to operands can be resolved using the lookupTable, to
+	 * which symbolic operand references are added and mapped to real memory addresses.
+	 */
+	public void separateOperands() {
+		operandArray = new ArrayList<String>();
+		instructionArray = new ArrayList<String>();
+		for (String s : programString) {
+			if (s.contains("DATA")) { //Only operand declarations contain this String sequence
+				operandArray.add(s);
+			}
+			else {
+				instructionArray.add(s);
+			}
+		}
+	}
+	
+	
 	public List<String> getProgramString() {
 		return this.programString;
 	}
@@ -70,24 +96,18 @@ public class AssemblerImpl implements Assembler {
 		
 		List<String> splitLine = new ArrayList<String>(); //Array to hold one line of code, split up into parts
 
-		//for (int i = 1; i < programString.size(); i++) { //Start at 1 to avoid header line
-			//lineArray = delimiterPattern.split(line);
-			//String line = programString.get(i);
 		if (line.contains("#")) { //If the line of code contains a comment, remove the comment part
 			String[] halvedLine = line.split("[\\#]");
-			line = halvedLine[0]; //Second half of the line always contains the comment, so this can be dropped
-//					for(int j = 0; j < lineParts.length; j++) {
-//						System.out.println(lineParts[j]);
-//					}
+			line = halvedLine[0]; 
 		}
-			sc = new Scanner(line);
-			sc.useDelimiter(delimiterPattern);
-			while (sc.hasNext()) { //Add each part of an instruction/declaration to splitLine
-				splitLine.add(sc.next());
-			}
-			sc.close();
-			
-		//}
+		
+		sc = new Scanner(line);
+		sc.useDelimiter(delimiterPattern);
+		while (sc.hasNext()) { //Add each part of an instruction/declaration to splitLine
+			splitLine.add(sc.next());
+		}
+		sc.close();			
+	
 		for (String str : splitLine) {
 			System.out.println(str);
 		}
@@ -95,6 +115,7 @@ public class AssemblerImpl implements Assembler {
 	}
 	
 	public void assembleCode() {
+		
 		for (int i = 1; i < programString.size(); i++) { //Start at 1 to skip header line of assembly program
 			List<String> lineComponents = this.splitCodeLine(programString.get(i)); //Break a line of code into parts
 			Data machineCodeLine = this.createData(lineComponents, i-1); //Create an instruction/operand from the line components
@@ -102,34 +123,6 @@ public class AssemblerImpl implements Assembler {
 			programCode.add(machineCodeLine); //Add the instruction/operand to an array list, to be later passed into memory
 		}
 		
-		
-		
-//		Scanner sc;
-//		Pattern delimiterPattern = Pattern.compile("[\\,]?[\\s]+"); //splits a String on one or more whitespaces, or a comma
-//		//followed by a whitespace -> this separates each line of assembly code into bits for processing into instructions.
-//		
-//		List<String> splitLine = new ArrayList<String>(); //Array to hold one line of code, split up into parts
-//
-//		for (int i = 1; i < programString.size(); i++) { //Start at 1 to avoid header line
-//			//lineArray = delimiterPattern.split(line);
-//			String line = programString.get(i);
-//				if (line.contains("#")) { //If the line of code contains a comment, remove the comment part
-//					String[] halvedLine = line.split("[\\#]");
-//					line = halvedLine[0]; //Second half of the line always contains the comment, so this can be dropped
-////					for(int j = 0; j < lineParts.length; j++) {
-////						System.out.println(lineParts[j]);
-////					}
-//				}
-//			sc = new Scanner(line);
-//			sc.useDelimiter(delimiterPattern);
-//			while (sc.hasNext()) { //Add each part of an instruction/declaration to splitLine
-//				splitLine.add(sc.next());
-//			}
-//			
-//		}
-//		for (String str : splitLine) {
-//			System.out.println(str);
-//		}
 	}
 	
 	
@@ -177,11 +170,26 @@ public class AssemblerImpl implements Assembler {
 		
 	}
 	
+	public List<String> getOperandArray() {
+		return this.operandArray;
+	}
+	
+	public List<String> getInstructionArray() {
+		return this.instructionArray;
+	}
+	
 
 /*
  * It will be simpler from an assembly point of view to make data declarations for storing variables
  * to memory first, and then have the program code following.  This allows variables to be mapped
  * to an address first, so that they may then be referred to in program code.
+ * 
+ * Better than this would be the following: keep structure of assembly text file as it is, but after
+ * each line has been added to the initial array list of Strings, go through the array and add any lines
+ * containing DATA to another array, and everything else to yet another one.  This effectively separates
+ * instructions from operand declarations. Then, the operands can be dealt with first so that their symbolic
+ * references can be added to the lookupTable, so that when instructions are created, the operand references
+ * can be looked up and resolved to a memory address value.
  */
 	
 /*
