@@ -125,16 +125,21 @@ public class MemoryModule implements MainMemory {
 	
 	
 	//Fix so that numbers 1-10 display with extra space to align | character
-	public void display() { //Display memory on command line interface
-		System.out.println("  -- MAIN MEMORY --  ");
+	public String display() { //Display memory on command line interface
+		String displayString = "<html> -- MAIN MEMORY -- ";
+		//System.out.println("  -- MAIN MEMORY --  ");
 		for (int i = 0; i < MEMORY.length; i++) {
 			if (MEMORY[i] == null) {
-				System.out.println(i + "| " + "--------");
+				//System.out.println(i + "| " + "--------");
+				displayString += "<br>" + i + "| ------------";
 			}
 			else { 
-				System.out.println(i + "| " + MEMORY[i].toString());
+				//System.out.println(i + "| " + MEMORY[i].toString());
+				displayString+= "<br>" + i + "| " + MEMORY[i].toString();
 			}
 		}
+		displayString += "</html>";
+		return displayString;
 	}
 	
 

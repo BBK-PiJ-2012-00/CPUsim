@@ -81,6 +81,22 @@ public abstract class Instruction implements Data {
 		return machineString;
 	}
 	
+//	@Override
+//	public boolean equals(Object o) {
+//		if (o == null) {
+//			return false;
+//		}
+//		if (!(o instanceof Instruction)) {
+//			return false;
+//		}
+//		
+//		Instruction i = (Instruction) o;
+//		if (i.OPCODE.equals(this.OPCODE) && i.getField1() == this.getField1() && i.getField2() == this.getField2()) {
+//			return true;
+//		}
+//		return false;
+//	}
+	
 	/*
 	 * Returns the first instruction field. For data transfer instructions, this is the source location (14 bits);
 	 * for arithmetic instructions, the register whose contents is an operand in the arithmetic operation, as well
