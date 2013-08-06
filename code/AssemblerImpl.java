@@ -135,22 +135,50 @@ public class AssemblerImpl implements Assembler {
 		return splitLine;		
 	}
 	
+	public void mapInstructionLabel(List<String> instructionParts, int lineNum) {
+		if (instructionParts.get(0).endsWith(":")) {
+			String label = instructionParts.get(0).substring(0, instructionParts.get(0).length() - 1); //Trim colon from end
+			lookupTable.put(label, lineNum);			
+		}
+		return;
+	}
 	
+
 	
+	/*
+	 * There is an error if a label is referenced that has not yet been added to the lookup table; instructionArray
+	 * needs to be cycled through first, with any labels being mapped before the code can be assembled.
+	 */
 	public void assembleCode() {
 		//Operands assembled first so their symbolic references can be mapped to actual addresses
 		this.separateOperands();
-		
+				
 		for (int i = 0; i < operandArray.size(); i++) {
+			System.out.println(operandArray.get(i));
 			List<String> lineComponents = this.splitCodeLine(operandArray.get(i)); //Break line of code into parts
 			Data operand = this.assembleOperand(lineComponents);
 			programCode[operandAddressPointer] = operand; //Add the operand to the data array, at specified address
 			operandAddressPointer++; //Increment so that the next operand will be stored in the next consecutive address
 		}
 		
-		for (int i = 0; i < instructionArray.size(); i++) { 			
+		/*
+		 * Instruction labels must be mapped prior to assembling instructions.
+		 */
+		for (int i = 0; i < instructionArray.size(); i++) {
+			List<String> lineComponents = this.splitCodeLine(instructionArray.get(i));
+			this.mapInstructionLabel(lineComponents, i);
+		}
+		
+		System.out.println("Program Code: ");
+		for (int i = 0; i < programCode.length; i++) {
+			System.out.println(programCode[i]);
+		}
+		
+		for (int i = 0; i < instructionArray.size(); i++) { 	
+			System.out.println(instructionArray.get(i));
 			List<String> lineComponents = this.splitCodeLine(instructionArray.get(i)); //Break a line of code into parts
 			Data instruction = this.assembleInstruction(lineComponents, i); //Create an instruction/operand from the line components
+			System.out.println("Instruction value: " + instruction.toString());
 			programCode[i] = instruction; //Add the instruction/operand to an array list, to be later passed into memory
 		}
 		
@@ -158,13 +186,18 @@ public class AssemblerImpl implements Assembler {
 	
 	@Override
 	public Data assembleInstruction(List<String> instructionParts, int lineNum) {
+		System.out.println("Linenum: " + lineNum);
 		Data data = null;
 		for (int i = 0; i < instructionParts.size(); i++) { //Go through the list of instruction/data parts
-			
-			if (instructionParts.get(i).endsWith(":")) { //Indicates a label (i.e. L1: LOAD....
-				String label = instructionParts.get(i).substring(0, instructionParts.get(i).length() - 2); //Trim the colon off the end
-				lookupTable.put(label, lineNum); //Map the label to the line number of the code
-			}
+//			System.out.println("In for-loop");
+//			System.out.println("parts: " + instructionParts.get(i));
+//			if (instructionParts.get(i).endsWith(":")) { //Indicates a label (i.e. L1: LOAD....
+//				System.out.println("In if-statement for labels.");
+//				
+//				String label = instructionParts.get(i).substring(0, instructionParts.get(i).length() - 2); //Trim the colon off the end
+//				lookupTable.put(label, lineNum); //Map the label to the line number of the code
+//				//System.out.println(lookupTable.get(label));
+//			}
 			
 			//This means a memory source and register destination are specified (these opcodes all follow same format)
 			if (instructionParts.get(i).equals("LOAD") || instructionParts.get(i).equals("BRE") ||
@@ -233,6 +266,7 @@ public class AssemblerImpl implements Assembler {
 				}
 				
 				if (opcode.equals("SUB")) {
+					System.out.println("in sub");
 					data = new ArithmeticInstr(Opcode.SUB, source, destination);
 					return data;
 				}
@@ -251,7 +285,8 @@ public class AssemblerImpl implements Assembler {
 			//These opcodes have the same instruction format; just a symbolic memory address
 			if (instructionParts.get(i).equals("BR") || instructionParts.get(i).equals("BRZ")) {
 				String opcode = instructionParts.get(i);
-				
+				System.out.println("In BR section.");
+				System.out.println(lookupTable.toString());
 				int destination = lookupTable.get(instructionParts.get(i+1)); //Get value for symbolic memory address ref.
 				
 				if (opcode.equals("BR")) {
