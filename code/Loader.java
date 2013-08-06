@@ -8,5 +8,9 @@ package code;
  */
 
 public interface Loader {
+	
+	public void load(Data[] assembledCode);
+	
+	public void loadToMemory();
 
 }
