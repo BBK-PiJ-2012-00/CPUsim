@@ -26,7 +26,9 @@ public interface Assembler {
 	
 	public Data assembleOperand(List<String> operandParts);
 	
-	public Data assembleInstruction(List<String> instructionParts, int lineNum);
+	public Data assembleInstruction(List<String> instructionParts);
+	
+	public void mapInstructionLabel(List<String> lineParts, int lineNum);
 	
 	public void loadToLoader(Data[] programCode);
 	
@@ -37,5 +39,7 @@ public interface Assembler {
 	public List<String> getOperandArray();
 	
 	public Map<String, Integer> getLookupTable();
+
+	public Data[] getProgramCode();
 
 }
