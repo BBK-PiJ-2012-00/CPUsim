@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class LoaderImpl implements Loader {
 	private MainMemory memory = MemoryModule.getInstance();
-	private List<Data> codeBuffer = new ArrayList<Data>(); //To buffer code coming in from memory (amount not known in advance)
+	//private List<Data> codeBuffer = new ArrayList<Data>(); //To buffer code coming in from memory (amount not known in advance)
 	//ArrayList grows as required, making it more suitable than an array
 	private Data[] programCode; //An array to represent the program to be loaded into memory
 	
@@ -18,7 +18,7 @@ public class LoaderImpl implements Loader {
 	}
 	
 	public void loadToMemory() {
-		this.programCode = codeBuffer.toArray(new Data[codeBuffer.size()]); //Convert codeBuffer to standard array
+		//this.programCode = codeBuffer.toArray(new Data[codeBuffer.size()]); //Convert codeBuffer to standard array
 		memory.loadMemory(programCode);		
 	}
 	
