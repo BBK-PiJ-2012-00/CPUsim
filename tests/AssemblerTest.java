@@ -10,6 +10,9 @@ import org.junit.Test;
 
 import code.Assembler;
 import code.AssemblerImpl;
+import code.Data;
+import code.Opcode;
+import code.TransferInstr;
 
 public class AssemblerTest {
 	private Assembler assembler;
@@ -59,5 +62,21 @@ public class AssemblerTest {
 		}
 		
 	}
+	
+	
+	@Test
+	public void testCreateData() {		
+		assembler.selectFile(testFile);
+		assembler.readAssemblyFile();
+		String testLine = "L0: LOAD r0, [0] #Comments to be omitted.";
+		List<String> splitCode = assembler.splitCodeLine(testLine);
+		Data output = assembler.createData(splitCode, 0);
+		Data expected = new TransferInstr(Opcode.LOAD, 0, 0);
+		
+		assertEquals(expected.toString(), output.toString());
+		
+	}
+
+
 
 }
