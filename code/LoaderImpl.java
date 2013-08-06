@@ -13,8 +13,8 @@ public class LoaderImpl implements Loader {
 	//ArrayList grows as required, making it more suitable than an array
 	private Data[] programCode; //An array to represent the program to be loaded into memory
 	
-	public void load(Data dataItem) { //For loading code from assmebler to loader
-		codeBuffer.add(dataItem);
+	public void load(Data[] assembledCode) { //For loading code from assmebler to loader
+		this.programCode = assembledCode;
 	}
 	
 	public void loadToMemory() {
