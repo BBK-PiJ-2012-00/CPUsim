@@ -136,17 +136,18 @@ public class AssemblerImpl implements Assembler {
 	public Data createData(List<String> splitData, int lineNum) {
 		Data data = null;
 		for (int i = 0; i < splitData.size(); i++) { //Go through the list of instruction/data parts
+			System.out.println("Entered for-loop: i = " + i);
 			if (splitData.get(i).endsWith(":")) { //Indicates a label (i.e. L1: LOAD....
 				String label = splitData.get(i).substring(0, splitData.get(i).length() - 2); //Trim the colon off the end
 				lookupTable.put(label, lineNum); //Map the label to the line number of the code
 			}
 			
-			else if (splitData.get(i) == "LOAD") { //This means a memory source and register destination are specified
-				String sourceString = splitData.get(i+1).substring(1, (splitData.get(i+1).length() - 1)); //Trim leading 'r' off
+			if (splitData.get(i).equals("LOAD")) { //This means a memory source and register destination are specified
+				String sourceString = splitData.get(i+1).substring(1); //Trim leading 'r' off
 				//register source to leave an integer reference
 				int source = Integer.parseInt(sourceString);
 				
-				String destinationString = splitData.get(i+1).substring(1, (splitData.get(i+1).length() - 2));//Trim brackets off
+				String destinationString = splitData.get(i+2).substring(1, splitData.get(i+2).length() - 1);//Trim brackets off
 				//memory address reference, leaving an integer
 				int destination = Integer.parseInt(destinationString);
 				
@@ -177,6 +178,12 @@ public class AssemblerImpl implements Assembler {
 	}
 	
 
+/*
+ * It will be simpler from an assembly point of view to make data declarations for storing variables
+ * to memory first, and then have the program code following.  This allows variables to be mapped
+ * to an address first, so that they may then be referred to in program code.
+ */
+	
 /*
  * Assembler reads file of format below. Each line is read into a String, which is stored in an array list.
  * Therefore, the index of each string forms its line number, which also serves as a relative address (i.e. the 
