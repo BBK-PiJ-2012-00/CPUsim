@@ -36,7 +36,8 @@ public class AssemblerTest {
 			output += ((AssemblerImpl) assembler).getProgramString().get(i) + "\n";
 			//System.out.println(((AssemblerImpl) assembler).getProgramString().get(i));
 		}
-		String expected = "<Label> <Instruction/Variable> <Comments>\nL1:  LOAD r0, [0] #Load r1 with contents of memory address 0\n";
+		String expected = "<Label> <Instruction/Variable> <Comments>\nL1:  LOAD r0, [0] #Load r1 with contents of memory address 0\n" +
+				"var1: DATA 7\n";
 		assertEquals(expected, output);
 	}
 	
