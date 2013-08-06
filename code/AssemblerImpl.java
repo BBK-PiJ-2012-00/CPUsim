@@ -11,7 +11,8 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class AssemblerImpl implements Assembler {
-	private List<Data> programCode; //The assembly language program to be passed to the loader (arraylist expands to fit)
+	private Data[] programCode; //The assembly language program to be passed to the loader 
+	
 	private List<String> programString; //Holds program code as string array list, for parsing into data array
 	//Reference to file
 	private String fileReference;
@@ -24,7 +25,6 @@ public class AssemblerImpl implements Assembler {
 	
 	
 	public AssemblerImpl() {
-		this.programCode = new ArrayList<Data>();
 		this.programString = new ArrayList<String>();
 		this.lookupTable = new HashMap<String, Integer>();
 		this.loader = new LoaderImpl();
@@ -81,6 +81,7 @@ public class AssemblerImpl implements Assembler {
 				instructionArray.add(programString.get(i));
 			}
 		}
+		programCode = new Data[instructionArray.size() + operandArray.size()];
 		operandAddressPointer = instructionArray.size(); //Set operand address pointer to a location that will come immediately
 														//after the last instruction (deduced by size of instructionArray).
 	}
@@ -103,9 +104,7 @@ public class AssemblerImpl implements Assembler {
 	}
 	
 	
-	public List<String> getProgramString() {
-		return this.programString;
-	}
+	
 	
 	/*
 	 * Method takes a line of code and splits it into an array list of Strings, which can then be passed
@@ -130,27 +129,30 @@ public class AssemblerImpl implements Assembler {
 		}
 		sc.close();			
 	
-		for (String str : splitLine) {
-			System.out.println(str);
-		}
+//		for (String str : splitLine) {
+//			System.out.println(str);
+//		}
 		return splitLine;		
 	}
 	
+	
+	
 	public void assembleCode() {
 		//Operands assembled first so their symbolic references can be mapped to actual addresses
+		this.separateOperands();
+		
 		for (int i = 0; i < operandArray.size(); i++) {
 			List<String> lineComponents = this.splitCodeLine(operandArray.get(i)); //Break line of code into parts
 			Data operand = this.assembleOperand(lineComponents);
-			programCode.set(operandAddressPointer, operand); //Add the operand to the data array, at specified address
+			programCode[operandAddressPointer] = operand; //Add the operand to the data array, at specified address
 			operandAddressPointer++; //Increment so that the next operand will be stored in the next consecutive address
 		}
 		
-//		for (int i = 1; i < programString.size(); i++) { //Start at 1 to skip header line of assembly program
-//			List<String> lineComponents = this.splitCodeLine(programString.get(i)); //Break a line of code into parts
-//			Data machineCodeLine = this.createData(lineComponents, i-1); //Create an instruction/operand from the line components
-//			//i-1 gives the line number of the line of code, useful for mapping labels
-//			programCode.add(machineCodeLine); //Add the instruction/operand to an array list, to be later passed into memory
-//		}
+		for (int i = 0; i < instructionArray.size(); i++) { 			
+			List<String> lineComponents = this.splitCodeLine(instructionArray.get(i)); //Break a line of code into parts
+			Data instruction = this.assembleInstruction(lineComponents, i); //Create an instruction/operand from the line components
+			programCode[i] = instruction; //Add the instruction/operand to an array list, to be later passed into memory
+		}
 		
 	}
 	
@@ -158,36 +160,31 @@ public class AssemblerImpl implements Assembler {
 	public Data assembleInstruction(List<String> instructionParts, int lineNum) {
 		Data data = null;
 		for (int i = 0; i < instructionParts.size(); i++) { //Go through the list of instruction/data parts
-			System.out.println("Entered for-loop: i = " + i);
 			if (instructionParts.get(i).endsWith(":")) { //Indicates a label (i.e. L1: LOAD....
 				String label = instructionParts.get(i).substring(0, instructionParts.get(i).length() - 2); //Trim the colon off the end
 				lookupTable.put(label, lineNum); //Map the label to the line number of the code
 			}
 			
 			if (instructionParts.get(i).equals("LOAD")) { //This means a memory source and register destination are specified
-				String sourceString = instructionParts.get(i+1).substring(1); //Trim leading 'r' off
+				String destinationString = instructionParts.get(i+2).substring(1); //Trim leading 'r' off
 				//register source to leave an integer reference
-				int source = Integer.parseInt(sourceString);
-				
-				String destinationString = instructionParts.get(i+2).substring(1, instructionParts.get(i+2).length() - 1);//Trim brackets off
-				//memory address reference, leaving an integer
 				int destination = Integer.parseInt(destinationString);
+				
+				int source = lookupTable.get(instructionParts.get(i+1)); //Memory addresses are always symbolic
 				
 				data = new TransferInstr(Opcode.LOAD, source, destination);
 				return data;
 			}
 			
-			else if (instructionParts.get(i) == "STORE") { //This means a register source and memory destination are specified
-				String sourceString = instructionParts.get(i+1).substring(1, (instructionParts.get(i+1).length() - 2));//Trim brackets off
-				//memory address reference, leaving an integer
+			if (instructionParts.get(i) == "STORE") { //This means a register source and memory destination are specified
+				int destination = lookupTable.get(instructionParts.get(i+2)); //Look up symbolic destination
+				
+				String sourceString = instructionParts.get(i+1).substring(1, (instructionParts.get(i+1).length() - 1)); //Trim leading 'r' off
+				//register source to leave an integer reference
 				int source = Integer.parseInt(sourceString);
 				
-				String destinationString = instructionParts.get(i+1).substring(1, (instructionParts.get(i+1).length() - 1)); //Trim leading 'r' off
-				//register destination to leave an integer reference
-				int destination = Integer.parseInt(destinationString);
 				
-				
-				data = new TransferInstr(Opcode.LOAD, source, destination);
+				data = new TransferInstr(Opcode.STORE, source, destination);
 				return data;
 			}
 		}
@@ -199,12 +196,27 @@ public class AssemblerImpl implements Assembler {
 		
 	}
 	
+	public List<String> getProgramString() {
+		return this.programString;
+	}
+	
 	public List<String> getOperandArray() {
 		return this.operandArray;
 	}
 	
 	public List<String> getInstructionArray() {
 		return this.instructionArray;
+	}
+
+
+	@Override
+	public Map<String, Integer> getLookupTable() {
+		return this.lookupTable;
+	}
+	
+	@Override
+	public Data[] getProgramCode() {
+		return this.programCode;
 	}
 	
 
