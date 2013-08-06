@@ -43,8 +43,10 @@ public class AssemblerImpl implements Assembler {
 	
 	        while (s.hasNextLine()) {
 	        	line = s.nextLine();
-	           // System.out.println(line); //For testing
-	            programString.add(line);
+	        	if (line.length() != 0) { //Don't add blank lines to the array
+	        		// System.out.println(line); //For testing
+		            programString.add(line);
+	        	}	           
 	        }
 	    } 
 	    catch (FileNotFoundException ex) {
