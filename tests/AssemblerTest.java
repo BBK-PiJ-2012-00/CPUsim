@@ -64,6 +64,50 @@ public class AssemblerTest {
 		
 	}
 	
+	@Test
+	public void testSeparateOperands_OperandArray() { //Test that the operand section of code is added to operandArray
+		assembler.selectFile(testFile);
+		assembler.readAssemblyFile();
+		assembler.separateOperands();
+		
+		List<String> outputArray = assembler.getOperandArray();
+		String output = outputArray.get(0);
+		String expected = "var1: DATA 7";
+		
+		assertEquals(expected, output);		
+	}
+	
+	@Test
+	public void testSeparateOperands_OperandArraySize() {//Test that nothing unexpected (like an instruction) is added to operandArray
+		assembler.selectFile(testFile);
+		assembler.readAssemblyFile();
+		assembler.separateOperands();
+		
+		assertEquals(1, assembler.getOperandArray().size()); //Only one operand declaration in testFile, so size should be 1
+	}
+	
+	@Test
+	public void testSeparateOperands_InstructionArray() { //Test that the instruction section of code is added to operandArray
+		assembler.selectFile(testFile);
+		assembler.readAssemblyFile();
+		assembler.separateOperands();
+		
+		List<String> outputArray = assembler.getInstructionArray();
+		String output = outputArray.get(0);
+		String expected = "L1:  LOAD r0, [0] #Load r1 with contents of memory address 0";
+		
+		assertEquals(expected, output);		
+	}
+	
+	@Test
+	public void testSeparateOperands_InstructionArraySize() {//Test that nothing unexpected (i.e. an operand) is added to instructionArray
+		assembler.selectFile(testFile);
+		assembler.readAssemblyFile();
+		assembler.separateOperands();
+		
+		assertEquals(1, assembler.getInstructionArray().size()); //Only one instruction in testFile, so size should be 1
+	}
+	
 	
 	@Test
 	public void testCreateData() {		
