@@ -72,12 +72,12 @@ public class AssemblerImpl implements Assembler {
 	public void separateOperands() {
 		operandArray = new ArrayList<String>();
 		instructionArray = new ArrayList<String>();
-		for (String s : programString) {
-			if (s.contains("DATA")) { //Only operand declarations contain this String sequence
-				operandArray.add(s);
+		for (int i = 1; i < programString.size(); i++) { //Start at 1 to miss out header line
+			if (programString.get(i).contains("DATA")) { //Only operand declarations contain this String sequence
+				operandArray.add(programString.get(i));
 			}
 			else {
-				instructionArray.add(s);
+				instructionArray.add(programString.get(i));
 			}
 		}
 	}
