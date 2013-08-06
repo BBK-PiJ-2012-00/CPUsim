@@ -248,11 +248,39 @@ public class AssemblerImpl implements Assembler {
 				}				
 			}
 			
+			//These opcodes have the same instruction format; just a symbolic memory address
+			if (instructionParts.get(i).equals("BR") || instructionParts.get(i).equals("BRZ")) {
+				String opcode = instructionParts.get(i);
+				
+				int destination = lookupTable.get(instructionParts.get(i+1)); //Get value for symbolic memory address ref.
+				
+				if (opcode.equals("BR")) {
+					data = new BranchInstr(Opcode.BR, destination);
+				}
+				else {
+					data = new BranchInstr(Opcode.BRZ, destination);
+				}
+				return data;
+			}
+			
+			if (instructionParts.get(i).equals("SKZ") || instructionParts.get(i).equals("HALT")) {
+				
+				String opcode = instructionParts.get(i);
+				
+				if (opcode.equals("SKZ")) {
+					data = new BranchInstr(Opcode.SKZ);
+				}
+				else {
+					data = new HaltInstr(Opcode.HALT);
+				}
+				return data;
+			}
 			
 		}
 		
 		return data;
 	}
+	
 	
 	public void loadToLoader(Data[] programCode) {
 		
