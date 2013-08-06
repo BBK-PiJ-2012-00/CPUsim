@@ -20,6 +20,7 @@ public class AssemblerImpl implements Assembler {
 	
 	private List<String> instructionArray; //For intermediate stage where programString is split into two, instructions being stored
 	private List<String> operandArray; //in instructionArray, operands being stored in operandArray (as Strings)
+	private int operandAddressPointer;
 	
 	
 	public AssemblerImpl() {
@@ -80,6 +81,25 @@ public class AssemblerImpl implements Assembler {
 				instructionArray.add(programString.get(i));
 			}
 		}
+		operandAddressPointer = instructionArray.size(); //Set operand address pointer to a location that will come immediately
+														//after the last instruction (deduced by size of instructionArray).
+	}
+	
+	/*
+	 * This method assembles the operandArray into proper Data (Operand) types, and stores them
+	 * in the program code array. They are stored at an index that exceeds what will be the last
+	 * address of the instruction code so that operands appear in memory at the end of the program.
+	 */
+	public Data assembleOperand(List<String> operandParts) {
+		//All operand part arrays will contain 3 parts: symbol, DATA declaration, and operand value
+		String symbol = operandParts.get(0).substring(0, operandParts.get(0).length() -1); //Trim semicolon from symbol
+		lookupTable.put(symbol, operandAddressPointer); //Map symbol to address		
+		
+		String operandString = operandParts.get(2); //Operand value as String
+		int operandValue = Integer.parseInt(operandString);
+		Data operand = new OperandImpl(operandValue);
+		
+		return operand;		
 	}
 	
 	
@@ -117,32 +137,39 @@ public class AssemblerImpl implements Assembler {
 	}
 	
 	public void assembleCode() {
-		
-		for (int i = 1; i < programString.size(); i++) { //Start at 1 to skip header line of assembly program
-			List<String> lineComponents = this.splitCodeLine(programString.get(i)); //Break a line of code into parts
-			Data machineCodeLine = this.createData(lineComponents, i-1); //Create an instruction/operand from the line components
-			//i-1 gives the line number of the line of code, useful for mapping labels
-			programCode.add(machineCodeLine); //Add the instruction/operand to an array list, to be later passed into memory
+		//Operands assembled first so their symbolic references can be mapped to actual addresses
+		for (int i = 0; i < operandArray.size(); i++) {
+			List<String> lineComponents = this.splitCodeLine(operandArray.get(i)); //Break line of code into parts
+			Data operand = this.assembleOperand(lineComponents);
+			programCode.set(operandAddressPointer, operand); //Add the operand to the data array, at specified address
+			operandAddressPointer++; //Increment so that the next operand will be stored in the next consecutive address
 		}
+		
+//		for (int i = 1; i < programString.size(); i++) { //Start at 1 to skip header line of assembly program
+//			List<String> lineComponents = this.splitCodeLine(programString.get(i)); //Break a line of code into parts
+//			Data machineCodeLine = this.createData(lineComponents, i-1); //Create an instruction/operand from the line components
+//			//i-1 gives the line number of the line of code, useful for mapping labels
+//			programCode.add(machineCodeLine); //Add the instruction/operand to an array list, to be later passed into memory
+//		}
 		
 	}
 	
-	
-	public Data createData(List<String> splitData, int lineNum) {
+	@Override
+	public Data assembleInstruction(List<String> instructionParts, int lineNum) {
 		Data data = null;
-		for (int i = 0; i < splitData.size(); i++) { //Go through the list of instruction/data parts
+		for (int i = 0; i < instructionParts.size(); i++) { //Go through the list of instruction/data parts
 			System.out.println("Entered for-loop: i = " + i);
-			if (splitData.get(i).endsWith(":")) { //Indicates a label (i.e. L1: LOAD....
-				String label = splitData.get(i).substring(0, splitData.get(i).length() - 2); //Trim the colon off the end
+			if (instructionParts.get(i).endsWith(":")) { //Indicates a label (i.e. L1: LOAD....
+				String label = instructionParts.get(i).substring(0, instructionParts.get(i).length() - 2); //Trim the colon off the end
 				lookupTable.put(label, lineNum); //Map the label to the line number of the code
 			}
 			
-			if (splitData.get(i).equals("LOAD")) { //This means a memory source and register destination are specified
-				String sourceString = splitData.get(i+1).substring(1); //Trim leading 'r' off
+			if (instructionParts.get(i).equals("LOAD")) { //This means a memory source and register destination are specified
+				String sourceString = instructionParts.get(i+1).substring(1); //Trim leading 'r' off
 				//register source to leave an integer reference
 				int source = Integer.parseInt(sourceString);
 				
-				String destinationString = splitData.get(i+2).substring(1, splitData.get(i+2).length() - 1);//Trim brackets off
+				String destinationString = instructionParts.get(i+2).substring(1, instructionParts.get(i+2).length() - 1);//Trim brackets off
 				//memory address reference, leaving an integer
 				int destination = Integer.parseInt(destinationString);
 				
@@ -150,12 +177,12 @@ public class AssemblerImpl implements Assembler {
 				return data;
 			}
 			
-			else if (splitData.get(i) == "STORE") { //This means a register source and memory destination are specified
-				String sourceString = splitData.get(i+1).substring(1, (splitData.get(i+1).length() - 2));//Trim brackets off
+			else if (instructionParts.get(i) == "STORE") { //This means a register source and memory destination are specified
+				String sourceString = instructionParts.get(i+1).substring(1, (instructionParts.get(i+1).length() - 2));//Trim brackets off
 				//memory address reference, leaving an integer
 				int source = Integer.parseInt(sourceString);
 				
-				String destinationString = splitData.get(i+1).substring(1, (splitData.get(i+1).length() - 1)); //Trim leading 'r' off
+				String destinationString = instructionParts.get(i+1).substring(1, (instructionParts.get(i+1).length() - 1)); //Trim leading 'r' off
 				//register destination to leave an integer reference
 				int destination = Integer.parseInt(destinationString);
 				

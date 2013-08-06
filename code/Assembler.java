@@ -1,6 +1,7 @@
 package code;
 
 import java.util.List;
+import java.util.Map;
 
 /*
  * Reads a text file containing assembly language. Can initially read into an array of Strings, from which an array of Instructions is
@@ -23,7 +24,9 @@ public interface Assembler {
 	
 	public void assembleCode();
 	
-	public Data createData(List<String> splitData, int lineNum);
+	public Data assembleOperand(List<String> operandParts);
+	
+	public Data assembleInstruction(List<String> instructionParts, int lineNum);
 	
 	public void loadToLoader(Data[] programCode);
 	
@@ -32,5 +35,7 @@ public interface Assembler {
 	public List<String> getInstructionArray();
 	
 	public List<String> getOperandArray();
+	
+	public Map<String, Integer> getLookupTable();
 
 }
