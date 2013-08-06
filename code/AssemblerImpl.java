@@ -160,33 +160,95 @@ public class AssemblerImpl implements Assembler {
 	public Data assembleInstruction(List<String> instructionParts, int lineNum) {
 		Data data = null;
 		for (int i = 0; i < instructionParts.size(); i++) { //Go through the list of instruction/data parts
+			
 			if (instructionParts.get(i).endsWith(":")) { //Indicates a label (i.e. L1: LOAD....
 				String label = instructionParts.get(i).substring(0, instructionParts.get(i).length() - 2); //Trim the colon off the end
 				lookupTable.put(label, lineNum); //Map the label to the line number of the code
 			}
 			
-			if (instructionParts.get(i).equals("LOAD")) { //This means a memory source and register destination are specified
+			//This means a memory source and register destination are specified (these opcodes all follow same format)
+			if (instructionParts.get(i).equals("LOAD") || instructionParts.get(i).equals("BRE") ||
+					instructionParts.get(i).equals("BRNE")) { 
+				
+				String opcode = instructionParts.get(i);
+				
 				String destinationString = instructionParts.get(i+2).substring(1); //Trim leading 'r' off
 				//register source to leave an integer reference
 				int destination = Integer.parseInt(destinationString);
 				
 				int source = lookupTable.get(instructionParts.get(i+1)); //Memory addresses are always symbolic
 				
-				data = new TransferInstr(Opcode.LOAD, source, destination);
-				return data;
+				if (opcode.equals("LOAD")) {
+					data = new TransferInstr(Opcode.LOAD, source, destination);
+					return data;
+				}
+				
+				if (opcode.equals("BRE")) {
+					data = new BranchInstr(Opcode.BRE, source, destination);
+					return data;
+				}
+				
+				if (opcode.equals("BRNE")) {
+					data = new BranchInstr(Opcode.BRNE, source, destination);
+					return data;
+				}
+				
+				
 			}
 			
-			if (instructionParts.get(i) == "STORE") { //This means a register source and memory destination are specified
+			if (instructionParts.get(i).equals("STORE")) { //This means a register source and memory destination are specified
 				int destination = lookupTable.get(instructionParts.get(i+2)); //Look up symbolic destination
 				
-				String sourceString = instructionParts.get(i+1).substring(1, (instructionParts.get(i+1).length() - 1)); //Trim leading 'r' off
+				String sourceString = instructionParts.get(i+1).substring(1);//Trim leading 'r' off
 				//register source to leave an integer reference
-				int source = Integer.parseInt(sourceString);
-				
+				int source = Integer.parseInt(sourceString);				
 				
 				data = new TransferInstr(Opcode.STORE, source, destination);
 				return data;
 			}
+			
+			//Register to register opcodes all follow this block (all register-register)
+			if (instructionParts.get(i).equals("MOVE") || instructionParts.get(i).equals("ADD") || 
+					instructionParts.get(i).equals("SUB") || instructionParts.get(i).equals("DIV") ||
+					instructionParts.get(i).equals("MUL")) {
+				
+				String opcode = instructionParts.get(i);
+								
+				//Register source, register destination
+				String sourceString = instructionParts.get(i+1).substring(1);
+				int source = Integer.parseInt(sourceString);
+				
+				String destinationString = instructionParts.get(i+2).substring(1); //Trim leading 'r' off
+				//register source to leave an integer reference
+				int destination = Integer.parseInt(destinationString);
+				
+				if (opcode.equals("MOVE")) {
+					data = new TransferInstr(Opcode.MOVE, source, destination);
+					return data;
+				}
+				
+				if (opcode.equals("ADD")) {
+					data = new ArithmeticInstr(Opcode.ADD, source, destination);
+					return data;
+				}
+				
+				if (opcode.equals("SUB")) {
+					data = new ArithmeticInstr(Opcode.SUB, source, destination);
+					return data;
+				}
+				
+				if (opcode.equals("DIV")) {
+					data = new ArithmeticInstr(Opcode.DIV, source, destination);
+					return data;
+				}
+				
+				if (opcode.equals("MUL")) {
+					data = new ArithmeticInstr(Opcode.MUL, source, destination);
+					return data;
+				}				
+			}
+			
+			
 		}
 		
 		return data;
