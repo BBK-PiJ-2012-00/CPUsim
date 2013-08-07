@@ -22,13 +22,16 @@ public class SimulatorLauncher {
 		ControlUnit controlUnit = new ControlUnitImpl(false);
 		MainMemory memory = MemoryModule.getInstance();
 		
-		JLabel testLabel = new JLabel(((MemoryModule) memory).display());
+		Assembler assembler = new AssemblerImpl();
 		
-		JFrame frame = new JFrame("CPUsim");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().add(testLabel, BorderLayout.WEST);
-		frame.pack();
-		frame.setVisible(true);
+		
+//		JLabel testLabel = new JLabel(((MemoryModule) memory).display());
+//		
+//		JFrame frame = new JFrame("CPUsim");
+//		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		frame.getContentPane().add(testLabel, BorderLayout.WEST);
+//		frame.pack();
+//		frame.setVisible(true);
 		
 	}
 

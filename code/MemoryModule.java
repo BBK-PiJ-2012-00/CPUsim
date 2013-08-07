@@ -81,6 +81,7 @@ public class MemoryModule implements MainMemory {
 	//	}
 		for (Data line : programCode) {
 			MEMORY[pointer] = line; //Load pointer location with line of program code
+			System.out.println(MEMORY[pointer].toString());
 			pointer++; //Increment pointer
 		}
 	//	if (pointerValue != 0) { //Set PC to start address, if not 0 (PC set to 0 by default)

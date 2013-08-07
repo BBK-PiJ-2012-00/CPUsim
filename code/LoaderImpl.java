@@ -18,10 +18,16 @@ public class LoaderImpl implements Loader {
 	}
 	
 	public void loadToMemory() {
+		for (Data d : programCode) {
+			System.out.println(d.toString());
+		}
 		//this.programCode = codeBuffer.toArray(new Data[codeBuffer.size()]); //Convert codeBuffer to standard array
 		memory.loadMemory(programCode);		
 	}
 	
+	public Data[] getProgramCode() {
+		return this.programCode;
+	}
 	
 
 }

@@ -12,5 +12,7 @@ public interface Loader {
 	public void load(Data[] assembledCode);
 	
 	public void loadToMemory();
+	
+	public Data[] getProgramCode();
 
 }

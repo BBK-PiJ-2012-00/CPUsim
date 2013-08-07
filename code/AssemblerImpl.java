@@ -142,8 +142,8 @@ public class AssemblerImpl implements Assembler {
 				
 		//Assemble the operands (represented as Strings) to real Operands and put them in programCode
 		for (int i = 0; i < operandArray.size(); i++) {
-			System.out.println(operandArray.get(i));
 			List<String> lineComponents = this.splitCodeLine(operandArray.get(i)); //Break line of code into parts
+			
 			Data operand = this.assembleOperand(lineComponents);
 			programCode[operandAddressPointer] = operand; //Add the operand to the data array, at specified address
 			operandAddressPointer++; //Increment so that the next operand will be stored in the next consecutive address
@@ -160,7 +160,6 @@ public class AssemblerImpl implements Assembler {
 
 		//Assemble the instructions represented as Strings into type Instruction, and put into programCode array
 		for (int i = 0; i < instructionArray.size(); i++) { 	
-			System.out.println(instructionArray.get(i));
 			List<String> lineComponents = this.splitCodeLine(instructionArray.get(i)); //Break a line of code into parts
 			
 			Data instruction = this.assembleInstruction(lineComponents); //Create an instruction/operand from the line components			
@@ -267,8 +266,6 @@ public class AssemblerImpl implements Assembler {
 			//These opcodes have the same instruction format; just a symbolic memory address
 			if (instructionParts.get(i).equals("BR") || instructionParts.get(i).equals("BRZ")) {
 				String opcode = instructionParts.get(i);
-				System.out.println("In BR section.");
-				System.out.println(lookupTable.toString());
 				int destination = lookupTable.get(instructionParts.get(i+1)); //Get value for symbolic memory address ref.
 				
 				if (opcode.equals("BR")) {
@@ -327,6 +324,10 @@ public class AssemblerImpl implements Assembler {
 	@Override
 	public Data[] getProgramCode() {
 		return this.programCode;
+	}
+	
+	public Loader getLoader() { //Returns reference to loader, for testing
+		return this.loader;
 	}
 
 
