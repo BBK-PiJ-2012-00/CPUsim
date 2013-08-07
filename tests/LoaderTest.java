@@ -41,26 +41,20 @@ public class LoaderTest {
 		for (int i = 0; i < testProgram.length; i++) {
 			assertEquals(expected[i].toString(), output[i].toString());
 		}
-		
 	}
 
-}
-
-
-
 	
-//	private Data[] programCode; //An array to represent the program to be loaded into memory
-//	
-//	public void load(Data[] assembledCode) { //For loading code from assmebler to loader
-//		this.programCode = assembledCode;
-//	}
-//	
-//	public void loadToMemory() {
-//		//this.programCode = codeBuffer.toArray(new Data[codeBuffer.size()]); //Convert codeBuffer to standard array
-//		memory.loadMemory(programCode);		
-//	}
-//	
-//	public Data[] getProgramCode() {
-//		return this.programCode;
-//	}
+	@Test
+	public void testLoadToMemory() {
+		loader.load(testProgram);
+		loader.loadToMemory();
+		
+		for (int i = 0; i < testProgram.length; i++) {
+			assertEquals(testProgram[i].toString(), memory.accessAddress(i).toString());
+		}
+	}
+	
+}
+	
+
 	
