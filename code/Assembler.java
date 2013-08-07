@@ -4,8 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 /*
- * Reads a text file containing assembly language. Can initially read into an array of Strings, from which an array of Instructions is
- * then created.
+ * Reads a text file containing assembly language, assembles the code and passed it the the loader.
  */
 
 public interface Assembler {
