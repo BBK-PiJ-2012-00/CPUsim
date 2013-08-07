@@ -10,8 +10,17 @@ import java.util.Map;
 
 public interface Assembler {
 	
+	/*
+	 * A method for referencing a text file containing the assembly program.
+	 * 
+	 * @param String fileName the path to the text file.
+	 */
 	public void selectFile(String fileName);
 	
+	/*
+	 * Reads the text file passed as a reference via selectFile(), and places the code line by line
+	 * into the programString array list.
+	 */
 	public void readAssemblyFile();
 	
 	/*
@@ -27,6 +36,17 @@ public interface Assembler {
 	
 	public List<String> getProgramString();
 	
+	/*
+	 * There is an error if a label is referenced that has not yet been added to the lookup table; instructionArray
+	 * needs to be cycled through first, with any labels being mapped before the code can be assembled.
+	 */
+	/*
+	 * assembleCode() prompts the conversion of an assembly file into a Data array containing the program code,
+	 * ready for passing to the loader. Operands are first mapped from symbolic to physical memory addresses before
+	 * being assembled and added to the programCode array. Instruction labels are also mapped to memory addresses, before
+	 * instructions themselves are assembled and added to programCode. This method relies on many of the other methods
+	 * of the assembler to do this.
+	 */	
 	public void assembleCode();
 	
 	/*
@@ -41,10 +61,31 @@ public interface Assembler {
 	 */
 	public Data assembleOperand(List<String> operandParts);
 	
+	
+	/*
+	 * Assembles the program instructions held in instructionArray as Strings to objects of type Data
+	 * (Instruction).  
+	 * 
+	 * @param List<String> instructionParts one line of code representing an instruction broken into
+	 * an array for easier interpretation.
+	 * @return Data the line of code representing an instruction assembled into type Data.
+	 */
 	public Data assembleInstruction(List<String> instructionParts);
 	
+	/*
+	 * A method for mapping instruction labels to memory addresses. The memory addresses are
+	 * absolute but could also be used as an offset from a base address, if the loader implements
+	 * relocatable addressing as an extension.  
+	 * 
+	 * @param List<String> lineParts a line of code broken up into an array, for simpler interpretation.
+	 * @param int lineNum the line number of the line of code, which is used as an address reference.
+	 */
 	public void mapInstructionLabel(List<String> lineParts, int lineNum);
 	
+	
+	/*
+	 * Loads programCode containing the program code into the loader.
+	 */
 	public void loadToLoader();
 	
 	/*
