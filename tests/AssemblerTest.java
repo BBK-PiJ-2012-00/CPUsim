@@ -205,4 +205,20 @@ public class AssemblerTest {
 			//System.out.println(outputArray[i]);
 		}
 	}
+	
+	@Test
+	public void testLoadToLoader() {
+		assembler.selectFile(testFile2);
+		assembler.assembleCode();
+		
+		assembler.loadToLoader();
+		
+		Data[] expected = assembler.getProgramCode();
+		Data[] output = ((AssemblerImpl) assembler).getLoader().getProgramCode();
+		
+		for (int i = 0; i < expected.length; i++) {
+			assertEquals(expected[i].toString(), output[i].toString());
+		}
+	}
+
 }
