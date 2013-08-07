@@ -428,6 +428,20 @@ public class ExecuteStageTest {
 		
 		assertFalse(result);
 	}
+	
+	//Test loading condition code register
+	@Test
+	public void testInstructionLOAD_statusRegister() {
+		memory.notify(0, new TransferInstr(Opcode.LOAD, 50, 16)); //16 refers to status register
+		fetchDecodeStage.instructionFetch();
+		int opcode = fetchDecodeStage.instructionDecode();
+		executeStage.instructionExecute(opcode);
+		
+		Operand expected = new OperandImpl(1000); //Value of operand stored in memory address 50
+		Operand output = statusRegister.read();
+		
+		assertEquals(expected, output);
+	}
 
 }
 
