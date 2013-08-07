@@ -39,6 +39,10 @@ public abstract class ExecuteStage {
 					
 					mar.write(0); //Reset MAR
 					
+					if (ir.read().getField2() == 16) { //ConditionCodeRegister reference
+						statusRegister.write((Operand) mbr.read()); //Write operand in mbr to condition/status register
+					}
+					
 					//Transfer data in mbr to destination field in instruction in ir (field2).
 					genRegisters.write(ir.read().getField2(), mbr.read());//getField2() gives reg. destination index, mbr.read()
 					//gives the operand to be moved from mbr to genRegisters at index given in getField2().
