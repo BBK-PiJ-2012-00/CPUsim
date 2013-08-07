@@ -13,14 +13,16 @@ import java.util.regex.Pattern;
 public class AssemblerImpl implements Assembler {
 	private Data[] programCode; //The assembly language program to be passed to the loader 
 	
-	private List<String> programString; //Holds program code as string array list, for parsing into data array
-	//Reference to file
-	private String fileReference;
-	private Map<String, Integer> lookupTable; //For associating labels with relative addresses
+	private String fileReference; //Reference to the text file containing assembly program
+	
 	private Loader loader;
 	
+	private List<String> programString; //Holds program code read from file as array list of Strings
 	private List<String> instructionArray; //For intermediate stage where programString is split into two, instructions being stored
 	private List<String> operandArray; //in instructionArray, operands being stored in operandArray (as Strings)
+		
+	private Map<String, Integer> lookupTable; //For associating labels with relative addresses	
+	
 	private int operandAddressPointer;
 	
 	
@@ -31,10 +33,13 @@ public class AssemblerImpl implements Assembler {
 	}
 	
 	
+	@Override
 	public void selectFile(String fileName) { //For selecting assembly program file
 		this.fileReference = fileName;
 	}
 	
+	
+	@Override
 	public void readAssemblyFile() {
 		String line;
 		Scanner s = null;
@@ -62,14 +67,7 @@ public class AssemblerImpl implements Assembler {
 	}
 	
 	
-	/*
-	 * This method splits the assembly program stored as an array of Strings in programString into
-	 * two distinct array lists (also of type String). The idea is that operand declarations are stored
-	 * separately from instructions, so that they may have their symbolic memory references mapped to 
-	 * real memory addresses before instructions are assembled. This means that when instructions come to be
-	 * interpreted and assembled, the symbolic references to operands can be resolved using the lookupTable, to
-	 * which symbolic operand references are added and mapped to real memory addresses.
-	 */
+	@Override
 	public void separateOperands() {
 		operandArray = new ArrayList<String>();
 		instructionArray = new ArrayList<String>();
@@ -86,11 +84,8 @@ public class AssemblerImpl implements Assembler {
 														//after the last instruction (deduced by size of instructionArray).
 	}
 	
-	/*
-	 * This method assembles the operandArray into proper Data (Operand) types, and stores them
-	 * in the program code array. They are stored at an index that exceeds what will be the last
-	 * address of the instruction code so that operands appear in memory at the end of the program.
-	 */
+	
+	@Override
 	public Data assembleOperand(List<String> operandParts) {
 		//All operand part arrays will contain 3 parts: symbol, DATA declaration, and operand value
 		String symbol = operandParts.get(0).substring(0, operandParts.get(0).length() -1); //Trim semicolon from symbol
@@ -104,12 +99,7 @@ public class AssemblerImpl implements Assembler {
 	}
 	
 	
-	
-	
-	/*
-	 * Method takes a line of code and splits it into an array list of Strings, which can then be passed
-	 * to another method for interpretation (i.e. so that instructions or operands can be created).
-	 */
+	@Override
 	public List<String> splitCodeLine(String line) {
 		Scanner sc;
 		Pattern delimiterPattern = Pattern.compile("[\\,]?[\\s]+"); //splits a String on one or more whitespaces, or a comma
@@ -143,13 +133,10 @@ public class AssemblerImpl implements Assembler {
 		return;
 	}
 	
-
 	
-	/*
-	 * There is an error if a label is referenced that has not yet been added to the lookup table; instructionArray
-	 * needs to be cycled through first, with any labels being mapped before the code can be assembled.
-	 */
+	@Override
 	public void assembleCode() {
+		this.readAssemblyFile();
 		//Operands assembled first so their symbolic references can be mapped to actual addresses
 		this.separateOperands();
 				
@@ -303,19 +290,22 @@ public class AssemblerImpl implements Assembler {
 		return data;
 	}
 	
-	
+	@Override
 	public void loadToLoader() {
 		loader.load(this.programCode);
 	}
 	
+	@Override
 	public List<String> getProgramString() {
 		return this.programString;
 	}
 	
+	@Override
 	public List<String> getOperandArray() {
 		return this.operandArray;
 	}
 	
+	@Override
 	public List<String> getInstructionArray() {
 		return this.instructionArray;
 	}
@@ -330,6 +320,9 @@ public class AssemblerImpl implements Assembler {
 	public Data[] getProgramCode() {
 		return this.programCode;
 	}
+
+
+	
 	
 
 /*
