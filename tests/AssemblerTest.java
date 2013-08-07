@@ -18,12 +18,14 @@ import code.TransferInstr;
 public class AssemblerTest {
 	private Assembler assembler;
 	private String testFile;
+	private String testFile2;
 
 	@Before
 	public void setUp() throws Exception {
 		assembler = new AssemblerImpl();
 		testFile = "src/assemblyPrograms/assemblerTestProgram.txt";
 		assembler.selectFile(testFile);
+		testFile2 = "src/assemblyPrograms/assemblerTestProgram2";
 	}
 
 	/*
@@ -141,7 +143,7 @@ public class AssemblerTest {
 		assembler.assembleOperand(operandParts); //Operand must be created for instruction to be able to be created
 		
 		String expected = new TransferInstr(Opcode.LOAD, 1, 0).toString();
-		String output = assembler.assembleInstruction(instructionParts, 0).toString(); //Create the instruction
+		String output = assembler.assembleInstruction(instructionParts).toString(); //Create the instruction
 		
 		assertEquals(expected, output);
 	}
@@ -149,7 +151,6 @@ public class AssemblerTest {
 	
 	@Test
 	public void assembleCodeTest_LOADinstr() { //Test assembly of load instruction with an operand
-		assembler.readAssemblyFile();
 		assembler.assembleCode();
 		Data[] expectedArray = new Data[2];
 		expectedArray[1] = new OperandImpl(7);
@@ -164,12 +165,45 @@ public class AssemblerTest {
 	
 	@Test
 	public void assembleCodeTest_size() { //Test assembly of load instruction with an operand, this time checking by size
-		assembler.readAssemblyFile();
 		assembler.assembleCode();
 		
 		Data[] outputArray = assembler.getProgramCode();		
 		assertEquals(2, outputArray.length);
 			
+	}
+	
+	@Test
+	public void testAssembly() { //Test assembly of a full program containing a variety of operands and instructions
+		assembler.selectFile(testFile2);
+		assembler.assembleCode();
+		
+		String[] expectedArray = new String[19]; //Hexadecimal representation
+        expectedArray[0] = "LOAD E 0";
+        expectedArray[1] = "LOAD F 1";
+        expectedArray[2] = "ADD 0 1";
+        expectedArray[3] = "STORE 0 10";
+        expectedArray[4] = "LOAD 12 2";
+        expectedArray[5] = "LOAD E 3";
+        expectedArray[6] = "BR 8";
+        expectedArray[7] = "SUB 2 3";
+        expectedArray[8] = "ADD 2 3";
+        expectedArray[9] = "STORE 2 11";
+        expectedArray[10] = "LOAD 12 10";
+        expectedArray[11] = "BRNE D 2";
+        expectedArray[12] = "MUL 2 3";
+        expectedArray[13] = "HALT";
+        expectedArray[14] = "5";
+        expectedArray[15] = "10";
+        expectedArray[16] = "0";
+        expectedArray[17] = "0";
+        expectedArray[18] = "20";
+        
+        Data[] outputArray = assembler.getProgramCode();
+		
+		for (int i = 0; i < outputArray.length; i++) {
+			assertEquals(expectedArray[i], outputArray[i].toString());
+			//System.out.println(outputArray[i]);
+		}
 	}
 	
 	
