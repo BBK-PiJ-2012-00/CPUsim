@@ -162,8 +162,8 @@ public class AssemblerImpl implements Assembler {
 		for (int i = 0; i < instructionArray.size(); i++) { 	
 			System.out.println(instructionArray.get(i));
 			List<String> lineComponents = this.splitCodeLine(instructionArray.get(i)); //Break a line of code into parts
-			Data instruction = this.assembleInstruction(lineComponents); //Create an instruction/operand from the line components
-			System.out.println("Instruction value: " + instruction.toString());
+			
+			Data instruction = this.assembleInstruction(lineComponents); //Create an instruction/operand from the line components			
 			programCode[i] = instruction; //Add the instruction/operand to an array list, to be later passed into memory
 		}
 		
@@ -182,7 +182,15 @@ public class AssemblerImpl implements Assembler {
 				
 				String destinationString = instructionParts.get(i+2).substring(1); //Trim leading 'r' off
 				//register source to leave an integer reference
-				int destination = Integer.parseInt(destinationString);
+				
+				int destination;
+				
+				if (destinationString.equals("CC")) { //A load instruction may reference condition code/status register
+					destination = 16;
+				}
+				else {
+					destination = Integer.parseInt(destinationString);
+				}				
 				
 				int source = lookupTable.get(instructionParts.get(i+1)); //Memory addresses are always symbolic
 				
