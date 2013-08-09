@@ -1,6 +1,7 @@
 package code;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.regex.Pattern;
 public class AssemblerImpl implements Assembler {
 	private Data[] programCode; //The assembly language program to be passed to the loader 
 	
-	private String fileReference; //Reference to the text file containing assembly program
+	private File fileReference; //Reference to the text file containing assembly program
 	
 	private Loader loader;
 	
@@ -29,12 +30,11 @@ public class AssemblerImpl implements Assembler {
 	public AssemblerImpl() {
 		this.programString = new ArrayList<String>();
 		this.lookupTable = new HashMap<String, Integer>();
-		this.loader = new LoaderImpl();
 	}
 	
 	
 	@Override
-	public void selectFile(String fileName) { //For selecting assembly program file
+	public void selectFile(File fileName) { //For selecting assembly program file
 		this.fileReference = fileName;
 	}
 	
@@ -297,6 +297,7 @@ public class AssemblerImpl implements Assembler {
 	
 	@Override
 	public void loadToLoader() {
+		loader = new LoaderImpl(); //has the effect of resetting the loader each time
 		loader.load(this.programCode);
 	}
 	
