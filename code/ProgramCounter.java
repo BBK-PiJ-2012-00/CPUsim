@@ -23,5 +23,6 @@ public interface ProgramCounter {
 	 */
 	public void setPC(int address);
 	
+	public String display();
 
 }

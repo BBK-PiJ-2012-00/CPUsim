@@ -15,6 +15,12 @@ public class PC implements ProgramCounter {
 		this.nextInstructionPointer = address;
 	}
 	
+	public String display() {
+		String display = "";
+		display += "<html>-- PC --<br>";
+		display += "-> " + nextInstructionPointer + "</html>";
+		return display;
+	}
 	
 
 }
