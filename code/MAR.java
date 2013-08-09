@@ -39,5 +39,16 @@ public class MAR implements MemoryAddressRegister {
 	public int read() {
 		return registerContents;
 	}
+	
+	public String display() {
+		String marDisplay = "<html> -- MAR -- <br>";
+		if (registerContents == -1) {
+			marDisplay += "--- </html>";
+		}
+		else {
+			marDisplay += "  " + this.registerContents + "</html>";
+		}
+		return marDisplay;
+	}
 
 }
