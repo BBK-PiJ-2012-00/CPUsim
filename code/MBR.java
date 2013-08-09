@@ -44,5 +44,16 @@ public class MBR implements MemoryBufferRegister {
 	public Data read() { 
 		return registerContents;
 	}
+	
+	public String display() {
+		String mbrDisplay = "<html> -- MBR -- <br>";
+		if (registerContents == null) {
+			mbrDisplay += "--- </html>";
+		}
+		else {
+			mbrDisplay += "  " + this.registerContents.toString() + "</html>";
+		}
+		return mbrDisplay;
+	}
 
 }

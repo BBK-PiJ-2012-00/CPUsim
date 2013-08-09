@@ -23,5 +23,8 @@ public interface MemoryBufferRegister {
 	 * @return Data the data contents of the MBR.
 	 */
 	public Data read();
+	
+	public String display();
 
+	
 }
