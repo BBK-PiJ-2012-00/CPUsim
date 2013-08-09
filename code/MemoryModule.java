@@ -81,7 +81,7 @@ public class MemoryModule implements MainMemory {
 	//	}
 		for (Data line : programCode) {
 			MEMORY[pointer] = line; //Load pointer location with line of program code
-			System.out.println(MEMORY[pointer].toString());
+			//System.out.println(MEMORY[pointer].toString());
 			pointer++; //Increment pointer
 		}
 	//	if (pointerValue != 0) { //Set PC to start address, if not 0 (PC set to 0 by default)
@@ -131,12 +131,24 @@ public class MemoryModule implements MainMemory {
 		//System.out.println("  -- MAIN MEMORY --  ");
 		for (int i = 0; i < MEMORY.length; i++) {
 			if (MEMORY[i] == null) {
-				//System.out.println(i + "| " + "--------");
-				displayString += "<br>" + i + "| ------------";
+				if (i < 10) { //For formatting of single digits
+					String iString = "0" + i;
+					displayString += "<br>" + iString + "| ------------";
+				}
+				else {
+					//System.out.println(i + "| " + "--------");
+					displayString += "<br>" + i + "| ------------";
+				}
 			}
 			else { 
-				//System.out.println(i + "| " + MEMORY[i].toString());
-				displayString+= "<br>" + i + "| " + MEMORY[i].toString();
+				if (i < 10) {
+					String iString = "0" + i;
+					displayString += "<br>" + iString + "| " + MEMORY[i].toString();
+				}
+				else {
+					//System.out.println(i + "| " + MEMORY[i].toString());
+					displayString+= "<br>" + i + "| " + MEMORY[i].toString();
+				}
 			}
 		}
 		displayString += "</html>";
