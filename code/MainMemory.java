@@ -52,6 +52,8 @@ public interface MainMemory {
 		
 	
 	public void loadMemory(Data[] programCode);
+	
+	public String display();
 		
 	
 	//Has reference to memory port(s) -> one for input, one for output, or perhaps several for pipelining
