@@ -18,4 +18,6 @@ public interface MemoryAddressRegister {
 	 * @return int the address contained in the MAR.
 	 */
 	public int read();
+	
+	public String display();
 }
