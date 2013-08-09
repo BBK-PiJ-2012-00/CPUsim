@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
@@ -31,9 +32,13 @@ public class SimulatorLauncher {
 		((AssemblerImpl) assembler).getLoader().loadToMemory();
 		
 		JLabel testLabel = new JLabel(((MemoryModule) memory).display());
+		JLabel testLabelPC = new JLabel(controlUnit.getPC().display());
+		
 		//JTextArea memoryArea = new JTextArea(10, 50);
 		//memoryArea.add(testLabel);
 		JScrollPane memoryScrollPane = new JScrollPane(testLabel);
+		JPanel memoryPanel = new JPanel();
+		memoryPanel.add(memoryScrollPane);
 		
 
 //				setPreferredSize(new Dimension(450, 110));
@@ -44,7 +49,8 @@ public class SimulatorLauncher {
 		JFrame frame = new JFrame("CPUsim");
 		frame.setSize(400, 400);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().add(memoryScrollPane, BorderLayout.WEST);
+		frame.getContentPane().add(memoryPanel, BorderLayout.WEST);
+		frame.getContentPane().add(testLabelPC, BorderLayout.EAST);
 		frame.pack();
 		frame.setVisible(true);
 		
