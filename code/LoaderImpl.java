@@ -22,6 +22,8 @@ public class LoaderImpl implements Loader {
 			System.out.println(d.toString());
 		}
 		//this.programCode = codeBuffer.toArray(new Data[codeBuffer.size()]); //Convert codeBuffer to standard array
+		memory.resetPointer(); //This can be removed if relocatable addressing is implemented, then more than one program can be
+		//loaded
 		memory.loadMemory(programCode);		
 	}
 	
