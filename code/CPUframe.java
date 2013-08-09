@@ -116,6 +116,9 @@ public class CPUframe extends JFrame {
 		        if (returnVal == JFileChooser.APPROVE_OPTION) {
 		            File file = fileChooser.getSelectedFile();
 		            
+		            memory.clearMemory();
+		           
+		            assembler = new AssemblerImpl();
 		            assembler.selectFile(file);
 		    		assembler.assembleCode();
 		    		assembler.loadToLoader();
