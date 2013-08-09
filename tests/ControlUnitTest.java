@@ -76,31 +76,31 @@ public class ControlUnitTest {
 	/*
 	 * Test non-pipelined execution.
 	 */
-//	@Test
-//	public void activateTest() { //Test activate() of ControlUnit, which triggers instruction cycle
-//		memory.notify(0, testInstrLOAD_2); //Put LOAD instruction into memory addr 0
-//		memory.notify(1, testInstrLOAD_4); //Put LOAD instruction into memory addr 1
-//		memory.notify(2, testInstrADD); //Load ADD instruction to memory addr 2
-//		memory.notify(3, testInstrSTORE_7); //Load STORE instruction to memory addr 3
-//		memory.notify(4, testInstrHALT); //Load HALT instruction to memory addr 4
-//		memory.notify(5, new OperandImpl(10)); //Load operand 10 to memory address 5
-//		memory.notify(6, new OperandImpl(20)); //Load operand 20 to memory address 6
-//		
-//		//Result of this instruction cycle should be that a value of 30 is stored in memory address 4
-//		controlUnit.activate();
-//		System.out.println("r2: " + controlUnit.getRegisters().read(2));
-//		for (int i = 0; i < 8; i++) {
-//			System.out.println(memory.accessAddress(i));
-//		}
-//		
-//		((MemoryModule) memory).display();
-//		
-//		Operand output = (Operand) memory.accessAddress(7);
-//		Operand expected = new OperandImpl(30);
-//		
-//		assertEquals(expected, output);
-//		
-//	}
+	@Test
+	public void activateTest() { //Test activate() of ControlUnit, which triggers instruction cycle
+		memory.notify(0, testInstrLOAD_2); //Put LOAD instruction into memory addr 0
+		memory.notify(1, testInstrLOAD_4); //Put LOAD instruction into memory addr 1
+		memory.notify(2, testInstrADD); //Load ADD instruction to memory addr 2
+		memory.notify(3, testInstrSTORE_7); //Load STORE instruction to memory addr 3
+		memory.notify(4, testInstrHALT); //Load HALT instruction to memory addr 4
+		memory.notify(5, new OperandImpl(10)); //Load operand 10 to memory address 5
+		memory.notify(6, new OperandImpl(20)); //Load operand 20 to memory address 6
+		
+		//Result of this instruction cycle should be that a value of 30 is stored in memory address 4
+		controlUnit.activate();
+		System.out.println("r2: " + controlUnit.getRegisters().read(2));
+		for (int i = 0; i < 8; i++) {
+			System.out.println(memory.accessAddress(i));
+		}
+		
+		((MemoryModule) memory).display();
+		
+		Operand output = (Operand) memory.accessAddress(7);
+		Operand expected = new OperandImpl(30);
+		
+		assertEquals(expected, output);
+		
+	}
 	
 	
 	@Test
