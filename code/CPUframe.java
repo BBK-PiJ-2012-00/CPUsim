@@ -4,12 +4,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.border.BevelBorder;
 
 
 public class CPUframe extends JFrame {
@@ -21,6 +24,8 @@ public class CPUframe extends JFrame {
 	private static final int FRAME_HEIGHT = 400;
 	
 	private JFileChooser fileChooser;
+	
+	private JPanel mainPanel;
 	
 	private JPanel controlPanel;
 	private JPanel memoryPanel;
@@ -39,8 +44,8 @@ public class CPUframe extends JFrame {
 
 	private JScrollPane scroller;
 	
-	public CPUframe(Assembler assembler, ControlUnit controlUnit, MainMemory memory) {
-		this.assembler = assembler;
+	public CPUframe(ControlUnit controlUnit, MainMemory memory) {
+		//this.assembler = assembler;
 		this.controlUnit = controlUnit;
 		this.memory = memory;
 				
@@ -50,17 +55,32 @@ public class CPUframe extends JFrame {
 	}
 	
 	private void createComponents() {
+		//mainPanel = new JPanel();
+		
+		
 		controlPanel = new JPanel();
-		memoryPanel = new JPanel(); 
-		memoryLabel = new JLabel(((MemoryModule) MemoryModule.getInstance()).display());
+		
+		memoryPanel = new JPanel();
+		memoryLabel = new JLabel(memory.display());
 		memoryPanel.add(memoryLabel);
+		
+		//memoryLabel.setSize(700, FRAME_HEIGHT);
 		registerPanel = new JPanel();
 	
-		scroller = new JScrollPane(memoryPanel);		
+		scroller = new JScrollPane(memoryPanel);
+		//memoryPanel.add(scroller);
+		scroller.setBorder(BorderFactory.createTitledBorder(" Main Memory "));
+		
+		mainPanel.add(scroller);
+		
 		this.getContentPane().add(scroller, BorderLayout.EAST); 
+		//this.getContentPane().add(mainPanel);
 		
 		MARlabel = new JLabel(MAR.getInstance().display());
 		registerPanel.add(MARlabel);
+		
+		MBRlabel = new JLabel(MBR.getInstance().display());
+		registerPanel.add(MBRlabel);
 
 		
 		executeButton = new JButton("Execute Program");
@@ -75,7 +95,7 @@ public class CPUframe extends JFrame {
 		
 		
 		controlPanel.add(resetButton);
-		this.getContentPane().add(registerPanel);
+		this.getContentPane().add(registerPanel, BorderLayout.WEST);
 		this.getContentPane().add(controlPanel);
 		
 		fileChooser = new JFileChooser("src/assemblyPrograms");		
