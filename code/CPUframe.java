@@ -204,7 +204,7 @@ public class CPUframe extends JFrame {
 		panel2.setLayout(new BoxLayout(panel2, BoxLayout.Y_AXIS));
 		
 		registerPanel = new JPanel();
-		registerPanel.setMaximumSize(new Dimension(300, 300));
+		registerPanel.setMaximumSize(new Dimension(400, 400));
 		registerPanel.setAlignmentX(CENTER_ALIGNMENT);
 		registerPanel.setAlignmentY(TOP_ALIGNMENT);
 		//registerPanel.setMaximumSize(new Dimension(20, 20));
@@ -267,33 +267,92 @@ public class CPUframe extends JFrame {
 		
 		registerPanel.add(controlRegistersPanel2);
 		
-		panel2.add(registerPanel);	
+		generalPurposePanel = new JPanel();
+		generalPurposePanel.setLayout(new BoxLayout(generalPurposePanel, BoxLayout.X_AXIS));
+		generalPurposePanel.setMaximumSize(new Dimension(400, 300));
+		generalPurposePanel.setBorder(BorderFactory.createTitledBorder("General Purpose Registers"));
 		
-//		
-//		MARlabel = new JLabel(MAR.getInstance().display());
-//		marPanel = new JPanel();
-//		marPanel.add(MARlabel);
-//		marPanel.setBorder(BorderFactory.createTitledBorder(" MAR "));
-//		
-//		MBRlabel = new JLabel(MBR.getInstance().display());
-//		mbrPanel = new JPanel();
-//		mbrPanel.add(MARlabel);
-//		mbrPanel.setBorder(BorderFactory.createTitledBorder(" MBR "));
-//		
-//		
-//		
-//		registerPanel.add(marPanel);
-//		registerPanel.add(mbrPanel);
-//		
+		JPanel individualPanel1 = new JPanel();
+		individualPanel1.setLayout(new BoxLayout(individualPanel1, BoxLayout.Y_AXIS));
 		
-//		registerPanel.add(MARlabel);
-//		
-//		MBRlabel = new JLabel(MBR.getInstance().display());
-//		registerPanel.add(MBRlabel);
-
-		
+		for (int i = 0; i < 4; i++) {
 			
-		//int returnVal = fileChooser.showOpenDialog(this); //Opens file chooser on program launch
+			JLabel regLabel = new JLabel("0" + i);
+			JTextField genRegister = new JTextField(4);
+			genRegister.setEditable(false);
+			JPanel regPanel = new JPanel();
+			genRegister.setEditable(false);
+			regPanel.add(regLabel);
+			regPanel.add(genRegister);
+			individualPanel1.add(regPanel);
+			
+		}
+		generalPurposePanel.add(individualPanel1);
+		
+		JPanel individualPanel2 = new JPanel();
+		individualPanel2.setLayout(new BoxLayout(individualPanel2, BoxLayout.Y_AXIS));
+		
+		for (int i = 4; i < 8; i++) {
+			
+			JLabel regLabel = new JLabel("0" + i);
+			JTextField genRegister = new JTextField(4);
+			genRegister.setEditable(false);
+			JPanel regPanel = new JPanel();
+			genRegister.setEditable(false);
+			regPanel.add(regLabel);
+			regPanel.add(genRegister);
+			individualPanel2.add(regPanel);
+			
+		}
+		generalPurposePanel.add(individualPanel2);
+		
+		JPanel individualPanel3 = new JPanel();
+		individualPanel3.setLayout(new BoxLayout(individualPanel3, BoxLayout.Y_AXIS));
+		
+		for (int i = 8; i < 12; i++) {
+			JLabel regLabel;
+			if (i < 10) {
+				regLabel = new JLabel("0" + i);
+			}
+			else {
+				regLabel = new JLabel("" + i);
+			}
+			JTextField genRegister = new JTextField(4);
+			JPanel regPanel = new JPanel();
+			genRegister.setEditable(false);
+			regPanel.add(regLabel);
+			regPanel.add(genRegister);
+			individualPanel3.add(regPanel);
+			
+		}
+		generalPurposePanel.add(individualPanel3);
+		
+		JPanel individualPanel4 = new JPanel();
+		individualPanel4.setLayout(new BoxLayout(individualPanel4, BoxLayout.Y_AXIS));
+		
+		for (int i = 12; i < 16; i++) {
+			JLabel regLabel = new JLabel("" + i);
+			JTextField genRegister = new JTextField(4);
+			JPanel regPanel = new JPanel();
+			genRegister.setEditable(false);
+			regPanel.add(regLabel);
+			regPanel.add(genRegister);
+			individualPanel4.add(regPanel);
+			
+		}
+		generalPurposePanel.add(individualPanel4);
+		
+		
+		
+		registerPanel.add(generalPurposePanel);
+		
+		panel2.add(registerPanel);
+		
+		/*
+		 * ALU display
+		 */
+		
+
 		
 		this.getContentPane().add(panel1); //Leftmost panel
 		this.getContentPane().add(panel2);
