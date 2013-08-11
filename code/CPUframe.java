@@ -1,5 +1,6 @@
 package code;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,8 +28,8 @@ public class CPUframe extends JFrame {
 	private MainMemory memory;
 	private Assembler assembler;
 	
-	private static final int FRAME_WIDTH = 1000;
-	private static final int FRAME_HEIGHT = 1000;
+	private static final int FRAME_WIDTH = 1800;
+	private static final int FRAME_HEIGHT = 1600;
 	
 	private JFileChooser fileChooser;
 	
@@ -98,6 +99,7 @@ public class CPUframe extends JFrame {
 		this.getContentPane().setLayout(new BoxLayout(this.getContentPane(), BoxLayout.X_AXIS)); //Arrange panels horizontally
 		
 		panel1 = new JPanel();
+		panel1.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 		panel2 = new JPanel();
 		panel3 = new JPanel();
 		panel4 = new JPanel();
@@ -197,20 +199,15 @@ public class CPUframe extends JFrame {
 		 * CPU registers
 		 */
 		
-//		private JPanel registerPanel; //A panel to hold all cpu registers
-//		private JPanel controlRegistersPanel; //A panel to hold control registers
-//		private JPanel generalPurposePanel; // A panel to group the general purpsoe registers
-//		private JPanel marPanel;
-//		private JPanel mbrPanel;
-//		private JPanel irPanel;
-//		private JPanel pcPanel;
-//		private JPanel statusPanel;
 		
 		panel2 = new JPanel();
 		panel2.setLayout(new BoxLayout(panel2, BoxLayout.Y_AXIS));
 		
 		registerPanel = new JPanel();
-		registerPanel.setSize(30, 40);
+		registerPanel.setMaximumSize(new Dimension(300, 300));
+		registerPanel.setAlignmentX(CENTER_ALIGNMENT);
+		registerPanel.setAlignmentY(TOP_ALIGNMENT);
+		//registerPanel.setMaximumSize(new Dimension(20, 20));
 		registerPanel.setBorder(BorderFactory.createTitledBorder("CPU Registers"));
 		registerPanel.setLayout(new BoxLayout(registerPanel, BoxLayout.Y_AXIS));
 		
@@ -219,22 +216,27 @@ public class CPUframe extends JFrame {
 		
 		pcField = new JTextField(4);
 		pcField.setEditable(false);
+		pcField.setAlignmentX(CENTER_ALIGNMENT);
+		pcField.setAlignmentY(CENTER_ALIGNMENT);
 		pcPanel = new JPanel();
+		pcPanel.setMaximumSize(new Dimension(75, 60));
 		pcPanel.add(pcField);
 		pcPanel.setBorder(BorderFactory.createTitledBorder(" PC "));
 		
 		irField = new JTextField(4);
 		irField.setEditable(false);
 		irPanel = new JPanel();
+		irPanel.setMaximumSize(new Dimension(75, 60));
 		irPanel.add(irField);
 		irPanel.setBorder(BorderFactory.createTitledBorder(" IR "));
 		
 		statusField = new JTextField(4);
 		statusField.setEditable(false);
 		statusPanel = new JPanel();
+		statusPanel.setMaximumSize(new Dimension(75, 60));
 		//statusPanel.setSize(5, 5);
 		statusPanel.add(statusField);
-		statusPanel.setBorder(BorderFactory.createTitledBorder(" Condition Code "));
+		statusPanel.setBorder(BorderFactory.createTitledBorder(" CC "));
 		
 		controlRegistersPanel1.add(pcPanel);
 		controlRegistersPanel1.add(irPanel);
@@ -248,12 +250,14 @@ public class CPUframe extends JFrame {
 		marField = new JTextField(4);
 		marField.setEditable(false);
 		marPanel = new JPanel();
+		marPanel.setMaximumSize(new Dimension(75, 60));
 		marPanel.add(marField);
 		marPanel.setBorder(BorderFactory.createTitledBorder(" MAR "));
 		
 		mbrField = new JTextField(4);
 		mbrField.setEditable(false);
 		mbrPanel = new JPanel();
+		mbrPanel.setMaximumSize(new Dimension(75, 60));
 		mbrPanel.add(mbrField);
 		mbrPanel.setBorder(BorderFactory.createTitledBorder(" MBR "));
 		
