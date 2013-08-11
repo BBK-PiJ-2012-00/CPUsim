@@ -331,6 +331,18 @@ public class AssemblerImpl implements Assembler {
 		return this.loader;
 	}
 
+	/*
+	 * Not working properly!!
+	 */
+	@Override
+	public String display() { //Displays assembly language program
+		String displayString = "";
+		for (String line : programString) {
+			displayString += line + "\n";
+		}
+		return displayString;
+	}
+
 
 	
 	

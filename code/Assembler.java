@@ -1,5 +1,6 @@
 package code;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +15,7 @@ public interface Assembler {
 	 * 
 	 * @param String fileName the path to the text file.
 	 */
-	public void selectFile(String fileName);
+	public void selectFile(File fileName);
 	
 	/*
 	 * Reads the text file passed as a reference via selectFile(), and places the code line by line
@@ -104,5 +105,7 @@ public interface Assembler {
 	public Map<String, Integer> getLookupTable();
 
 	public Data[] getProgramCode();
+	
+	public String display();
 
 }
