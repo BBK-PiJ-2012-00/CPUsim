@@ -1,5 +1,6 @@
 package code;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -8,6 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -16,6 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
 
 
@@ -45,7 +48,10 @@ public class CPUframe extends JFrame {
 	private JPanel assemblerContentPanel;
 	
 	
-	private JPanel registerPanel;
+	private JPanel registerPanel; //A panel to hold all cpu registers
+	private JPanel controlRegistersPanel1; //A panel to hold one row of control registers
+	private JPanel controlRegistersPanel2;
+	private JPanel generalPurposePanel; // A panel to group the general purpsoe registers
 	private JPanel marPanel;
 	private JPanel mbrPanel;
 	private JPanel irPanel;
@@ -58,10 +64,14 @@ public class CPUframe extends JFrame {
 	private JTextArea memoryContentArea;
 	private JTextArea assemblyProgramArea;
 	
-	private JLabel MARlabel;
-	private JLabel MBRlabel;
-	private JLabel StatusRegisterlabel;
-	private JLabel PClabel;
+	private JTextField pcField;
+	private JTextField irField;
+	private JTextField statusField;
+	private JTextField marField;
+	private JTextField mbrField;
+	
+	
+
 	private JLabel generalPurposeLabel;
 	
 	private JButton executeButton;
@@ -163,7 +173,7 @@ public class CPUframe extends JFrame {
 		 * Assembler display in panel 1
 		 */
 		assemblerContentPanel = new JPanel();
-		assemblyProgramArea = new JTextArea(15, 30);
+		assemblyProgramArea = new JTextArea(15, 35);
 		assemblyProgramArea.setEditable(false);
 		assemblyProgramArea.setCaretPosition(0);
 		
@@ -180,35 +190,97 @@ public class CPUframe extends JFrame {
 		
 		assemblerContentPanel.setBorder(BorderFactory.createTitledBorder(" Assembly Program "));
 		
-
-
-		
 		panel1.add(assemblerPanel);		
 		//Assembly program panel isn't fixed size; things move when frame resied; panels not fixed size.
-		//Fix assembly string display
 		
+		/*
+		 * CPU registers
+		 */
 		
+//		private JPanel registerPanel; //A panel to hold all cpu registers
+//		private JPanel controlRegistersPanel; //A panel to hold control registers
+//		private JPanel generalPurposePanel; // A panel to group the general purpsoe registers
+//		private JPanel marPanel;
+//		private JPanel mbrPanel;
+//		private JPanel irPanel;
+//		private JPanel pcPanel;
+//		private JPanel statusPanel;
 		
-		
+		panel2 = new JPanel();
+		panel2.setLayout(new BoxLayout(panel2, BoxLayout.Y_AXIS));
 		
 		registerPanel = new JPanel();
+		registerPanel.setSize(30, 40);
 		registerPanel.setBorder(BorderFactory.createTitledBorder("CPU Registers"));
+		registerPanel.setLayout(new BoxLayout(registerPanel, BoxLayout.Y_AXIS));
 		
-		MARlabel = new JLabel(MAR.getInstance().display());
+		controlRegistersPanel1 = new JPanel();		
+		controlRegistersPanel1.setLayout(new BoxLayout(controlRegistersPanel1, BoxLayout.X_AXIS));
+		
+		pcField = new JTextField(4);
+		pcField.setEditable(false);
+		pcPanel = new JPanel();
+		pcPanel.add(pcField);
+		pcPanel.setBorder(BorderFactory.createTitledBorder(" PC "));
+		
+		irField = new JTextField(4);
+		irField.setEditable(false);
+		irPanel = new JPanel();
+		irPanel.add(irField);
+		irPanel.setBorder(BorderFactory.createTitledBorder(" IR "));
+		
+		statusField = new JTextField(4);
+		statusField.setEditable(false);
+		statusPanel = new JPanel();
+		//statusPanel.setSize(5, 5);
+		statusPanel.add(statusField);
+		statusPanel.setBorder(BorderFactory.createTitledBorder(" Condition Code "));
+		
+		controlRegistersPanel1.add(pcPanel);
+		controlRegistersPanel1.add(irPanel);
+		controlRegistersPanel1.add(statusPanel);
+		registerPanel.add(controlRegistersPanel1);
+				
+		
+		controlRegistersPanel2 = new JPanel();
+		controlRegistersPanel2.setLayout(new BoxLayout(controlRegistersPanel2, BoxLayout.X_AXIS));
+		
+		marField = new JTextField(4);
+		marField.setEditable(false);
 		marPanel = new JPanel();
-		marPanel.add(MARlabel);
+		marPanel.add(marField);
 		marPanel.setBorder(BorderFactory.createTitledBorder(" MAR "));
 		
-		MBRlabel = new JLabel(MBR.getInstance().display());
+		mbrField = new JTextField(4);
+		mbrField.setEditable(false);
 		mbrPanel = new JPanel();
-		mbrPanel.add(MARlabel);
+		mbrPanel.add(mbrField);
 		mbrPanel.setBorder(BorderFactory.createTitledBorder(" MBR "));
 		
+		controlRegistersPanel2.add(marPanel);
+		controlRegistersPanel2.add(mbrPanel);
 		
 		
-		registerPanel.add(marPanel);
-		registerPanel.add(mbrPanel);
+		registerPanel.add(controlRegistersPanel2);
 		
+		panel2.add(registerPanel);	
+		
+//		
+//		MARlabel = new JLabel(MAR.getInstance().display());
+//		marPanel = new JPanel();
+//		marPanel.add(MARlabel);
+//		marPanel.setBorder(BorderFactory.createTitledBorder(" MAR "));
+//		
+//		MBRlabel = new JLabel(MBR.getInstance().display());
+//		mbrPanel = new JPanel();
+//		mbrPanel.add(MARlabel);
+//		mbrPanel.setBorder(BorderFactory.createTitledBorder(" MBR "));
+//		
+//		
+//		
+//		registerPanel.add(marPanel);
+//		registerPanel.add(mbrPanel);
+//		
 		
 //		registerPanel.add(MARlabel);
 //		
@@ -270,21 +342,10 @@ public class CPUframe extends JFrame {
 		    		memoryContentArea.setText(memory.display()); //update memory display on opening file
 		    		memoryContentArea.setCaretPosition(0); //Scrolls text area to top
 		    		
-//		    		assemblyProgramArea.setText(assembler.display());
-//		    		assemblyProgramArea.setCaretPosition(0);
+		    		assemblyProgramArea.setText(assembler.display());
+		    		assemblyProgramArea.setCaretPosition(0);
 		    		
-//		    		BufferedReader in = null;
-//		    		try {
-//		    		    in = new BufferedReader(new FileReader(file));
-//		    		    String line;
-//		    		    while ((line = in.readLine()) != null) {
-//		    		        assemblyProgramArea.append(line + "\n");
-//		    		        assemblyProgramArea.setCaretPosition(0);
-//		    		    }
-//		    		} catch (IOException ioEx) {
-//		    		} finally {
-//		    		    try { in.close(); } catch (Exception ex) { }
-//		        	}
+
 		    		
 		    		
 		            
