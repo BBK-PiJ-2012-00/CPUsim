@@ -162,25 +162,30 @@ public class CPUframe extends JFrame {
 		/*
 		 * Assembler display in panel 1
 		 */
-		assemblerPanel = new JPanel();
-		assemblerPanel.setAlignmentX(LEFT_ALIGNMENT);
 		assemblerContentPanel = new JPanel();
-		assemblerContentPanel.setLayout(new BoxLayout(assemblerContentPanel, BoxLayout.X_AXIS));
-		assemblerContentPanel.setAlignmentX(LEFT_ALIGNMENT);
 		assemblyProgramArea = new JTextArea(15, 30);
 		assemblyProgramArea.setEditable(false);
+		assemblyProgramArea.setCaretPosition(0);
 		
 		assemblerScroller = new JScrollPane(assemblyProgramArea);
-		assemblerScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		
 		assemblerContentPanel.add(assemblerScroller);
+		
+		assemblerPanel = new JPanel();
+		//assemblerPanel.setLayout(new BoxLayout(assemblerPanel, BoxLayout.Y_AXIS));
+		assemblerPanel.add(assemblerContentPanel);		
+		assemblerPanel.setAlignmentX(LEFT_ALIGNMENT);
+		assemblerPanel.setAlignmentY(BOTTOM_ALIGNMENT);
+		
+		
 		assemblerContentPanel.setBorder(BorderFactory.createTitledBorder(" Assembly Program "));
 		
-		assemblerPanel.add(assemblerContentPanel);
-		
+
+
 		
 		panel1.add(assemblerPanel);		
-		//Assembly program panel isn't fixed to the left like control panel is; why is this?
+		//Assembly program panel isn't fixed size; things move when frame resied; panels not fixed size.
+		//Fix assembly string display
 		
 		
 		
@@ -265,21 +270,21 @@ public class CPUframe extends JFrame {
 		    		memoryContentArea.setText(memory.display()); //update memory display on opening file
 		    		memoryContentArea.setCaretPosition(0); //Scrolls text area to top
 		    		
-		    		assemblyProgramArea.setText(assembler.display());
-		    		assemblyProgramArea.setCaretPosition(0);
+//		    		assemblyProgramArea.setText(assembler.display());
+//		    		assemblyProgramArea.setCaretPosition(0);
 		    		
 //		    		BufferedReader in = null;
 //		    		try {
 //		    		    in = new BufferedReader(new FileReader(file));
 //		    		    String line;
 //		    		    while ((line = in.readLine()) != null) {
-//		    		        assemblyProgramArea.append(line);
+//		    		        assemblyProgramArea.append(line + "\n");
 //		    		        assemblyProgramArea.setCaretPosition(0);
 //		    		    }
 //		    		} catch (IOException ioEx) {
 //		    		} finally {
 //		    		    try { in.close(); } catch (Exception ex) { }
-		    		
+//		        	}
 		    		
 		    		
 		            
