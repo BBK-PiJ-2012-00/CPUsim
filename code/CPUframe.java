@@ -1,5 +1,6 @@
 package code;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -8,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.EventListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -20,13 +22,19 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingWorker;
 import javax.swing.border.BevelBorder;
+import javax.swing.text.JTextComponent;
+
+
 
 
 public class CPUframe extends JFrame {
+	
 	private ControlUnit controlUnit;
 	private MainMemory memory;
 	private Assembler assembler;
+	
 	
 	private static final int FRAME_WIDTH = 1800;
 	private static final int FRAME_HEIGHT = 1600;
@@ -73,7 +81,6 @@ public class CPUframe extends JFrame {
 	
 	
 
-	private JLabel generalPurposeLabel;
 	
 	private JButton executeButton;
 	private JButton resetButton;
@@ -82,10 +89,10 @@ public class CPUframe extends JFrame {
 	private JScrollPane scroller;
 	private JScrollPane assemblerScroller;
 	
-	public CPUframe(ControlUnit controlUnit, MainMemory memory) {
+	public CPUframe() {
 		//this.assembler = assembler;
-		this.controlUnit = controlUnit;
-		this.memory = memory;
+		this.controlUnit =  new ControlUnitImpl(false);
+		this.memory = MemoryModule.getInstance();
 		
 		//setSize(FRAME_WIDTH, FRAME_HEIGHT);
 				
@@ -94,13 +101,15 @@ public class CPUframe extends JFrame {
 		
 	}
 	
+	
+	
 	private void createComponents() {
 		
 		this.getContentPane().setLayout(new BoxLayout(this.getContentPane(), BoxLayout.X_AXIS)); //Arrange panels horizontally
 		
-		panel1 = new JPanel();
-		panel1.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-		panel2 = new JPanel();
+		//panel1 = new JPanel();
+		//panel1.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));	
+		//panel2 = new JPanel();
 		panel3 = new JPanel();
 		panel4 = new JPanel();
 		
@@ -147,6 +156,9 @@ public class CPUframe extends JFrame {
 		
 		panel1 = new JPanel();
 		panel1.setLayout(new BoxLayout(panel1, BoxLayout.Y_AXIS));
+		panel1.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		//panel1.setBackground(Color.cyan);
+		panel1.setMaximumSize(new Dimension(0, 1000)); //Use Box to keep things rigid
 		
 		controlPanel = new JPanel(); //Container panel for all control buttons
 		controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.Y_AXIS));
@@ -174,14 +186,17 @@ public class CPUframe extends JFrame {
 		/*
 		 * Assembler display in panel 1
 		 */
+		JPanel assemblerBufferPanel = new JPanel(); //To make border equal to controlPanel above
 		assemblerContentPanel = new JPanel();
-		assemblyProgramArea = new JTextArea(15, 35);
+		assemblyProgramArea = new JTextArea(15, 30);
 		assemblyProgramArea.setEditable(false);
 		assemblyProgramArea.setCaretPosition(0);
 		
 		assemblerScroller = new JScrollPane(assemblyProgramArea);
 		
-		assemblerContentPanel.add(assemblerScroller);
+		assemblerBufferPanel.add(assemblerScroller);
+		
+		assemblerContentPanel.add(assemblerBufferPanel);
 		
 		assemblerPanel = new JPanel();
 		//assemblerPanel.setLayout(new BoxLayout(assemblerPanel, BoxLayout.Y_AXIS));
@@ -214,7 +229,7 @@ public class CPUframe extends JFrame {
 		controlRegistersPanel1 = new JPanel();		
 		controlRegistersPanel1.setLayout(new BoxLayout(controlRegistersPanel1, BoxLayout.X_AXIS));
 		
-		pcField = new JTextField(4);
+		pcField = new JTextField(4);		
 		pcField.setEditable(false);
 		pcField.setAlignmentX(CENTER_ALIGNMENT);
 		pcField.setAlignmentY(CENTER_ALIGNMENT);
@@ -223,12 +238,17 @@ public class CPUframe extends JFrame {
 		pcPanel.add(pcField);
 		pcPanel.setBorder(BorderFactory.createTitledBorder(" PC "));
 		
-		irField = new JTextField(4);
+		RegisterListener registerListener = new RegisterListener(this);
+		controlUnit.getPC().registerListener(registerListener);
+		
+		irField = new JTextField(10);
 		irField.setEditable(false);
 		irPanel = new JPanel();
-		irPanel.setMaximumSize(new Dimension(75, 60));
+		irPanel.setMaximumSize(new Dimension(150, 60));
 		irPanel.add(irField);
 		irPanel.setBorder(BorderFactory.createTitledBorder(" IR "));
+		
+		controlUnit.getIR().registerListener(registerListener);
 		
 		statusField = new JTextField(4);
 		statusField.setEditable(false);
@@ -362,13 +382,48 @@ public class CPUframe extends JFrame {
 		
 	}
 	
+//	class MeaningOfLifeFinder extends SwingWorker<String, Object> {
+//	       @Override
+//	       public String doInBackground() {
+//	           return findTheMeaningOfLife();
+//	       }
+//
+//	       @Override
+//	       protected void done() {
+//	           try {
+//	               label.setText(get());
+//	           } catch (Exception ignore) {
+//	           }
+//	       }
+//	   }
+//
+//	   (new MeaningOfLifeFinder()).execute();
+//	
+	class ExecutionWorker extends SwingWorker<Void, Void> {
+
+		@Override
+		protected Void doInBackground() throws Exception {
+			controlUnit.activate();			
+			return null;
+		}
+		
+		@Override
+		protected void done() {
+			memoryContentArea.setText(memory.display());
+			memoryContentArea.setCaretPosition(0);
+		}
+		
+	}
+	
+	
 	class ExecuteListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			controlUnit.activate();
-			memoryContentArea.setText(memory.display());
-			memoryContentArea.setCaretPosition(0); //Scrolls to top of memory for better view
+			new ExecutionWorker().execute();
+//			controlUnit.activate();
+//			memoryContentArea.setText(memory.display());
+//			memoryContentArea.setCaretPosition(0); //Scrolls to top of memory for better view
 			
 		}
 		
@@ -406,21 +461,28 @@ public class CPUframe extends JFrame {
 		    		memoryContentArea.setCaretPosition(0); //Scrolls text area to top
 		    		
 		    		assemblyProgramArea.setText(assembler.display());
-		    		assemblyProgramArea.setCaretPosition(0);
-		    		
-
-		    		
-		    		
+		    		assemblyProgramArea.setCaretPosition(0);		    		
 		            
-//		            //This is where a real application would open the file.
-//		            log.append("Opening: " + file.getName() + "." + newline);
-		        } //else {
-//		            log.append("Open command cancelled by user." + newline);
-//		        }
+		        }
 		   }
-		}
-		
+		}		
 	}
+	
+	public JTextField getPCfield() {
+		return this.pcField;
+	}
+
+
+
+	public JTextComponent getIRfield() {
+		return this.irField;
+	}
+	
+	
+
+		
+		
+	
 	
 
 }
