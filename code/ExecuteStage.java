@@ -1,6 +1,6 @@
 package code;
 
-public abstract class ExecuteStage {
+public abstract class ExecuteStage implements Runnable {
 	private BusController systemBus;
 	
 	private MemoryAddressRegister mar;
@@ -12,6 +12,9 @@ public abstract class ExecuteStage {
 	private Register statusRegister;
 	
 	private WriteBackStage writeBackStage;
+	
+	private boolean active;
+	private int opcode;
 	
 	
 	public ExecuteStage(InstructionRegister ir, ProgramCounter pc, RegisterFile genRegisters, Register statusRegister,
@@ -142,6 +145,18 @@ public abstract class ExecuteStage {
 	public WriteBackStage getWriteBackStage() {
 		return this.writeBackStage;
 	} 
+	
+	public void run() {
+		active = this.instructionExecute(opcode);
+	}
+	
+	public void setOpcodeValue(int opcode) {
+		this.opcode = opcode;
+	}
+	
+	public boolean isActive() {
+		return this.active;
+	}
 	
 	
 	//public abstract void receive(int opcode);
