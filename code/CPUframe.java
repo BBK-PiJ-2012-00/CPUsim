@@ -256,7 +256,7 @@ public class CPUframe extends JFrame {
 		RegisterListener registerListener = new RegisterListener(this);
 		controlUnit.getPC().registerListener(registerListener);
 		
-		irField = new JTextField(10);
+		irField = new JTextField(8);
 		irField.setEditable(false);
 		irPanel = new JPanel();
 		irPanel.setMaximumSize(new Dimension(150, 60));
@@ -283,18 +283,20 @@ public class CPUframe extends JFrame {
 		controlRegistersPanel2.setLayout(new BoxLayout(controlRegistersPanel2, BoxLayout.X_AXIS));
 		
 		marField = new JTextField(4);
-		marField.setEditable(false);
+		marField.setEditable(false);		
 		marPanel = new JPanel();
 		marPanel.setMaximumSize(new Dimension(75, 60));
 		marPanel.add(marField);
 		marPanel.setBorder(BorderFactory.createTitledBorder(" MAR "));
+		MAR.getInstance().registerListener(registerListener);
 		
-		mbrField = new JTextField(4);
+		mbrField = new JTextField(8);
 		mbrField.setEditable(false);
 		mbrPanel = new JPanel();
-		mbrPanel.setMaximumSize(new Dimension(75, 60));
+		mbrPanel.setMaximumSize(new Dimension(150, 60));
 		mbrPanel.add(mbrField);
 		mbrPanel.setBorder(BorderFactory.createTitledBorder(" MBR "));
+		MBR.getInstance().registerListener(registerListener);
 		
 		controlRegistersPanel2.add(marPanel);
 		controlRegistersPanel2.add(mbrPanel);
@@ -487,14 +489,16 @@ public class CPUframe extends JFrame {
 		}		
 	}
 	
-	class StepExecutionListener implements ActionListener {
+	class StepExecutionListener implements ActionListener { //Implements step execution (notifies worker thread)
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			synchronized(controlUnit.getFetchDecodeStage()) {
 				controlUnit.getFetchDecodeStage().notify();
 			}
-			
+			synchronized(controlUnit.getExecuteStage()) {
+				controlUnit.getExecuteStage().notify();
+			}
 		}
 		
 	}
@@ -511,6 +515,16 @@ public class CPUframe extends JFrame {
 	
 	public JTextArea getMemoryField() {
 		return this.memoryContentArea;
+	}
+
+
+
+	public JTextComponent getMARfield() {
+		return this.marField;
+	}
+	
+	public JTextComponent getMBRfield() {
+		return this.mbrField;
 	}
 	
 	
