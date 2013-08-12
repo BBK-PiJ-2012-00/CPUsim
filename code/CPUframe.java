@@ -35,6 +35,8 @@ public class CPUframe extends JFrame {
 	private MainMemory memory;
 	private Assembler assembler;
 	
+	private SwingWorker<Void, Void> executionWorker;
+	
 	
 	private static final int FRAME_WIDTH = 1800;
 	private static final int FRAME_HEIGHT = 1600;
@@ -85,6 +87,7 @@ public class CPUframe extends JFrame {
 	private JButton executeButton;
 	private JButton resetButton;
 	private JButton fileOpenButton;
+	private JButton stepButton;
 
 	private JScrollPane scroller;
 	private JScrollPane assemblerScroller;
@@ -167,10 +170,13 @@ public class CPUframe extends JFrame {
 		
 		subControlPanel1 = new JPanel();
 		subControlPanel1.setLayout(new BoxLayout(subControlPanel1, BoxLayout.X_AXIS));
-		subControlPanel1.setBorder(BorderFactory.createTitledBorder(" Control Panel "));
+		//subControlPanel1.setBorder(BorderFactory.createTitledBorder(" Control Panel "));
+		
+		subControlPanel2 = new JPanel();
+		subControlPanel2.setLayout(new BoxLayout(subControlPanel2, BoxLayout.X_AXIS));
 		
 		controlPanel.add(subControlPanel1);
-		//controlPanel.add(subControlPanel2);
+		controlPanel.add(subControlPanel2);
 		
 		fileOpenButton = new JButton("Select Assembly File");
 		fileOpenButton.addActionListener(new FileOpenListener());
@@ -180,7 +186,15 @@ public class CPUframe extends JFrame {
 		
 		executeButton = new JButton("Execute Program");
 		executeButton.addActionListener(new ExecuteListener());
-		subControlPanel1.add(executeButton);			
+		subControlPanel1.add(executeButton);
+		
+		stepButton = new JButton("Step");
+		stepButton.setAlignmentX(LEFT_ALIGNMENT);
+		stepButton.addActionListener(new StepExecutionListener());
+		
+		subControlPanel2.add(stepButton);
+		
+		controlPanel.setBorder(BorderFactory.createTitledBorder( " Control Panel "));
 		
 		panel1.add(controlPanel);
 	
@@ -376,8 +390,10 @@ public class CPUframe extends JFrame {
 
 		
 		this.getContentPane().add(panel1); //Leftmost panel
+		panel1.setBackground(Color.cyan);
 		this.getContentPane().add(panel2);
 		this.getContentPane().add(panel3);
+		panel3.setBackground(Color.orange);
 		this.getContentPane().add(panel4); //Rightmost panel
 		
 		
@@ -421,7 +437,9 @@ public class CPUframe extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			new ExecutionWorker().execute();
+			//executionWorker = new ExecutionWorker().execute();
+			executionWorker = new ExecutionWorker();
+			executionWorker.execute();
 //			controlUnit.activate();
 //			memoryContentArea.setText(memory.display());
 //			memoryContentArea.setCaretPosition(0); //Scrolls to top of memory for better view
@@ -467,6 +485,18 @@ public class CPUframe extends JFrame {
 		        }
 		   }
 		}		
+	}
+	
+	class StepExecutionListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			synchronized(controlUnit.getFetchDecodeStage()) {
+				controlUnit.getFetchDecodeStage().notify();
+			}
+			
+		}
+		
 	}
 	
 	public JTextField getPCfield() {
