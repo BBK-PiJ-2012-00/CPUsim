@@ -1,7 +1,8 @@
 package code;
 
 public class PC implements ProgramCounter {
-	int nextInstructionPointer; //address of the next instruction to be fetched
+	private int nextInstructionPointer; //address of the next instruction to be fetched
+	private RegisterListener updateListener;
 	
 	public int getValue() {
 		return nextInstructionPointer;
@@ -9,17 +10,24 @@ public class PC implements ProgramCounter {
 	
 	public void incrementPC() {
 		nextInstructionPointer++;
+		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, "" + nextInstructionPointer);
+		updateListener.handleUpDateEvent(updateEvent);
 	}
 	
 	public void setPC(int address) { //Used to set PC pointer
 		this.nextInstructionPointer = address;
+		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, "" + nextInstructionPointer);
+		updateListener.handleUpDateEvent(updateEvent);
 	}
 	
 	public String display() {
 		String display = "";
-		display += "<html>-- PC --<br>";
-		display += "-> " + nextInstructionPointer + "</html>";
+		display += nextInstructionPointer;
 		return display;
+	}
+	
+	public void registerListener(RegisterListener listener) {
+		this.updateListener = listener;
 	}
 	
 

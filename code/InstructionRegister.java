@@ -19,4 +19,6 @@ public interface InstructionRegister {
 	 * @return Instruction the instruction held in the IR.
 	 */
 	public Instruction read();
+	
+	public void registerListener(RegisterListener listener);
 }
