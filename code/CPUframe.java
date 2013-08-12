@@ -130,7 +130,8 @@ public class CPUframe extends JFrame {
 		
 		memoryContentsPanel.add(scroller); //Add text area to memory panel
 	
-		
+		RegisterListener memoryListener = new RegisterListener(this);
+		memory.registerListener(memoryListener);
 
 		//scroller.setBorder(BorderFactory.createTitledBorder(" Main Memory "));
 		//memoryPanel.add(scroller);
@@ -476,6 +477,10 @@ public class CPUframe extends JFrame {
 
 	public JTextComponent getIRfield() {
 		return this.irField;
+	}
+	
+	public JTextArea getMemoryField() {
+		return this.memoryContentArea;
 	}
 	
 	
