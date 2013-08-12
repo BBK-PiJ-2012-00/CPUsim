@@ -19,6 +19,19 @@ public class RegisterListener implements EventListener {
 		else if (e.getSource() instanceof InstructionRegister) {
 			frame.getIRfield().setText(e.getUpdate());
 		}
+		
+		else if (e.getSource() instanceof MainMemory) {
+			frame.getMemoryField().setText(e.getUpdate());
+			frame.getMemoryField().setCaretPosition(0);
+		}
+		
+		else if (e.getSource() instanceof MemoryAddressRegister) {
+			frame.getMARfield().setText(e.getUpdate());
+		}
+		
+		else if (e.getSource() instanceof MemoryBufferRegister) {
+			frame.getMBRfield().setText(e.getUpdate());
+		}
 	}
 
 }
