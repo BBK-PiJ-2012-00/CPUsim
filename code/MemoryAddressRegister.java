@@ -20,4 +20,6 @@ public interface MemoryAddressRegister {
 	public int read();
 	
 	public String display();
+
+	public void registerListener(RegisterListener registerListener);
 }

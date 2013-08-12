@@ -13,8 +13,8 @@ package code;
 
 public class MBR implements MemoryBufferRegister {
 	private static MemoryBufferRegister MBRinstance;
-	
 	private Data registerContents;
+	private RegisterListener updateListener;
 	
 	private MBR() {
 		//Constructor only explicitly referenced in order to make it private, preventing instantiation
@@ -33,7 +33,9 @@ public class MBR implements MemoryBufferRegister {
 	@Override
 	public boolean write(Data data) { //Successful write returns true
 		//Size is restricted in Instruction/Operand classes
-		registerContents = data;		
+		registerContents = data;
+		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, display());
+		updateListener.handleUpDateEvent(updateEvent);
 		if (registerContents == null) {
 			return false;
 		}
@@ -46,14 +48,22 @@ public class MBR implements MemoryBufferRegister {
 	}
 	
 	public String display() {
-		String mbrDisplay = "<html> -- MBR -- <br>";
+		String mbrDisplay = "";
 		if (registerContents == null) {
-			mbrDisplay += "--- </html>";
+			mbrDisplay += "---";
 		}
 		else {
-			mbrDisplay += "  " + this.registerContents.toString() + "</html>";
+			mbrDisplay += "  " + this.registerContents.toString();
 		}
 		return mbrDisplay;
 	}
+
+	@Override
+	public void registerListener(RegisterListener listener) {
+		this.updateListener = listener;
+		
+	}
+
+
 
 }

@@ -25,6 +25,8 @@ public interface MemoryBufferRegister {
 	public Data read();
 	
 	public String display();
+	
+	public void registerListener(RegisterListener listener);
 
 	
 }

@@ -6,6 +6,7 @@ package code;
  */
 public class MAR implements MemoryAddressRegister {
 	private static MemoryAddressRegister mar;
+	private RegisterListener updateListener;
 	
 	private int registerContents;
 	
@@ -22,6 +23,10 @@ public class MAR implements MemoryAddressRegister {
 		return mar;
 	}
 	
+	public void registerListener(RegisterListener listener) {
+		this.updateListener = listener;
+	}
+	
 	/*
 	 * 	 * (non-Javadoc)
 	 * @see code.MemoryAddressRegister#write(int)
@@ -33,6 +38,8 @@ public class MAR implements MemoryAddressRegister {
 	@Override
 	public void write(int address) {
 		registerContents = address;
+		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, display());
+		updateListener.handleUpDateEvent(updateEvent);
 	}
 	
 	@Override
@@ -41,12 +48,12 @@ public class MAR implements MemoryAddressRegister {
 	}
 	
 	public String display() {
-		String marDisplay = "<html> -- MAR -- <br>";
+		String marDisplay = "";
 		if (registerContents == -1) {
-			marDisplay += "--- </html>";
+			marDisplay += "---";
 		}
 		else {
-			marDisplay += "  " + this.registerContents + "</html>";
+			marDisplay += this.registerContents;
 		}
 		return marDisplay;
 	}
