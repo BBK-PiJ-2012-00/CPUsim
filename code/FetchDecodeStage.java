@@ -37,6 +37,13 @@ public abstract class FetchDecodeStage implements Runnable {
 		systemBus.transferToMemory(mar.read(), null); //Transfer address from MAR to system bus, prompting read
 		mar.write(0);//Reset MAR (but is it more confusing to place 0 there, as 0 is valid memory address?
 		
+		try {
+			wait();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 
 		
 		//A Data item should now be in MBR
@@ -57,12 +64,15 @@ public abstract class FetchDecodeStage implements Runnable {
 		int opcodeValue = instr.getOpcode().getValue(); //Gets instruction opcode as int value
 		pc.incrementPC(); //Increment PC; done here so that with pipelining, the next instruction can be fetched at this point
 		
-		try {
-			Thread.sleep(3000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			Thread.sleep(3000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		
+		
+		
 		
 		pc.display();
 		return opcodeValue;
@@ -72,7 +82,7 @@ public abstract class FetchDecodeStage implements Runnable {
 		
 	}
 	
-	public void run() {
+	public synchronized void run() { //Synchronized to enable step execution
 		this.instructionFetch();
 		opcodeValue = this.instructionDecode();
 	}
