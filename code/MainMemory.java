@@ -53,6 +53,8 @@ public interface MainMemory {
 	
 	public void loadMemory(Data[] programCode);
 	
+	public void registerListener(RegisterListener listener);
+	
 	public String display();
 		
 	

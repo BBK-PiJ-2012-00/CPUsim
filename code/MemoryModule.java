@@ -13,6 +13,8 @@ public class MemoryModule implements MainMemory {
 	private int pointer; //Points to next available location for storage	
 	private BusController systemBusController; //Reference to system bus
 	
+	private RegisterListener updateListener; //Will perhaps have different listener
+	
 	
 	
 	private MemoryModule() { //Memory is a singleton to prevent duplicates and inconsistency
@@ -58,6 +60,8 @@ public class MemoryModule implements MainMemory {
 	//May take an array as a parameter, depdening on Loader implementation
 	public void writeInstruction(Instruction instr, int index) { //For use by Loader to write instructions into memory
 		MEMORY[index] = instr; 
+		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, display());
+		updateListener.handleUpDateEvent(updateEvent);
 		//As this is only used by loader, it should take the address of the first instruction loaded into memory
 		//and transfer this address via the address bus to the MAR, and on to the PC to begin execution.
 		//A method can be called to do this; transferFirstInstruction().
@@ -84,6 +88,8 @@ public class MemoryModule implements MainMemory {
 			//System.out.println(MEMORY[pointer].toString());
 			pointer++; //Increment pointer
 		}
+		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, display());
+		updateListener.handleUpDateEvent(updateEvent);
 	//	if (pointerValue != 0) { //Set PC to start address, if not 0 (PC set to 0 by default)
 			
 	//	}
@@ -98,6 +104,8 @@ public class MemoryModule implements MainMemory {
 		//No checking of address being empty or not; up to programmer
 		if (address < 100 && address >= 0) {
 			MEMORY[address] = data;
+			ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, display());
+			updateListener.handleUpDateEvent(updateEvent);
 			return true;
 		}
 		//Throw an exception or simply return false?
@@ -127,32 +135,36 @@ public class MemoryModule implements MainMemory {
 	
 	//Fix so that numbers 1-10 display with extra space to align | character
 	public String display() { //Display memory on command line interface
-		String displayString = "<html> -- MAIN MEMORY -- ";
+		String displayString = "";
 		//System.out.println("  -- MAIN MEMORY --  ");
 		for (int i = 0; i < MEMORY.length; i++) {
 			if (MEMORY[i] == null) {
 				if (i < 10) { //For formatting of single digits
-					String iString = "0" + i;
-					displayString += "<br>" + iString + "| ------------";
+					String iString = "  0" + i;
+					displayString += "\n" + iString + "| ------------";
 				}
 				else {
 					//System.out.println(i + "| " + "--------");
-					displayString += "<br>" + i + "| ------------";
+					displayString += "\n  " + i + "| ------------";
 				}
 			}
 			else { 
 				if (i < 10) {
-					String iString = "0" + i;
-					displayString += "<br>" + iString + "| " + MEMORY[i].toString();
+					String iString = "  0" + i;
+					displayString += "\n" + iString + "| " + MEMORY[i].toString();
 				}
 				else {
 					//System.out.println(i + "| " + MEMORY[i].toString());
-					displayString+= "<br>" + i + "| " + MEMORY[i].toString();
+					displayString+= "\n  " + i + "| " + MEMORY[i].toString();
 				}
 			}
 		}
-		displayString += "</html>";
+		//displayString += "</html>";
 		return displayString;
+	}
+	
+	public void registerListener(RegisterListener listener) {
+		this.updateListener = listener;
 	}
 	
 
