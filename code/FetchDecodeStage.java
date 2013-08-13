@@ -33,9 +33,15 @@ public abstract class FetchDecodeStage implements Runnable {
 	public void instructionFetch() {
 		mar.write(pc.getValue()); //Write address value in PC to MAR.
 		
+		try {
+			wait();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		systemBus.transferToMemory(mar.read(), null); //Transfer address from MAR to system bus, prompting read
-		mar.write(0);//Reset MAR (but is it more confusing to place 0 there, as 0 is valid memory address?
+		mar.write(-1);//Reset MAR (but is it more confusing to place 0 there, as 0 is valid memory address?
 		
 		try {
 			wait();
@@ -48,6 +54,13 @@ public abstract class FetchDecodeStage implements Runnable {
 		
 		//A Data item should now be in MBR
 		ir.loadIR((Instruction) mbr.read()); //Cast required as mbr holds type data, IR type Instruction; May need to handle exception
+		
+		try {
+			wait();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		
 		mbr.write(null); //Clear MBR to reflect that instruction has moved to IR (should it be reset earlier, to better reflect

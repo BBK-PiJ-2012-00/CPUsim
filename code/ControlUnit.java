@@ -28,6 +28,11 @@ public interface ControlUnit {
 	public RegisterFile getRegisters(); //To access general purpose registers, for testing.
 	
 	public Register getStatusRegister(); //To access status register, for testing.
+	
+	public FetchDecodeStage getFetchDecodeStage();
+	
+	public ExecuteStage getExecuteStage();
+
 		
 	
 

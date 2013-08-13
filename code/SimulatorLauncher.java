@@ -25,46 +25,49 @@ public class SimulatorLauncher {
 		ControlUnit controlUnit = new ControlUnitImpl(false);
 		MainMemory memory = MemoryModule.getInstance();
 		
-		Assembler assembler = new AssemblerImpl();
-		assembler.selectFile("src/assemblyPrograms/assemblerTestProgram2");
-		assembler.assembleCode();
-		assembler.loadToLoader();
-		((AssemblerImpl) assembler).getLoader().loadToMemory();
+		//Assembler assembler = new AssemblerImpl();
+//		assembler.selectFile("src/assemblyPrograms/assemblerTestProgram2");
+//		assembler.assembleCode();
+//		assembler.loadToLoader();
+//		((AssemblerImpl) assembler).getLoader().loadToMemory();
 		
-		JLabel testLabel = new JLabel(((MemoryModule) memory).display());
-		JLabel testLabelPC = new JLabel(controlUnit.getPC().display());
+		JFrame frame = new CPUframe();
 		
-		//JTextArea memoryArea = new JTextArea(10, 50);
-		//memoryArea.add(testLabel);
-		JScrollPane memoryScrollPane = new JScrollPane(testLabel);
-		JPanel memoryPanel = new JPanel();
-		memoryPanel.add(memoryScrollPane);
-		
-
-//				setPreferredSize(new Dimension(450, 110));
-//				...
-//				add(scrollPane, BorderLayout.CENTER);
-//)
-		
-		JFrame frame = new JFrame("CPUsim");
-		frame.setSize(400, 400);
+//		JLabel testLabel = new JLabel(((MemoryModule) memory).display());
+//		JLabel testLabelPC = new JLabel(controlUnit.getPC().display());
+//		
+//		//JTextArea memoryArea = new JTextArea(10, 50);
+//		//memoryArea.add(testLabel);
+//		JScrollPane memoryScrollPane = new JScrollPane(testLabel);
+//		//JPanel memoryPanel = new JPanel();
+//		//memoryPanel.add(memoryScrollPane);
+//		//memoryPanel.setSize(100, 300);
+//		
+////				setPreferredSize(new Dimension(450, 110));
+////				...
+////				add(scrollPane, BorderLayout.CENTER);
+////)
+//		
+//		JFrame frame = new JFrame("CPUsim");
+		//frame.setSize(800, 400);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().add(memoryPanel, BorderLayout.WEST);
-		frame.getContentPane().add(testLabelPC, BorderLayout.EAST);
-		frame.pack();
+//		frame.getContentPane().add(memoryScrollPane, BorderLayout.EAST);
+//		frame.getContentPane().add(testLabelPC, BorderLayout.WEST);
+		frame.pack(); //Adjusts size automatically
 		frame.setVisible(true);
 		
 		
-		controlUnit.activate();
-		
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		testLabel.setText(((MemoryModule) memory).display());
+//		controlUnit.activate();
+//		
+//		try {
+//			Thread.sleep(5000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
+//		testLabelPC.setText(controlUnit.getPC().display());
+//		testLabel.setText(((MemoryModule) memory).display());
 		
 		
 		

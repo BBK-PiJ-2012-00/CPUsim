@@ -132,8 +132,13 @@ public class ControlUnitImpl implements ControlUnit {
 	}
 
 	
-	public FetchDecodeStage getFetchDecodeStage() {
+	public synchronized FetchDecodeStage getFetchDecodeStage() {
 		return this.fetchDecodeStage;
+	}
+
+	@Override
+	public ExecuteStage getExecuteStage() {
+		return this.executeStage;
 	}
 	
 	
