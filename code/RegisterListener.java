@@ -32,6 +32,10 @@ public class RegisterListener implements EventListener {
 		else if (e.getSource() instanceof MemoryBufferRegister) {
 			frame.getMBRfield().setText(e.getUpdate());
 		}
+		
+		else if (e.getSource() instanceof RegisterFile) {
+			frame.getGenPurposeRegister(e.getRegisterReference()).setText(e.getUpdate());
+		}
 	}
 
 }
