@@ -69,8 +69,14 @@ public class CPUframe extends JFrame {
 	private JPanel pcPanel;
 	private JPanel statusPanel;
 	
-	//private JLabel memoryLabel;
-	//private JLabel titleLabel;
+	private JPanel aluPanel;
+	private JPanel aluSubPanel1;
+	private JPanel aluSubPanel2;
+	private JPanel aluAdderPanel;
+	private JPanel aluSubtractorPanel;
+	private JPanel aluDivPanel;
+	private JPanel aluMulPanel;
+	
 	
 	private JTextArea memoryContentArea;
 	private JTextArea assemblyProgramArea;
@@ -81,26 +87,7 @@ public class CPUframe extends JFrame {
 	private JTextField marField;
 	private JTextField mbrField;
 	
-	private JTextField[] genRegisters = new JTextField[16];
-	
-//	JTextField genRegister0;
-//	JTextField genRegister1;
-//	JTextField genRegister2;
-//	JTextField genRegister3;
-//	JTextField genRegister4;
-//	JTextField genRegister5;
-//	JTextField genRegister6;
-//	JTextField genRegister7;
-//	JTextField genRegister8;
-//	JTextField genRegister9;
-//	JTextField genRegister10;
-//	JTextField genRegister11;
-//	JTextField genRegister12;
-//	JTextField genRegister13;
-//	JTextField genRegister14;
-//	JTextField genRegister15;
-	
-	
+	private JTextField[] genRegisters = new JTextField[16];	
 
 	
 	private JButton executeButton;
@@ -525,16 +512,6 @@ public class CPUframe extends JFrame {
 		genReg15panel.add(genRegisters[15]);
 		individualPanel4.add(genReg15panel);
 		
-////		for (int i = 12; i < 16; i++) {
-////			JLabel regLabel = new JLabel("" + i);
-////			JTextField genRegister = new JTextField(4);
-////			JPanel regPanel = new JPanel();
-////			genRegister.setEditable(false);
-////			regPanel.add(regLabel);
-////			regPanel.add(genRegister);
-////			individualPanel4.add(regPanel);
-////			
-////		}
 		generalPurposePanel.add(individualPanel4);
 		
 		
@@ -543,9 +520,26 @@ public class CPUframe extends JFrame {
 		
 		panel2.add(registerPanel);
 		
+		controlUnit.getRegisters().registerListener(registerListener);
+		
 		/*
 		 * ALU display
 		 */
+		
+//		private JPanel aluPanel;
+//		private JPanel aluSubPanel1;
+//		private JPanel aluSubPanel2;
+//		private JPanel aluAdderPanel;
+//		private JPanel aluSubtractorPanel;
+//		private JPanel aluDivPanel;
+//		private JPanel aluMulPanel;
+		
+		aluPanel = new JPanel(); //Panel to encase the two subpanels
+		aluPanel.setLayout(new BoxLayout(aluPanel, BoxLayout.Y_AXIS));
+		aluPanel.setBorder(BorderFactory.createTitledBorder(" ALU "));
+		
+		
+		
 		
 
 		
@@ -657,6 +651,9 @@ public class CPUframe extends JFrame {
 			synchronized(controlUnit.getExecuteStage()) {
 				controlUnit.getExecuteStage().notify();
 			}
+//			synchronized(controlUnit.getWriteBackStage()) {
+//				controlUnit.getWriteBackStage().notify();
+//			}
 		}
 		
 	}
