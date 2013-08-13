@@ -55,10 +55,15 @@ public abstract class Instruction implements Data {
 			return OPCODE.toString();
 		}
 		if (OPCODE.getValue() > 7 && OPCODE.getValue() < 10) { //For branch instructions which only have one instruction field besides opcode
-			return OPCODE.toString() + " " + Integer.toHexString(this.getField1()).toUpperCase();
+			return OPCODE.toString() + " " + this.getField1();
 		}
-		return OPCODE.toString() + " " + Integer.toHexString(this.getField1()).toUpperCase() + " " + 
-			Integer.toHexString(this.getField2()).toUpperCase();
+		if (OPCODE.getValue() > 2 && OPCODE.getValue() < 8) { //Arithmetic and MOVE instructions
+			return OPCODE.toString() + " r" + this.getField1() + " r" + this.getField2();
+		}
+		if ((OPCODE.getValue() > 10 && OPCODE.getValue() < 13) || OPCODE.getValue() == 1) { //BRE/BRNE/LOAD instructions
+			return OPCODE.toString() + " " + this.getField1() + " r" + this.getField2();
+		}
+		return OPCODE.toString() + " r" + this.getField1() + " " + this.getField2(); //STORE
 	}
 	
 	
