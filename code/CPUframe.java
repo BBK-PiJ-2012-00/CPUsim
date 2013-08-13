@@ -535,10 +535,177 @@ public class CPUframe extends JFrame {
 //		private JPanel aluMulPanel;
 		
 		aluPanel = new JPanel(); //Panel to encase the two subpanels
-		aluPanel.setLayout(new BoxLayout(aluPanel, BoxLayout.Y_AXIS));
+		aluPanel.setLayout(new BoxLayout(aluPanel, BoxLayout.X_AXIS));
 		aluPanel.setBorder(BorderFactory.createTitledBorder(" ALU "));
 		
+		aluSubPanel1 = new JPanel();
+		aluSubPanel1.setLayout(new BoxLayout(aluSubPanel1, BoxLayout.Y_AXIS));
 		
+		JLabel addOperand1Label = new JLabel("Operand 1:");
+		JTextField addOperand1 = new JTextField(4);
+		addOperand1.setEditable(false);
+		JPanel adderOperand1Panel = new JPanel();
+		adderOperand1Panel.setLayout(new BoxLayout(adderOperand1Panel, BoxLayout.X_AXIS));
+		adderOperand1Panel.add(addOperand1Label);
+		adderOperand1Panel.add(addOperand1);
+
+		
+		JLabel addOperand2Label = new JLabel("Operand 2:");
+		JTextField addOperand2 = new JTextField(4);
+		//addOperand2.setMaximumSize(new Dimension(20, 10));
+		addOperand2.setEditable(false);
+		JPanel adderOperand2Panel = new JPanel();
+		adderOperand2Panel.setLayout(new BoxLayout(adderOperand2Panel, BoxLayout.X_AXIS));
+		adderOperand2Panel.add(addOperand2Label);
+		adderOperand2Panel.add(addOperand2);
+		
+		JLabel addResultLabel = new JLabel("Result:       ");
+		JTextField addResult = new JTextField(4);
+		addResult.setEditable(false);
+		JPanel adderResultPanel = new JPanel();
+		adderResultPanel.setLayout(new BoxLayout(adderResultPanel, BoxLayout.X_AXIS));
+		adderResultPanel.add(addResultLabel);
+		adderResultPanel.add(addResult);		
+		
+		aluAdderPanel = new JPanel();
+		aluAdderPanel.setLayout(new BoxLayout(aluAdderPanel, BoxLayout.Y_AXIS));
+		aluAdderPanel.add(adderOperand1Panel);
+		aluAdderPanel.add(adderOperand2Panel);
+		aluAdderPanel.add(adderResultPanel);
+		aluAdderPanel.setBorder(BorderFactory.createTitledBorder("Add. Unit"));
+		
+		aluSubPanel1.add(aluAdderPanel);
+		
+		/*
+		 * Sub unit
+		 */
+		JLabel subOperand1Label = new JLabel("Operand 1:");
+		JTextField subOperand1 = new JTextField(4);
+		subOperand1.setEditable(false);
+		JPanel subOperand1Panel = new JPanel();
+		subOperand1Panel.setLayout(new BoxLayout(subOperand1Panel, BoxLayout.X_AXIS));
+		subOperand1Panel.add(subOperand1Label);
+		subOperand1Panel.add(subOperand1);
+
+		
+		JLabel subOperand2Label = new JLabel("Operand 2:");
+		JTextField subOperand2 = new JTextField(4);
+		//addOperand2.setMaximumSize(new Dimension(20, 10));
+		subOperand2.setEditable(false);
+		JPanel subOperand2Panel = new JPanel();
+		subOperand2Panel.setLayout(new BoxLayout(subOperand2Panel, BoxLayout.X_AXIS));
+		subOperand2Panel.add(subOperand2Label);
+		subOperand2Panel.add(subOperand2);
+		
+		JLabel subResultLabel = new JLabel("Result:       ");
+		JTextField subResult = new JTextField(4);
+		subResult.setEditable(false);
+		JPanel subResultPanel = new JPanel();
+		subResultPanel.setLayout(new BoxLayout(subResultPanel, BoxLayout.X_AXIS));
+		subResultPanel.add(subResultLabel);
+		subResultPanel.add(subResult);		
+		
+		aluSubtractorPanel = new JPanel();
+		aluSubtractorPanel.setLayout(new BoxLayout(aluSubtractorPanel, BoxLayout.Y_AXIS));
+		aluSubtractorPanel.add(subOperand1Panel);
+		aluSubtractorPanel.add(subOperand2Panel);
+		aluSubtractorPanel.add(subResultPanel);
+		aluSubtractorPanel.setBorder(BorderFactory.createTitledBorder("Sub. Unit"));
+		
+		aluSubPanel1.add(aluAdderPanel);
+		aluSubPanel1.add(aluSubtractorPanel);
+		//aluSubPanel1.setMaximumSize(new Dimension(100, 125));
+		//aluSubPanel1.setMinimumSize(new Dimension(100, 125));
+		
+		
+		
+		/*
+		 * For aluSubPanel2, containing mul and div units
+		 */
+		
+		aluSubPanel2 = new JPanel();
+		aluSubPanel2.setLayout(new BoxLayout(aluSubPanel2, BoxLayout.Y_AXIS));			
+
+		JLabel divOperand1Label = new JLabel("Operand 1:");
+		JTextField divOperand1 = new JTextField(4);
+		divOperand1.setEditable(false);
+		JPanel divOperand1Panel = new JPanel();
+		divOperand1Panel.setLayout(new BoxLayout(divOperand1Panel, BoxLayout.X_AXIS));
+		divOperand1Panel.add(divOperand1Label);
+		divOperand1Panel.add(divOperand1);
+
+		
+		JLabel divOperand2Label = new JLabel("Operand 2:");
+		JTextField divOperand2 = new JTextField(4);
+		//addOperand2.setMaximumSize(new Dimension(20, 10));
+		divOperand2.setEditable(false);
+		JPanel divOperand2Panel = new JPanel();
+		divOperand2Panel.setLayout(new BoxLayout(divOperand2Panel, BoxLayout.X_AXIS));
+		divOperand2Panel.add(divOperand2Label);
+		divOperand2Panel.add(divOperand2);
+		
+		JLabel divResultLabel = new JLabel("Result:       ");
+		JTextField divResult = new JTextField(4);
+		divResult.setEditable(false);
+		JPanel divResultPanel = new JPanel();
+		divResultPanel.setLayout(new BoxLayout(divResultPanel, BoxLayout.X_AXIS));
+		divResultPanel.add(divResultLabel);
+		divResultPanel.add(divResult);		
+		
+		aluDivPanel = new JPanel();
+		aluDivPanel.setLayout(new BoxLayout(aluDivPanel, BoxLayout.Y_AXIS));
+		aluDivPanel.add(divOperand1Panel);
+		aluDivPanel.add(divOperand2Panel);
+		aluDivPanel.add(divResultPanel);
+		aluDivPanel.setBorder(BorderFactory.createTitledBorder("Div. Unit"));
+		
+		
+		/*
+		 * Mul unit
+		 */
+		JLabel mulOperand1Label = new JLabel("Operand 1:");
+		JTextField mulOperand1 = new JTextField(4);
+		subOperand1.setEditable(false);
+		JPanel mulOperand1Panel = new JPanel();
+		mulOperand1Panel.setLayout(new BoxLayout(mulOperand1Panel, BoxLayout.X_AXIS));
+		mulOperand1Panel.add(mulOperand1Label);
+		mulOperand1Panel.add(mulOperand1);
+
+		
+		JLabel mulOperand2Label = new JLabel("Operand 2:");
+		JTextField mulOperand2 = new JTextField(4);
+		//addOperand2.setMaximumSize(new Dimension(20, 10));
+		mulOperand2.setEditable(false);
+		JPanel mulOperand2Panel = new JPanel();
+		mulOperand2Panel.setLayout(new BoxLayout(mulOperand2Panel, BoxLayout.X_AXIS));
+		mulOperand2Panel.add(mulOperand2Label);
+		mulOperand2Panel.add(mulOperand2);
+		
+		JLabel mulResultLabel = new JLabel("Result:       ");
+		JTextField mulResult = new JTextField(4);
+		mulResult.setEditable(false);
+		JPanel mulResultPanel = new JPanel();
+		mulResultPanel.setLayout(new BoxLayout(mulResultPanel, BoxLayout.X_AXIS));
+		mulResultPanel.add(mulResultLabel);
+		mulResultPanel.add(mulResult);		
+		
+		aluMulPanel = new JPanel();
+		aluMulPanel.setLayout(new BoxLayout(aluMulPanel, BoxLayout.Y_AXIS));
+		aluMulPanel.add(mulOperand1Panel);
+		aluMulPanel.add(mulOperand2Panel);
+		aluMulPanel.add(mulResultPanel);
+		aluMulPanel.setBorder(BorderFactory.createTitledBorder("Mul. Unit"));
+		
+		aluSubPanel2.add(aluDivPanel);
+		aluSubPanel2.add(aluMulPanel);
+		//aluSubPanel2.setMaximumSize(new Dimension(100, 125));
+		//aluSubPanel2.setMinimumSize(new Dimension(100, 125));
+		
+		aluPanel.add(aluSubPanel1);
+		aluPanel.add(aluSubPanel2);
+		aluPanel.setMaximumSize(new Dimension(400, 280));
+		
+		panel2.add(aluPanel);
 		
 		
 
@@ -580,8 +747,8 @@ public class CPUframe extends JFrame {
 		
 		@Override
 		protected void done() {
-			memoryContentArea.setText(memory.display());
-			memoryContentArea.setCaretPosition(0);
+			//memoryContentArea.setText(memory.display());
+			//memoryContentArea.setCaretPosition(0);
 		}
 		
 	}
