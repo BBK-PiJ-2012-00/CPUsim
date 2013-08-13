@@ -304,6 +304,10 @@ public class CPUframe extends JFrame {
 		
 		registerPanel.add(controlRegistersPanel2);
 		
+		/*
+		 * General purpose registers.
+		 */
+		
 		generalPurposePanel = new JPanel();
 		generalPurposePanel.setLayout(new BoxLayout(generalPurposePanel, BoxLayout.X_AXIS));
 		generalPurposePanel.setMaximumSize(new Dimension(400, 300));
@@ -312,71 +316,206 @@ public class CPUframe extends JFrame {
 		JPanel individualPanel1 = new JPanel();
 		individualPanel1.setLayout(new BoxLayout(individualPanel1, BoxLayout.Y_AXIS));
 		
-		for (int i = 0; i < 4; i++) {
-			
-			JLabel regLabel = new JLabel("0" + i);
-			JTextField genRegister = new JTextField(4);
-			genRegister.setEditable(false);
-			JPanel regPanel = new JPanel();
-			genRegister.setEditable(false);
-			regPanel.add(regLabel);
-			regPanel.add(genRegister);
-			individualPanel1.add(regPanel);
-			
-		}
+		JLabel r0label = new JLabel("r0");
+		JTextField genRegister0 = new JTextField(4);
+		genRegister0.setEditable(false);
+		JPanel genReg0panel = new JPanel();
+		genReg0panel.add(r0label);
+		genReg0panel.add(genRegister0);
+		individualPanel1.add(genReg0panel);
+		
+		JLabel r1label = new JLabel("r1");
+		JTextField genRegister1 = new JTextField(4);
+		genRegister1.setEditable(false);
+		JPanel genReg1panel = new JPanel();
+		genReg1panel.add(r1label);
+		genReg1panel.add(genRegister1);
+		individualPanel1.add(genReg1panel);
+		
+		JLabel r2label = new JLabel("r2");
+		JTextField genRegister2 = new JTextField(4);
+		genRegister2.setEditable(false);
+		JPanel genReg2panel = new JPanel();
+		genReg2panel.add(r2label);
+		genReg2panel.add(genRegister2);
+		individualPanel1.add(genReg2panel);
+		
+		JLabel r3label = new JLabel("r3");
+		JTextField genRegister3 = new JTextField(4);
+		genRegister3.setEditable(false);
+		JPanel genReg3panel = new JPanel();
+		genReg3panel.add(r3label);
+		genReg3panel.add(genRegister3);
+		individualPanel1.add(genReg3panel);
+		
+		
+//		/*
+//		 * Automated gen register creation.
+//		 */
+//		for (int i = 0; i < 4; i++) {
+//			
+//			JLabel regLabel = new JLabel("0" + i);
+//			JTextField genRegister = new JTextField(4);
+//			genRegister.setEditable(false);
+//			JPanel regPanel = new JPanel();
+//			genRegister.setEditable(false);
+//			regPanel.add(regLabel);
+//			regPanel.add(genRegister);
+//			individualPanel1.add(regPanel);
+//			
+//		}
 		generalPurposePanel.add(individualPanel1);
 		
 		JPanel individualPanel2 = new JPanel();
 		individualPanel2.setLayout(new BoxLayout(individualPanel2, BoxLayout.Y_AXIS));
 		
-		for (int i = 4; i < 8; i++) {
-			
-			JLabel regLabel = new JLabel("0" + i);
-			JTextField genRegister = new JTextField(4);
-			genRegister.setEditable(false);
-			JPanel regPanel = new JPanel();
-			genRegister.setEditable(false);
-			regPanel.add(regLabel);
-			regPanel.add(genRegister);
-			individualPanel2.add(regPanel);
-			
-		}
+		JLabel r4label = new JLabel("r4");
+		JTextField genRegister4 = new JTextField(4);
+		genRegister4.setEditable(false);
+		JPanel genReg4panel = new JPanel();
+		genReg4panel.add(r4label);
+		genReg4panel.add(genRegister4);
+		individualPanel2.add(genReg4panel);
+		
+		JLabel r5label = new JLabel("r5");
+		JTextField genRegister5 = new JTextField(4);
+		genRegister5.setEditable(false);
+		JPanel genReg5panel = new JPanel();
+		genReg5panel.add(r5label);
+		genReg5panel.add(genRegister5);
+		individualPanel2.add(genReg5panel);
+		
+		JLabel r6label = new JLabel("r6");
+		JTextField genRegister6 = new JTextField(4);
+		genRegister6.setEditable(false);
+		JPanel genReg6panel = new JPanel();
+		genReg6panel.add(r6label);
+		genReg6panel.add(genRegister6);
+		individualPanel2.add(genReg6panel);
+		
+		JLabel r7label = new JLabel("r7");
+		JTextField genRegister7 = new JTextField(4);
+		genRegister7.setEditable(false);
+		JPanel genReg7panel = new JPanel();
+		genReg7panel.add(r7label);
+		genReg7panel.add(genRegister7);
+		individualPanel2.add(genReg7panel);
+		
+		
+////		for (int i = 4; i < 8; i++) {
+////			
+////			JLabel regLabel = new JLabel("0" + i);
+////			JTextField genRegister = new JTextField(4);
+////			genRegister.setEditable(false);
+////			JPanel regPanel = new JPanel();
+////			genRegister.setEditable(false);
+////			regPanel.add(regLabel);
+////			regPanel.add(genRegister);
+////			individualPanel2.add(regPanel);
+////			
+////		}
+		
 		generalPurposePanel.add(individualPanel2);
 		
 		JPanel individualPanel3 = new JPanel();
 		individualPanel3.setLayout(new BoxLayout(individualPanel3, BoxLayout.Y_AXIS));
 		
-		for (int i = 8; i < 12; i++) {
-			JLabel regLabel;
-			if (i < 10) {
-				regLabel = new JLabel("0" + i);
-			}
-			else {
-				regLabel = new JLabel("" + i);
-			}
-			JTextField genRegister = new JTextField(4);
-			JPanel regPanel = new JPanel();
-			genRegister.setEditable(false);
-			regPanel.add(regLabel);
-			regPanel.add(genRegister);
-			individualPanel3.add(regPanel);
-			
-		}
+		JLabel r8label = new JLabel("r8");
+		JTextField genRegister8 = new JTextField(4);
+		genRegister8.setEditable(false);
+		JPanel genReg8panel = new JPanel();
+		genReg8panel.add(r8label);
+		genReg8panel.add(genRegister8);
+		individualPanel3.add(genReg8panel);
+		
+		JLabel r9label = new JLabel("r9");
+		JTextField genRegister9 = new JTextField(4);
+		genRegister9.setEditable(false);
+		JPanel genReg9panel = new JPanel();
+		genReg9panel.add(r9label);
+		genReg9panel.add(genRegister9);
+		individualPanel3.add(genReg9panel);
+		
+		JLabel r10label = new JLabel("r10");
+		JTextField genRegister10 = new JTextField(4);
+		genRegister10.setEditable(false);
+		JPanel genReg10panel = new JPanel();
+		genReg10panel.add(r10label);
+		genReg10panel.add(genRegister10);
+		individualPanel3.add(genReg10panel);
+		
+		JLabel r11label = new JLabel("r11");
+		JTextField genRegister11 = new JTextField(4);
+		genRegister11.setEditable(false);
+		JPanel genReg11panel = new JPanel();
+		genReg11panel.add(r11label);
+		genReg11panel.add(genRegister11);
+		individualPanel3.add(genReg11panel);
+		
+////		for (int i = 8; i < 12; i++) {
+////			JLabel regLabel;
+////			if (i < 10) {
+////				regLabel = new JLabel("0" + i);
+////			}
+////			else {
+////				regLabel = new JLabel("" + i);
+////			}
+////			JTextField genRegister = new JTextField(4);
+////			JPanel regPanel = new JPanel();
+////			genRegister.setEditable(false);
+////			regPanel.add(regLabel);
+////			regPanel.add(genRegister);
+////			individualPanel3.add(regPanel);
+////			
+////		}
+		
 		generalPurposePanel.add(individualPanel3);
 		
 		JPanel individualPanel4 = new JPanel();
 		individualPanel4.setLayout(new BoxLayout(individualPanel4, BoxLayout.Y_AXIS));
 		
-		for (int i = 12; i < 16; i++) {
-			JLabel regLabel = new JLabel("" + i);
-			JTextField genRegister = new JTextField(4);
-			JPanel regPanel = new JPanel();
-			genRegister.setEditable(false);
-			regPanel.add(regLabel);
-			regPanel.add(genRegister);
-			individualPanel4.add(regPanel);
-			
-		}
+		JLabel r12label = new JLabel("r12");
+		JTextField genRegister12 = new JTextField(4);
+		genRegister12.setEditable(false);
+		JPanel genReg12panel = new JPanel();
+		genReg12panel.add(r12label);
+		genReg12panel.add(genRegister12);
+		individualPanel4.add(genReg12panel);
+		
+		JLabel r13label = new JLabel("r13");
+		JTextField genRegister13 = new JTextField(4);
+		genRegister13.setEditable(false);
+		JPanel genReg13panel = new JPanel();
+		genReg13panel.add(r13label);
+		genReg13panel.add(genRegister13);
+		individualPanel4.add(genReg13panel);
+		
+		JLabel r14label = new JLabel("r14");
+		JTextField genRegister14 = new JTextField(4);
+		genRegister14.setEditable(false);
+		JPanel genReg14panel = new JPanel();
+		genReg14panel.add(r14label);
+		genReg14panel.add(genRegister14);
+		individualPanel4.add(genReg14panel);
+		
+		JLabel r15label = new JLabel("r15");
+		JTextField genRegister15 = new JTextField(4);
+		genRegister15.setEditable(false);
+		JPanel genReg15panel = new JPanel();
+		genReg15panel.add(r15label);
+		genReg15panel.add(genRegister15);
+		individualPanel4.add(genReg15panel);
+		
+////		for (int i = 12; i < 16; i++) {
+////			JLabel regLabel = new JLabel("" + i);
+////			JTextField genRegister = new JTextField(4);
+////			JPanel regPanel = new JPanel();
+////			genRegister.setEditable(false);
+////			regPanel.add(regLabel);
+////			regPanel.add(genRegister);
+////			individualPanel4.add(regPanel);
+////			
+////		}
 		generalPurposePanel.add(individualPanel4);
 		
 		
