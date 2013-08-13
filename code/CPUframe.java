@@ -665,7 +665,7 @@ public class CPUframe extends JFrame {
 		 */
 		JLabel mulOperand1Label = new JLabel("Operand 1:");
 		JTextField mulOperand1 = new JTextField(4);
-		subOperand1.setEditable(false);
+		mulOperand1.setEditable(false);
 		JPanel mulOperand1Panel = new JPanel();
 		mulOperand1Panel.setLayout(new BoxLayout(mulOperand1Panel, BoxLayout.X_AXIS));
 		mulOperand1Panel.add(mulOperand1Label);
@@ -706,8 +706,9 @@ public class CPUframe extends JFrame {
 		aluPanel.setMaximumSize(new Dimension(400, 280));
 		
 		panel2.add(aluPanel);
-		
-		
+		panel2.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); //Set right hand side to 0, and same for panel3
+		//so that bus lines touch cpu and memory
+		//Also, insert empty box with min size into panel2 to keep components at fixed heights in the panel
 
 		
 		this.getContentPane().add(panel1); //Leftmost panel
