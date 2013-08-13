@@ -91,7 +91,7 @@ public class OperandImpl implements Operand {
 	@Override
 	public String toString() {
 		if (isInteger) {
-			return intOperand + ""; //Return int as String 	
+			return "#" + intOperand; //Return int as String 	
 		}
 		if (isFloatingPoint) {
 			return floatingPointOperand + "";
