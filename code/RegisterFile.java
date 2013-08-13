@@ -40,6 +40,8 @@ public interface RegisterFile {
 	 */
 	public Data read(int index);
 	
+	public void registerListener(RegisterListener listener);
+	
 
 
 }

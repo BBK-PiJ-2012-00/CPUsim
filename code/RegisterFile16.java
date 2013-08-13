@@ -10,14 +10,19 @@ package code;
 public class RegisterFile16 implements RegisterFile {
 	private Data[] generalPurposeRegisters = new Data[16]; //Enables general purpose registers to hold multiple data types
 	//Should this be of type Operand?
+	private RegisterListener updateListener; //to handle update events every time a register is updated
+	
 	
 	@Override
 	public void write(int index, Data data) {
 		if (index > -1 && index < 16) { //Ensure valid index (0-15)
 			generalPurposeRegisters[index] = data;
+			ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, index, data.toString());
+			updateListener.handleUpDateEvent(updateEvent);
 		}
 		//Otherwise do nothing (throw exception?)
 	}
+	
 	@Override
 	public Data read(int index) {
 		if (index > -1 && index < 16) { //Ensure valid index (0-15)
@@ -25,6 +30,11 @@ public class RegisterFile16 implements RegisterFile {
 		}
 		//Throw exception?
 		return null;
+	}
+	
+	@Override
+	public void registerListener(RegisterListener listener) {
+		this.updateListener = listener;		
 	}
 	
 
