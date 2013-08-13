@@ -1,13 +1,22 @@
 package code;
 
-public abstract class WriteBackStage {
+public abstract class WriteBackStage implements Runnable {
 	private InstructionRegister ir;
 	private RegisterFile genRegisters;
+	private Operand result;
 	
 	
 	public WriteBackStage(InstructionRegister ir, RegisterFile genRegisters) {
 		this.ir = ir;
 		this.genRegisters = genRegisters;
+	}
+	
+	public Operand getResult() {
+		return this.result;
+	}
+	
+	public void setResult(Operand result) {
+		this.result = result;
 	}
 		
 	
@@ -22,4 +31,7 @@ public abstract class WriteBackStage {
 										//will implement this differently)
 		
 
+	public synchronized void run() {
+		this.instructionWriteBack(result);
+	}
 }

@@ -9,7 +9,9 @@ public class StandardWriteBackStage extends WriteBackStage {
 
 	@Override
 	public void receive(Operand result) {
-		this.instructionWriteBack(result);
+		//this.instructionWriteBack(result);
+		this.setResult(result);
 	}
+	
 
 }
