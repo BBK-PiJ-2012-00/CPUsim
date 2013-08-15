@@ -36,6 +36,34 @@ public class RegisterListener implements EventListener {
 		else if (e.getSource() instanceof RegisterFile) {
 			frame.getGenPurposeRegister(e.getRegisterReference()).setText(e.getUpdate());
 		}
+		
+		/*
+		 * As a dummy object is used for ALU updates (ALU uses static methods and cannot be instantiated, so a dummy
+		 * Object instance is used) so this if statement must come last to avoid use by any other instances.
+		 */
+		else if (e.getSource() instanceof Object) { //ALU (static, therefore no object instantiation; dummy object used)
+			System.out.println("In registerListener from ALU");
+			if (e.getAluUnit().equals("add")) { //addition unit update
+				frame.getAddFields()[0].setText(e.getOp1().toString());
+				frame.getAddFields()[1].setText(e.getOp2().toString());
+				frame.getAddFields()[2].setText(e.getResult().toString());
+			}
+			else if (e.getAluUnit().equals("sub")) { //sub unit update
+				frame.getSubFields()[0].setText(e.getOp1().toString());
+				frame.getSubFields()[1].setText(e.getOp2().toString());
+				frame.getSubFields()[2].setText(e.getResult().toString());
+			}
+			else if (e.getAluUnit().equals("div")) { //div unit update
+				frame.getDivFields()[0].setText(e.getOp1().toString());
+				frame.getDivFields()[1].setText(e.getOp2().toString());
+				frame.getDivFields()[2].setText(e.getResult().toString());
+			}
+			else if (e.getAluUnit().equals("mul")) { //sub unit update
+				frame.getMulFields()[0].setText(e.getOp1().toString());
+				frame.getMulFields()[1].setText(e.getOp2().toString());
+				frame.getMulFields()[2].setText(e.getResult().toString());
+			}
+		}
 	}
 
 }
