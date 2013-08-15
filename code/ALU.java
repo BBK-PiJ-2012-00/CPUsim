@@ -19,6 +19,7 @@ public class ALU {
 		
 		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(null, "add", op1, op2, result);
 		updateListener.handleUpDateEvent(updateEvent);
+		
 		return result;
 	}
 	
@@ -57,6 +58,11 @@ public class ALU {
 	
 	public static void registerListener(RegisterListener listener) {
 		updateListener = listener;
+	}
+	
+	public static void clearFields() { //For resetting GUI fields after alu operation
+		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(null, "", 0, 0, null);
+		updateListener.handleUpDateEvent(updateEvent);
 	}
 	
 
