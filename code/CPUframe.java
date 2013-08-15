@@ -88,6 +88,22 @@ public class CPUframe extends JFrame {
 	private JTextField mbrField;
 	
 	private JTextField[] genRegisters = new JTextField[16];	
+	
+	private JTextField addOperand1;
+	private JTextField addOperand2;
+	private JTextField addResult;
+	
+	private JTextField subOperand1;
+	private JTextField subOperand2;
+	private JTextField subResult;
+	
+	private JTextField divOperand1;
+	private JTextField divOperand2;
+	private JTextField divResult;
+	
+	private JTextField mulOperand1;
+	private JTextField mulOperand2;
+	private JTextField mulResult;
 
 	
 	private JButton executeButton;
@@ -542,7 +558,7 @@ public class CPUframe extends JFrame {
 		aluSubPanel1.setLayout(new BoxLayout(aluSubPanel1, BoxLayout.Y_AXIS));
 		
 		JLabel addOperand1Label = new JLabel("Operand 1:");
-		JTextField addOperand1 = new JTextField(4);
+		addOperand1 = new JTextField(4);
 		addOperand1.setEditable(false);
 		JPanel adderOperand1Panel = new JPanel();
 		adderOperand1Panel.setLayout(new BoxLayout(adderOperand1Panel, BoxLayout.X_AXIS));
@@ -551,7 +567,7 @@ public class CPUframe extends JFrame {
 
 		
 		JLabel addOperand2Label = new JLabel("Operand 2:");
-		JTextField addOperand2 = new JTextField(4);
+		addOperand2 = new JTextField(4);
 		//addOperand2.setMaximumSize(new Dimension(20, 10));
 		addOperand2.setEditable(false);
 		JPanel adderOperand2Panel = new JPanel();
@@ -560,7 +576,7 @@ public class CPUframe extends JFrame {
 		adderOperand2Panel.add(addOperand2);
 		
 		JLabel addResultLabel = new JLabel("Result:       ");
-		JTextField addResult = new JTextField(4);
+		addResult = new JTextField(4);
 		addResult.setEditable(false);
 		JPanel adderResultPanel = new JPanel();
 		adderResultPanel.setLayout(new BoxLayout(adderResultPanel, BoxLayout.X_AXIS));
@@ -580,7 +596,7 @@ public class CPUframe extends JFrame {
 		 * Sub unit
 		 */
 		JLabel subOperand1Label = new JLabel("Operand 1:");
-		JTextField subOperand1 = new JTextField(4);
+		subOperand1 = new JTextField(4);
 		subOperand1.setEditable(false);
 		JPanel subOperand1Panel = new JPanel();
 		subOperand1Panel.setLayout(new BoxLayout(subOperand1Panel, BoxLayout.X_AXIS));
@@ -589,7 +605,7 @@ public class CPUframe extends JFrame {
 
 		
 		JLabel subOperand2Label = new JLabel("Operand 2:");
-		JTextField subOperand2 = new JTextField(4);
+		subOperand2 = new JTextField(4);
 		//addOperand2.setMaximumSize(new Dimension(20, 10));
 		subOperand2.setEditable(false);
 		JPanel subOperand2Panel = new JPanel();
@@ -598,7 +614,7 @@ public class CPUframe extends JFrame {
 		subOperand2Panel.add(subOperand2);
 		
 		JLabel subResultLabel = new JLabel("Result:       ");
-		JTextField subResult = new JTextField(4);
+		subResult = new JTextField(4);
 		subResult.setEditable(false);
 		JPanel subResultPanel = new JPanel();
 		subResultPanel.setLayout(new BoxLayout(subResultPanel, BoxLayout.X_AXIS));
@@ -627,7 +643,7 @@ public class CPUframe extends JFrame {
 		aluSubPanel2.setLayout(new BoxLayout(aluSubPanel2, BoxLayout.Y_AXIS));			
 
 		JLabel divOperand1Label = new JLabel("Operand 1:");
-		JTextField divOperand1 = new JTextField(4);
+		divOperand1 = new JTextField(4);
 		divOperand1.setEditable(false);
 		JPanel divOperand1Panel = new JPanel();
 		divOperand1Panel.setLayout(new BoxLayout(divOperand1Panel, BoxLayout.X_AXIS));
@@ -636,7 +652,7 @@ public class CPUframe extends JFrame {
 
 		
 		JLabel divOperand2Label = new JLabel("Operand 2:");
-		JTextField divOperand2 = new JTextField(4);
+		divOperand2 = new JTextField(4);
 		//addOperand2.setMaximumSize(new Dimension(20, 10));
 		divOperand2.setEditable(false);
 		JPanel divOperand2Panel = new JPanel();
@@ -645,7 +661,7 @@ public class CPUframe extends JFrame {
 		divOperand2Panel.add(divOperand2);
 		
 		JLabel divResultLabel = new JLabel("Result:       ");
-		JTextField divResult = new JTextField(4);
+		divResult = new JTextField(4);
 		divResult.setEditable(false);
 		JPanel divResultPanel = new JPanel();
 		divResultPanel.setLayout(new BoxLayout(divResultPanel, BoxLayout.X_AXIS));
@@ -664,7 +680,7 @@ public class CPUframe extends JFrame {
 		 * Mul unit
 		 */
 		JLabel mulOperand1Label = new JLabel("Operand 1:");
-		JTextField mulOperand1 = new JTextField(4);
+		mulOperand1 = new JTextField(4);
 		mulOperand1.setEditable(false);
 		JPanel mulOperand1Panel = new JPanel();
 		mulOperand1Panel.setLayout(new BoxLayout(mulOperand1Panel, BoxLayout.X_AXIS));
@@ -673,7 +689,7 @@ public class CPUframe extends JFrame {
 
 		
 		JLabel mulOperand2Label = new JLabel("Operand 2:");
-		JTextField mulOperand2 = new JTextField(4);
+		mulOperand2 = new JTextField(4);
 		//addOperand2.setMaximumSize(new Dimension(20, 10));
 		mulOperand2.setEditable(false);
 		JPanel mulOperand2Panel = new JPanel();
@@ -682,7 +698,7 @@ public class CPUframe extends JFrame {
 		mulOperand2Panel.add(mulOperand2);
 		
 		JLabel mulResultLabel = new JLabel("Result:       ");
-		JTextField mulResult = new JTextField(4);
+		mulResult = new JTextField(4);
 		mulResult.setEditable(false);
 		JPanel mulResultPanel = new JPanel();
 		mulResultPanel.setLayout(new BoxLayout(mulResultPanel, BoxLayout.X_AXIS));
@@ -709,6 +725,8 @@ public class CPUframe extends JFrame {
 		panel2.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); //Set right hand side to 0, and same for panel3
 		//so that bus lines touch cpu and memory
 		//Also, insert empty box with min size into panel2 to keep components at fixed heights in the panel
+		
+		ALU.registerListener(new RegisterListener(this));
 
 		
 		this.getContentPane().add(panel1); //Leftmost panel
@@ -854,6 +872,65 @@ public class CPUframe extends JFrame {
 		return this.genRegisters[index];
 	}
 	
+	/*
+	 * Rather than 12 individual getters for ALU text fields, it is more concise to
+	 * add the fields to arrays for handling by RegisterListener. 
+	 */
+	
+	public JTextField[] getAddFields() {
+		JTextField[] addFields = new JTextField[3];
+		addFields[0] = addOperand1;
+		addFields[1] = addOperand2;
+		addFields[2] = addResult;
+		
+		return addFields;
+	}
+	
+	public JTextField[] getSubFields() {
+		JTextField[] subFields = new JTextField[3];
+		subFields[0] = subOperand1;
+		subFields[1] = subOperand2;
+		subFields[2] = subResult;
+		
+		return subFields;
+	}
+	
+	public JTextField[] getDivFields() {
+		JTextField[] divFields = new JTextField[3];
+		divFields[0] = divOperand1;
+		divFields[1] = divOperand2;
+		divFields[2] = divResult;
+		
+		return divFields;
+	}
+	
+	public JTextField[] getMulFields() {
+		JTextField[] mulFields = new JTextField[3];
+		mulFields[0] = mulOperand1;
+		mulFields[1] = mulOperand2;
+		mulFields[2] = mulResult;
+		
+		return mulFields;
+	}
+	
+	public JTextField[] getAllAluFields() { //Used for reset (called by RegisterListener)
+		JTextField[] aluFields = new JTextField[12];
+		aluFields[0] = addOperand1;
+		aluFields[1] = addOperand2;
+		aluFields[2] = addResult;
+		aluFields[3] = subOperand1;
+		aluFields[4] = subOperand2;
+		aluFields[5] = subResult;
+		aluFields[6] = divOperand1;
+		aluFields[7] = divOperand2;
+		aluFields[8] = divResult;
+		aluFields[9] = mulOperand1;
+		aluFields[10] = mulOperand2;
+		aluFields[11] = mulResult;
+		
+		return aluFields;
+	}
+
 	
 	
 
