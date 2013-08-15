@@ -156,6 +156,14 @@ public abstract class ExecuteStage implements Runnable {
 					Operand op1 = (Operand) genRegisters.read(ir.read().getField1()); //access operand stored in first register
 					Operand op2 = (Operand) genRegisters.read(ir.read().getField2());//access operand stored in second register
 					Operand result = ALU.AdditionUnit(op1, op2); //Have ALU perform operation
+					
+					try { //Makes more sense to put the wait here than complicate write back stage
+						wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
 					writeBackStage.receive(result); //Call write back stage to store result of addition
 					writeBackStage.run();
 					
@@ -166,12 +174,22 @@ public abstract class ExecuteStage implements Runnable {
 						e.printStackTrace();
 					}
 					
+					ALU.clearFields();
+					
 					break;
 			
 			case 5: //A SUB instruction (subtracting contents of one register from a second (storing in the first).
 					op1 = (Operand) genRegisters.read(ir.read().getField1()); //access first operand
 					op2 = (Operand) genRegisters.read(ir.read().getField2()); //access second operand
 					result = ALU.SubtractionUnit(op1, op2);
+					
+					try { //Makes more sense to put the wait here than complicate write back stage
+						wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
 					writeBackStage.receive(result);
 					writeBackStage.run();
 					
@@ -181,6 +199,8 @@ public abstract class ExecuteStage implements Runnable {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					
+					ALU.clearFields();
 					
 					break;				
 					
@@ -188,6 +208,14 @@ public abstract class ExecuteStage implements Runnable {
 					op1 = (Operand) genRegisters.read(ir.read().getField1()); //access first operand
 					op2 = (Operand) genRegisters.read(ir.read().getField2()); //access second operand
 					result = ALU.DivisionUnit(op1, op2); //op1 / op2
+					
+					try { //Makes more sense to put the wait here than complicate write back stage
+						wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
 					writeBackStage.receive(result);
 					writeBackStage.run();
 					
@@ -197,6 +225,8 @@ public abstract class ExecuteStage implements Runnable {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					
+					ALU.clearFields();
 					
 					break;					
 					
@@ -204,6 +234,14 @@ public abstract class ExecuteStage implements Runnable {
 					op1 = (Operand) genRegisters.read(ir.read().getField1()); //access first operand
 					op2 = (Operand) genRegisters.read(ir.read().getField2()); //access second operand
 					result = ALU.MultiplicationUnit(op1, op2); //op1 * op2
+					
+					try { //Makes more sense to put the wait here than complicate write back stage
+						wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
 					writeBackStage.receive(result);
 					writeBackStage.run();
 					
@@ -213,6 +251,8 @@ public abstract class ExecuteStage implements Runnable {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					
+					ALU.clearFields();
 					
 					break;
 					
