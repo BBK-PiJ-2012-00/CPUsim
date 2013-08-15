@@ -5,6 +5,7 @@ package code;
  * addition unit, multiplication unit etc.
  */
 public class ALU {
+	private static RegisterListener updateListener;
 	
 	private ALU() { //To prevent instantiation; all methods are static (as ALU is like a utility class)
 		super();
@@ -14,11 +15,10 @@ public class ALU {
 		int op1 = operand1.unwrapInteger();
 		int op2 = operand2.unwrapInteger();
 		int sum = op1 + op2;
-		if (sum > 2147483647 || sum < -2147483648) { //Max/min signed integer for 32-bit machine -> would cause overflow
-			//Throw exception
-			return null;
-		}
 		Operand result = new OperandImpl(sum);
+		
+		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(null, "add", op1, op2, result);
+		updateListener.handleUpDateEvent(updateEvent);
 		return result;
 	}
 	
@@ -26,11 +26,10 @@ public class ALU {
 		int op1 = operand1.unwrapInteger();
 		int op2 = operand2.unwrapInteger();
 		int intResult = op1 - op2;
-		if (intResult > 2147483647 || intResult < -2147483648) { //Max/min signed integer for 32-bit machine -> would cause overflow
-			//Throw exception
-			return null;
-		}
 		Operand result = new OperandImpl(intResult);
+		
+		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(null, "sub", op1, op2, result);
+		updateListener.handleUpDateEvent(updateEvent);
 		return result;
 	}
 	
@@ -38,25 +37,28 @@ public class ALU {
 		int op1 = operand1.unwrapInteger();
 		int op2 = operand2.unwrapInteger();
 		int intResult = op1 / op2;
-		if (intResult > 2147483647 || intResult < -2147483648) { //Max/min signed integer for 32-bit machine -> would cause overflow
-			//Throw exception
-			return null;
-		}
 		Operand result = new OperandImpl(intResult);
+		
+		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(null, "div", op1, op2, result);
+		updateListener.handleUpDateEvent(updateEvent);
 		return result;
 	}
 	
 	public static Operand MultiplicationUnit(Operand operand1, Operand operand2) {
 		int op1 = operand1.unwrapInteger();
 		int op2 = operand2.unwrapInteger();
-		int intResult = op1 * op2;
-		if (intResult > 2147483647 || intResult < -2147483648) { //Max/min signed integer for 32-bit machine -> would cause overflow
-			//Throw exception
-			return null;
-		}
+		int intResult = op1 * op2;		
 		Operand result = new OperandImpl(intResult);
+		
+		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(null, "mul", op1, op2, result);
+		updateListener.handleUpDateEvent(updateEvent);
 		return result;
 	}
+	
+	public static void registerListener(RegisterListener listener) {
+		updateListener = listener;
+	}
+	
 
 
 }
