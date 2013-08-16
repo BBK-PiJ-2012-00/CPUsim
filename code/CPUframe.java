@@ -268,11 +268,12 @@ public class CPUframe extends JFrame {
 		activityContentPanel.add(activityBufferPanel);
 		
 		activityPanel = new JPanel();
-		//assemblerPanel.setLayout(new BoxLayout(assemblerPanel, BoxLayout.Y_AXIS));
 		activityPanel.add(activityContentPanel);			
 		
 		activityContentPanel.setBorder(BorderFactory.createTitledBorder(" Activity Monitor "));
 		activityPanel.setAlignmentX(LEFT_ALIGNMENT);
+		
+		controlUnit.getFetchDecodeStage().registerListener(new RegisterListener(this)); //Register a listener with FD stage
 		
 		panel1.add(activityPanel);
 		
@@ -911,8 +912,8 @@ public class CPUframe extends JFrame {
 		return aluFields;
 	}
 	
-	public JTextArea getActivityMonitor() {
-		return this.activityArea;
+	public JTextArea getActivityMonitor() {		
+		return this.activityArea;		
 	}
 
 	
