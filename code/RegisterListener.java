@@ -41,6 +41,7 @@ public class RegisterListener implements EventListener {
 		else if ((e.getSource() instanceof FetchDecodeStage) || (e.getSource() instanceof ExecuteStage) ||
 				(e.getSource() instanceof WriteBackStage)) {
 			frame.getActivityMonitor().append(e.getUpdate()); //Append new update to existing text
+			frame.getActivityMonitor().setCaretPosition(frame.getActivityMonitor().getDocument().getLength());
 		}
 		
 		/*
