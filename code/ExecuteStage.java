@@ -51,7 +51,7 @@ public abstract class ExecuteStage implements Runnable {
 					}
 					
 					systemBus.transferToMemory(mar.read(), null);
-					this.fireUpdate("Operand " + mbr.read().toString() + " loaded from address " + ir.read().getField1() + " into MBR\n");
+					this.fireUpdate("Operand " + mbr.read().toString() + " loaded from address " + ir.read().getField2() + " into MBR\n");
 					
 					try {
 						wait();
@@ -87,7 +87,7 @@ public abstract class ExecuteStage implements Runnable {
 					//Transfer data in mbr to destination field in instruction in ir (field2).
 					genRegisters.write(ir.read().getField2(), mbr.read());//getField2() gives reg. destination index, mbr.read()
 					//gives the operand to be moved from mbr to genRegisters at index given in getField2().
-					this.fireUpdate("Operand " + mbr.read() + " loaded into r" + ir.read().getField2() + "/n");
+					this.fireUpdate("Operand " + mbr.read() + " loaded into r" + ir.read().getField2() + "\n");
 					
 					try {
 						wait();
@@ -98,12 +98,11 @@ public abstract class ExecuteStage implements Runnable {
 					
 					
 					mbr.write(null); //Reset MBR
-					//Reset IR?
 					break;
 					
 			case 2: //A STORE instruction
-				this.fireUpdate("Executing STORE instruction; memory address " + ir.read().getField1() + 
-						"\nplaced into MAR to initiate operand store \n");
+				this.fireUpdate("Executing STORE instruction; destination memory address " + ir.read().getField2() + 
+						"\nplaced into MAR \n");
 					mar.write(ir.read().getField2()); //Load mar with destination (memory address)
 					
 					try {
@@ -115,6 +114,8 @@ public abstract class ExecuteStage implements Runnable {
 					
 					mbr.write(genRegisters.read(ir.read().getField1())); //Write to mbr the data held in genRegisters at index
 					//given by field1(source) of instruction held in IR.
+					this.fireUpdate("Operand " + genRegisters.read(ir.read().getField1()) + " loaded from r" + ir.read().getField1() + 
+							" into MBR\n");
 					
 					try {
 						wait();
@@ -125,6 +126,9 @@ public abstract class ExecuteStage implements Runnable {
 					
 					
 					systemBus.transferToMemory(mar.read(), mbr.read()); //Transfer contents of mbr to address specified in mar
+					
+					this.fireUpdate("Operand " + genRegisters.read(ir.read().getField1()) + " stored in memory address " +
+							ir.read().getField2());
 					
 					try {
 						wait();
