@@ -58,9 +58,15 @@ public abstract class Instruction implements Data {
 			return OPCODE.toString() + " " + this.getField1();
 		}
 		if (OPCODE.getValue() > 2 && OPCODE.getValue() < 8) { //Arithmetic and MOVE instructions
+			if (this.getField2() == 16) { //Display condition code register as rCC rather than r16
+				return OPCODE.toString() + " r" + this.getField1() + " rCC";
+			}
 			return OPCODE.toString() + " r" + this.getField1() + " r" + this.getField2();
 		}
 		if ((OPCODE.getValue() > 10 && OPCODE.getValue() < 13) || OPCODE.getValue() == 1) { //BRE/BRNE/LOAD instructions
+			if (this.getField2() == 16) { //Display condition code register as rCC rather than r16
+				return OPCODE.toString() + " r" + this.getField1() + " rCC";
+			}
 			return OPCODE.toString() + " " + this.getField1() + " r" + this.getField2();
 		}
 		return OPCODE.toString() + " r" + this.getField1() + " " + this.getField2(); //STORE
