@@ -34,6 +34,8 @@ public interface ControlUnit {
 	public ExecuteStage getExecuteStage();
 
 	public WriteBackStage getWriteBackStage();
+	
+	public void clearRegisters();
 
 		
 	

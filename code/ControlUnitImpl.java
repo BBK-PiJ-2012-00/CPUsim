@@ -94,6 +94,17 @@ public class ControlUnitImpl implements ControlUnit {
 		}
 	}
 	
+	public void clearRegisters() {
+		pc.setPC(0);
+		ir.loadIR(null);
+		mar.write(-1); // -1 triggers clear
+		mbr.write(null);
+		for (int i = 0; i < 16; i++) {
+			genRegisters.write(i, null); //Set each general purpose register to null, clearing them			
+		}
+		//STATUS REGISTER!		
+	}
+	
 	/*
 	 * If the main thread running through this method controls worker threads in the run method, prompting it
 	 * to pause at every stage, step by step execution could be implemented.  Calling next simply wakes the 
