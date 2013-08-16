@@ -35,7 +35,7 @@ public abstract class ExecuteStage implements Runnable {
 	}
 	
 	public synchronized boolean instructionExecute(int opcode) {
-		this.fireUpdate("** INSTRUCTION EXECUTION STAGE ** \n");
+		this.fireUpdate("\n** INSTRUCTION EXECUTION STAGE ** \n");
 		switch (opcode) {
 		
 			case 1: //A LOAD instruction
@@ -51,7 +51,7 @@ public abstract class ExecuteStage implements Runnable {
 					}
 					
 					systemBus.transferToMemory(mar.read(), null);
-					this.fireUpdate("Operand " + mbr.read().toString() + " loaded from address " + ir.read().getField1() + " into MBR");
+					this.fireUpdate("Operand " + mbr.read().toString() + " loaded from address " + ir.read().getField1() + " into MBR\n");
 					
 					try {
 						wait();

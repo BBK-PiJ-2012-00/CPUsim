@@ -33,8 +33,7 @@ public abstract class FetchDecodeStage implements Runnable {
 	
 	
 	public void instructionFetch() {
-		this.fireUpdate("** INSTRUCTION FETCH/DECODE STAGE ** \n");
-		pc.setPC(0); //Initialise PC to 0 for GUI display
+		this.fireUpdate("\n** INSTRUCTION FETCH/DECODE STAGE ** \n");
 		ir.clear(); //Clear previous instruction from display
 		mar.write(pc.getValue()); //Write address value in PC to MAR.
 		
@@ -76,12 +75,12 @@ public abstract class FetchDecodeStage implements Runnable {
 		mbr.write(null); //Clear MBR to reflect that instruction has moved to IR (should it be reset earlier, to better reflect
 		//movement?)
 		
-		try {
-			wait();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			wait();
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 	//Fetch ends with instruction being loaded into IR.
 	
@@ -91,7 +90,7 @@ public abstract class FetchDecodeStage implements Runnable {
 		Instruction instr = ir.read();
 		int opcodeValue = instr.getOpcode().getValue(); //Gets instruction opcode as int value
 		pc.incrementPC(); //Increment PC; done here so that with pipelining, the next instruction can be fetched at this point
-		this.fireUpdate("PC incremented by 1 (ready for next instruction fetch)");
+		this.fireUpdate("PC incremented by 1 (ready for next instruction fetch) \n");
 		
 		try {
 			wait();
