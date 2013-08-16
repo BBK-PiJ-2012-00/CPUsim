@@ -19,5 +19,10 @@ public class IR implements InstructionRegister {
 	public void registerListener(RegisterListener listener) {
 		this.registerListener = listener;		
 	}
+	
+	@Override
+	public void clear() {
+		this.contents = null;
+	}
 
 }
