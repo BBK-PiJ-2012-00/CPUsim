@@ -61,16 +61,18 @@ public abstract class ExecuteStage implements Runnable {
 					}
 					
 					mar.write(-1); //Reset MAR
-					
-					try {
-						wait();
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+//					
+//					try {
+//						wait();
+//					} catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
 					
 					if (ir.read().getField2() == 16) { //ConditionCodeRegister reference
 						statusRegister.write((Operand) mbr.read()); //Write operand in mbr to condition/status register
+						
+						this.fireUpdate("Loaded operand " + mbr.read() + " into condition code register\n");
 						
 						try {
 							wait();
@@ -85,6 +87,7 @@ public abstract class ExecuteStage implements Runnable {
 					//Transfer data in mbr to destination field in instruction in ir (field2).
 					genRegisters.write(ir.read().getField2(), mbr.read());//getField2() gives reg. destination index, mbr.read()
 					//gives the operand to be moved from mbr to genRegisters at index given in getField2().
+					this.fireUpdate("Operand " + mbr.read() + " loaded into r" + ir.read().getField2() + "/n");
 					
 					try {
 						wait();
@@ -99,6 +102,8 @@ public abstract class ExecuteStage implements Runnable {
 					break;
 					
 			case 2: //A STORE instruction
+				this.fireUpdate("Executing STORE instruction; memory address " + ir.read().getField1() + 
+						"\nplaced into MAR to initiate operand store \n");
 					mar.write(ir.read().getField2()); //Load mar with destination (memory address)
 					
 					try {
