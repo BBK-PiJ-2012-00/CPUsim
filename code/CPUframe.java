@@ -910,6 +910,10 @@ public class CPUframe extends JFrame {
 		
 		return aluFields;
 	}
+	
+	public JTextArea getActivityMonitor() {
+		return this.activityArea;
+	}
 
 	
 	
