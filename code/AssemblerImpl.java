@@ -233,9 +233,17 @@ public class AssemblerImpl implements Assembler {
 				String sourceString = instructionParts.get(i+1).substring(1);
 				int source = Integer.parseInt(sourceString);
 				
+				int destination;
+				
 				String destinationString = instructionParts.get(i+2).substring(1); //Trim leading 'r' off
+				if (destinationString.equals("CC")) { //A load instruction may reference condition code/status register
+					destination = 16;
+				}
+				else {
+					destination = Integer.parseInt(destinationString);
+				}	
 				//register source to leave an integer reference
-				int destination = Integer.parseInt(destinationString);
+				//int destination = Integer.parseInt(destinationString);
 				
 				if (opcode.equals("MOVE")) {
 					data = new TransferInstr(Opcode.MOVE, source, destination);
