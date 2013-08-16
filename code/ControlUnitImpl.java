@@ -49,7 +49,7 @@ public class ControlUnitImpl implements ControlUnit {
 		if (!pipeliningMode) { //If not pipelined, create standard stages
 			fetchDecodeStage = new StandardFetchDecodeStage(ir, pc);
 			writeBackStage = new StandardWriteBackStage(ir, genRegisters);
-			executeStage = new StandardExecuteStage(ir, pc, genRegisters, statusRegister, writeBackStage);			
+			executeStage = new StandardExecuteStage(ir, pc, genRegisters, statusRegister, writeBackStage);	
 		}
 		
 		if (pipeliningMode) { //Queues only required if pipelining enabled
@@ -72,6 +72,7 @@ public class ControlUnitImpl implements ControlUnit {
 	}
 	
 	private void launch() { //The method that kick starts execution of a program, and manages it
+		pc.setPC(0); //Initialise PC to 0 for GUI display
 		if (!pipeliningMode) { 
 			while (active) {	
 				
@@ -139,6 +140,11 @@ public class ControlUnitImpl implements ControlUnit {
 	@Override
 	public ExecuteStage getExecuteStage() {
 		return this.executeStage;
+	}
+
+	@Override
+	public WriteBackStage getWriteBackStage() {
+		return this.writeBackStage;
 	}
 	
 	

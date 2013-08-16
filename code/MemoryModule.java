@@ -96,7 +96,7 @@ public class MemoryModule implements MainMemory {
 	}
 	
 	public void setPC() { //Method to send start address of program code via system bus to set PC before execution begins
-		//Can use systembus.transferToCPU(), 
+		
 	}
 	
 	

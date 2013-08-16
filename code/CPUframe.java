@@ -274,6 +274,7 @@ public class CPUframe extends JFrame {
 		activityPanel.setAlignmentX(LEFT_ALIGNMENT);
 		
 		controlUnit.getFetchDecodeStage().registerListener(new RegisterListener(this)); //Register a listener with FD stage
+		controlUnit.getExecuteStage().registerListener(new RegisterListener(this)); //Register a listener with Ex. stage
 		
 		panel1.add(activityPanel);
 		
