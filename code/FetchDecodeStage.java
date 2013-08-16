@@ -91,7 +91,7 @@ public abstract class FetchDecodeStage implements Runnable {
 		Instruction instr = ir.read();
 		int opcodeValue = instr.getOpcode().getValue(); //Gets instruction opcode as int value
 		pc.incrementPC(); //Increment PC; done here so that with pipelining, the next instruction can be fetched at this point
-		this.fireUpdate("PC incremented by 1");
+		this.fireUpdate("PC incremented by 1 (ready for next instruction fetch)");
 		
 		try {
 			wait();
