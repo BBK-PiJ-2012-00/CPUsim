@@ -256,32 +256,23 @@ public class CPUframe extends JFrame {
 		/*
 		 * Activity Monitor display in panel1
 		 */
-		//JPanel activityBufferPanel = new JPanel(); //To make border equal to controlPanel above
+		JPanel activityBufferPanel = new JPanel(); //To make border equal to controlPanel and assembly above
 		activityContentPanel = new JPanel();
 		activityArea = new JTextArea(15, 30);
-		//activityArea.setMaximumSize(new Dimension(50, 50));
 		activityArea.setEditable(false);
-		//activityArea.setCaretPosition(0);
 		
 		activityScroller = new JScrollPane(activityArea);
 		
-		//activityBufferPanel.add(assemblerScroller);
-		//activityBufferPanel.setMaximumSize(new Dimension(50, 50));
+		activityBufferPanel.add(activityScroller);
 		
-		activityContentPanel.add(activityScroller);
-		//activityContentPanel.setMaximumSize(new Dimension(50, 50));
+		activityContentPanel.add(activityBufferPanel);
 		
 		activityPanel = new JPanel();
 		//assemblerPanel.setLayout(new BoxLayout(assemblerPanel, BoxLayout.Y_AXIS));
-		activityPanel.add(activityContentPanel);	
-		//activityPanel.setMaximumSize(new Dimension(200, 200));
-		//activityPanel.setAlignmentX(LEFT_ALIGNMENT);
-		//activityPanel.setAlignmentY(BOTTOM_ALIGNMENT);
-		//activityContentPanel.setMaximumSize(new Dimension(50, 50));
-		
+		activityPanel.add(activityContentPanel);			
 		
 		activityContentPanel.setBorder(BorderFactory.createTitledBorder(" Activity Monitor "));
-		activityContentPanel.setAlignmentX(LEFT_ALIGNMENT);
+		activityPanel.setAlignmentX(LEFT_ALIGNMENT);
 		
 		panel1.add(activityPanel);
 		
