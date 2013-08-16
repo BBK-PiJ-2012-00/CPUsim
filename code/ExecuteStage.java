@@ -51,7 +51,7 @@ public abstract class ExecuteStage implements Runnable {
 					}
 					
 					systemBus.transferToMemory(mar.read(), null);
-					this.fireUpdate("Operand " + mbr.read().toString() + " loaded from address " + ir.read().getField2() + " into MBR\n");
+					this.fireUpdate("Operand " + mbr.read().toString() + " loaded from address " + ir.read().getField1() + " into MBR\n");
 					
 					try {
 						wait();
@@ -100,9 +100,10 @@ public abstract class ExecuteStage implements Runnable {
 					mbr.write(null); //Reset MBR
 					break;
 					
+					
 			case 2: //A STORE instruction
-				this.fireUpdate("Executing STORE instruction; destination memory address " + ir.read().getField2() + 
-						"\nplaced into MAR \n");
+					this.fireUpdate("Executing STORE instruction; destination memory \naddress " + ir.read().getField2() + 
+						" placed into MAR \n");
 					mar.write(ir.read().getField2()); //Load mar with destination (memory address)
 					
 					try {
@@ -128,7 +129,7 @@ public abstract class ExecuteStage implements Runnable {
 					systemBus.transferToMemory(mar.read(), mbr.read()); //Transfer contents of mbr to address specified in mar
 					
 					this.fireUpdate("Operand " + genRegisters.read(ir.read().getField1()) + " stored in memory address " +
-							ir.read().getField2());
+							ir.read().getField2() + "\n");
 					
 					try {
 						wait();
@@ -138,6 +139,7 @@ public abstract class ExecuteStage implements Runnable {
 					}
 					
 					break;
+					
 					
 			case 3: //A MOVE instruction (moving data between registers)
 					this.fireUpdate("Executing MOVE instruction \n");
@@ -192,6 +194,8 @@ public abstract class ExecuteStage implements Runnable {
 					Operand op1 = (Operand) genRegisters.read(ir.read().getField1()); //access operand stored in first register
 					Operand op2 = (Operand) genRegisters.read(ir.read().getField2());//access operand stored in second register
 					Operand result = ALU.AdditionUnit(op1, op2); //Have ALU perform operation
+					fireUpdate("Operands " + op1 + " and " + op2 + " loaded from general purpose \nregisters into ALU " +
+							"for ADD operation\n");
 					
 					try { //Makes more sense to put the wait here than complicate write back stage
 						wait();
@@ -202,6 +206,8 @@ public abstract class ExecuteStage implements Runnable {
 					
 					writeBackStage.receive(result); //Call write back stage to store result of addition
 					writeBackStage.run();
+					fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
+					fireUpdate("Result operand " + result + " written to r" + ir.read().getField1() + " from ALU\n");
 					
 					try { //Makes more sense to put the wait here than complicate write back stage
 						wait();
@@ -213,6 +219,7 @@ public abstract class ExecuteStage implements Runnable {
 					ALU.clearFields();
 					
 					break;
+					
 			
 			case 5: //A SUB instruction (subtracting contents of one register from a second (storing in the first).
 					op1 = (Operand) genRegisters.read(ir.read().getField1()); //access first operand
@@ -238,7 +245,8 @@ public abstract class ExecuteStage implements Runnable {
 					
 					ALU.clearFields();
 					
-					break;				
+					break;	
+					
 					
 			case 6: //A DIV instruction (dividing contents of one register by contents of another (storing in the first).
 					op1 = (Operand) genRegisters.read(ir.read().getField1()); //access first operand
@@ -264,7 +272,8 @@ public abstract class ExecuteStage implements Runnable {
 					
 					ALU.clearFields();
 					
-					break;					
+					break;	
+					
 					
 			case 7: //A MUL instruction (multiplying contents of one register by contents of another (storing result in first).
 					op1 = (Operand) genRegisters.read(ir.read().getField1()); //access first operand
@@ -306,6 +315,7 @@ public abstract class ExecuteStage implements Runnable {
 					
 					//A branch instruction updates PC to new memory location
 					break;
+					
 				
 			case 9: //A BRZ instruction (branch if value in status register is zero).
 					if (statusRegister.read().unwrapInteger() == 0) {
@@ -320,6 +330,7 @@ public abstract class ExecuteStage implements Runnable {
 					}
 					break; //If not 0, do nothing
 					
+					
 			case 10: //A SKZ instruction (skip the next instruction (increment PC by one) if status register holds 0).
 					 if (statusRegister.read().unwrapInteger() == 0) {
 						 pc.incrementPC();
@@ -333,6 +344,7 @@ public abstract class ExecuteStage implements Runnable {
 						 
 					 }
 					 break; //If not 0, do nothing
+					 
 					 
 			case 11: //A BRE instruction (branch if status reg. contents = contents of register ref. in instruction)
 					 int genRegRef = ir.read().getField2(); //Reference to register referred to in instruction
@@ -369,6 +381,8 @@ public abstract class ExecuteStage implements Runnable {
 					 pc.setPC(0);
 					 statusRegister.write(null);
 					 ir.loadIR(null);	
+					 
+					 fireUpdate("HALT instruction decoded; end of program");
 					 return false; //Signals end of instruction cycle		
 		}
 		return true;
