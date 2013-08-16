@@ -50,7 +50,7 @@ public class MBR implements MemoryBufferRegister {
 	public String display() {
 		String mbrDisplay = "";
 		if (registerContents == null) {
-			mbrDisplay += "---";
+			mbrDisplay += "";
 		}
 		else {
 			mbrDisplay += "  " + this.registerContents.toString();

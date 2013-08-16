@@ -50,7 +50,7 @@ public class MAR implements MemoryAddressRegister {
 	public String display() {
 		String marDisplay = "";
 		if (registerContents == -1) {
-			marDisplay += "---";
+			marDisplay += "";
 		}
 		else {
 			marDisplay += this.registerContents;
