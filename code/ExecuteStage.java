@@ -140,15 +140,38 @@ public abstract class ExecuteStage implements Runnable {
 					break;
 					
 			case 3: //A MOVE instruction (moving data between registers)
-					genRegisters.write(ir.read().getField2(), genRegisters.read(ir.read().getField1()));
-					//Write to the destination specified in field2 of instr held in ir, the instr held in the register
-					//specified by field1 of the instruction in the ir.
+					this.fireUpdate("Executing MOVE instruction \n");
 					
-					try {
-						wait();
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					if (ir.read().getField2() == 16) { //ConditionCodeRegister destination reference
+						statusRegister.write((Operand)genRegisters.read(ir.read().getField1())); //Write operand from source register
+						//to condition/status register
+						
+						this.fireUpdate("Loaded operand " + genRegisters.read(ir.read().getField1()) + 
+								" into condition code register\n");
+						
+						try {
+							wait();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					
+					else { //Register-register move
+					
+						genRegisters.write(ir.read().getField2(), genRegisters.read(ir.read().getField1()));
+						//Write to the destination specified in field2 of instr held in ir, the instr held in the register
+						//specified by field1 of the instruction in the ir.
+						
+						this.fireUpdate("Operand " + genRegisters.read(ir.read().getField1()) + 
+								" moved into r" + genRegisters.read(ir.read().getField2()) + "\n");
+						
+						try {
+							wait();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 					
 					
