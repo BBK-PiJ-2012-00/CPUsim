@@ -17,6 +17,8 @@ public abstract class FetchDecodeStage implements Runnable {
 	
 	private int opcodeValue; //This is fetched by control unit to pass to next stage.
 	
+	private RegisterListener updateListener; //Update event listener
+	
 	
 	public FetchDecodeStage(InstructionRegister ir, ProgramCounter pc) {
 		systemBus = SystemBusController.getInstance();
@@ -31,7 +33,10 @@ public abstract class FetchDecodeStage implements Runnable {
 	
 	
 	public void instructionFetch() {
+		ir.clear(); //Clear previous instruction from display
 		mar.write(pc.getValue()); //Write address value in PC to MAR.
+		
+		this.fireUpdate("Memory address from PC placed into MAR \n");
 		
 		try {
 			wait();
@@ -41,7 +46,7 @@ public abstract class FetchDecodeStage implements Runnable {
 		}
 		
 		systemBus.transferToMemory(mar.read(), null); //Transfer address from MAR to system bus, prompting read
-		
+		this.fireUpdate("Load contents of memory address " + mar.read() + " into MBR \n");
 		
 		try {
 			wait();
@@ -62,7 +67,7 @@ public abstract class FetchDecodeStage implements Runnable {
 			e.printStackTrace();
 		}
 		
-		mar.write(-1);//Reset MAR (but is it more confusing to place 0 there, as 0 is valid memory address?s
+		mar.write(-1);//Reset MAR. Repositioned here for user clarity; mem. addr. remains in MAR until instr. in IR.
 		
 		
 		mbr.write(null); //Clear MBR to reflect that instruction has moved to IR (should it be reset earlier, to better reflect
@@ -111,6 +116,15 @@ public abstract class FetchDecodeStage implements Runnable {
 	
 	public int getOpcodeValue() {
 		return this.opcodeValue;
+	}
+	
+	public void fireUpdate(String update) {
+		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, update);
+		updateListener.handleUpDateEvent(updateEvent);		
+	}
+	
+	public void registerListener(RegisterListener listener) {
+		this.updateListener = listener;
 	}
 	
 }
