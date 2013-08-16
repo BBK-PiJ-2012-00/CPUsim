@@ -16,6 +16,8 @@ public abstract class ExecuteStage implements Runnable {
 	private boolean active;
 	private int opcode;
 	
+	private RegisterListener updateListener;
+	
 	
 	public ExecuteStage(InstructionRegister ir, ProgramCounter pc, RegisterFile genRegisters, Register statusRegister,
 			WriteBackStage writeBackStage) {
@@ -33,10 +35,11 @@ public abstract class ExecuteStage implements Runnable {
 	}
 	
 	public synchronized boolean instructionExecute(int opcode) {
+		this.fireUpdate("** INSTRUCTION EXECUTION STAGE ** \n");
 		switch (opcode) {
 		
-		
 			case 1: //A LOAD instruction
+					this.fireUpdate("Executing LOAD instruction; memory address " +	ir.read().getField1() + "\nplaced into MAR to initiate operand fetch \n");
 					mar.write(ir.read().getField1()); //Load mar with source address of instruction in IR
 					//Request a read from memory via system bus, with address contained in mar
 					
@@ -48,6 +51,7 @@ public abstract class ExecuteStage implements Runnable {
 					}
 					
 					systemBus.transferToMemory(mar.read(), null);
+					this.fireUpdate("Operand " + mbr.read().toString() + " loaded from address " + ir.read().getField1() + " into MBR");
 					
 					try {
 						wait();
@@ -358,6 +362,15 @@ public abstract class ExecuteStage implements Runnable {
 	//public abstract void receive(int opcode);
 	
 	public abstract void forward(Operand result); //For forwarding execution to WriteBackStage
+	
+	private void fireUpdate(String update) {
+		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, update);
+		updateListener.handleUpDateEvent(updateEvent);
+	}
+	
+	public void registerListener(RegisterListener listener) {
+		this.updateListener = listener;
+	}
 	
 
 	
