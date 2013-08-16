@@ -23,4 +23,6 @@ public interface InstructionRegister {
 	public void registerListener(RegisterListener listener);
 	
 	public void clear();
+	
+	public String display();
 }

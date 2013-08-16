@@ -6,7 +6,7 @@ public class IR implements InstructionRegister {
 	
 	public void loadIR(Instruction instr) {
 		this.contents = instr;
-		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, "" + contents);
+		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, this.display());
 		registerListener.handleUpDateEvent(updateEvent);
 	}
 	
@@ -23,6 +23,18 @@ public class IR implements InstructionRegister {
 	@Override
 	public void clear() {
 		this.contents = null;
+		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, this.display());
+		registerListener.handleUpDateEvent(updateEvent);
+	}
+	
+	@Override
+	public String display() {
+		String displayString = "";
+		if (this.contents == null) {
+			return displayString; //Will update display with blank string if contents is empty
+		}
+		displayString += this.contents;
+		return displayString;
 	}
 
 }
