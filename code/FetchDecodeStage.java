@@ -122,7 +122,7 @@ public abstract class FetchDecodeStage implements Runnable {
 		return this.opcodeValue;
 	}
 	
-	public void fireUpdate(String update) {
+	private void fireUpdate(String update) {
 		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, update);
 		updateListener.handleUpDateEvent(updateEvent);		
 	}
