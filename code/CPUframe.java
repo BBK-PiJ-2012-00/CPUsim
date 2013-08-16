@@ -58,6 +58,10 @@ public class CPUframe extends JFrame {
 	private JPanel assemblerPanel;
 	private JPanel assemblerContentPanel;
 	
+	private JPanel activityContentPanel;
+	private JPanel activityPanel;
+	private JScrollPane activityScroller;
+	
 	
 	private JPanel registerPanel; //A panel to hold all cpu registers
 	private JPanel controlRegistersPanel1; //A panel to hold one row of control registers
@@ -80,6 +84,8 @@ public class CPUframe extends JFrame {
 	
 	private JTextArea memoryContentArea;
 	private JTextArea assemblyProgramArea;
+	
+	private JTextArea activityArea;
 	
 	private JTextField pcField;
 	private JTextField irField;
@@ -248,6 +254,39 @@ public class CPUframe extends JFrame {
 		//Assembly program panel isn't fixed size; things move when frame resied; panels not fixed size.
 		
 		/*
+		 * Activity Monitor display in panel1
+		 */
+		//JPanel activityBufferPanel = new JPanel(); //To make border equal to controlPanel above
+		activityContentPanel = new JPanel();
+		activityArea = new JTextArea(15, 30);
+		//activityArea.setMaximumSize(new Dimension(50, 50));
+		activityArea.setEditable(false);
+		//activityArea.setCaretPosition(0);
+		
+		activityScroller = new JScrollPane(activityArea);
+		
+		//activityBufferPanel.add(assemblerScroller);
+		//activityBufferPanel.setMaximumSize(new Dimension(50, 50));
+		
+		activityContentPanel.add(activityScroller);
+		//activityContentPanel.setMaximumSize(new Dimension(50, 50));
+		
+		activityPanel = new JPanel();
+		//assemblerPanel.setLayout(new BoxLayout(assemblerPanel, BoxLayout.Y_AXIS));
+		activityPanel.add(activityContentPanel);	
+		//activityPanel.setMaximumSize(new Dimension(200, 200));
+		//activityPanel.setAlignmentX(LEFT_ALIGNMENT);
+		//activityPanel.setAlignmentY(BOTTOM_ALIGNMENT);
+		//activityContentPanel.setMaximumSize(new Dimension(50, 50));
+		
+		
+		activityContentPanel.setBorder(BorderFactory.createTitledBorder(" Activity Monitor "));
+		activityContentPanel.setAlignmentX(LEFT_ALIGNMENT);
+		
+		panel1.add(activityPanel);
+		
+		
+		/*
 		 * CPU registers
 		 */
 		
@@ -370,23 +409,9 @@ public class CPUframe extends JFrame {
 		genReg3panel.add(genRegisters[3]);
 		individualPanel1.add(genReg3panel);
 		
-		
-//		/*
-//		 * Automated gen register creation.
-//		 */
-//		for (int i = 0; i < 4; i++) {
-//			
-//			JLabel regLabel = new JLabel("0" + i);
-//			JTextField genRegister = new JTextField(4);
-//			genRegister.setEditable(false);
-//			JPanel regPanel = new JPanel();
-//			genRegister.setEditable(false);
-//			regPanel.add(regLabel);
-//			regPanel.add(genRegister);
-//			individualPanel1.add(regPanel);
-//			
-//		}
 		generalPurposePanel.add(individualPanel1);
+		
+		
 		
 		JPanel individualPanel2 = new JPanel();
 		individualPanel2.setLayout(new BoxLayout(individualPanel2, BoxLayout.Y_AXIS));
@@ -423,19 +448,6 @@ public class CPUframe extends JFrame {
 		genReg7panel.add(genRegisters[7]);
 		individualPanel2.add(genReg7panel);
 		
-		
-////		for (int i = 4; i < 8; i++) {
-////			
-////			JLabel regLabel = new JLabel("0" + i);
-////			JTextField genRegister = new JTextField(4);
-////			genRegister.setEditable(false);
-////			JPanel regPanel = new JPanel();
-////			genRegister.setEditable(false);
-////			regPanel.add(regLabel);
-////			regPanel.add(genRegister);
-////			individualPanel2.add(regPanel);
-////			
-////		}
 		
 		generalPurposePanel.add(individualPanel2);
 		
@@ -474,22 +486,7 @@ public class CPUframe extends JFrame {
 		genReg11panel.add(genRegisters[11]);
 		individualPanel3.add(genReg11panel);
 		
-////		for (int i = 8; i < 12; i++) {
-////			JLabel regLabel;
-////			if (i < 10) {
-////				regLabel = new JLabel("0" + i);
-////			}
-////			else {
-////				regLabel = new JLabel("" + i);
-////			}
-////			JTextField genRegister = new JTextField(4);
-////			JPanel regPanel = new JPanel();
-////			genRegister.setEditable(false);
-////			regPanel.add(regLabel);
-////			regPanel.add(genRegister);
-////			individualPanel3.add(regPanel);
-////			
-////		}
+
 		
 		generalPurposePanel.add(individualPanel3);
 		
@@ -541,14 +538,6 @@ public class CPUframe extends JFrame {
 		/*
 		 * ALU display
 		 */
-		
-//		private JPanel aluPanel;
-//		private JPanel aluSubPanel1;
-//		private JPanel aluSubPanel2;
-//		private JPanel aluAdderPanel;
-//		private JPanel aluSubtractorPanel;
-//		private JPanel aluDivPanel;
-//		private JPanel aluMulPanel;
 		
 		aluPanel = new JPanel(); //Panel to encase the two subpanels
 		aluPanel.setLayout(new BoxLayout(aluPanel, BoxLayout.X_AXIS));
