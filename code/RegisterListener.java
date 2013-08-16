@@ -38,6 +38,11 @@ public class RegisterListener implements EventListener {
 			frame.getGenPurposeRegister(e.getRegisterReference()).setText(e.getUpdate());
 		}
 		
+		else if ((e.getSource() instanceof FetchDecodeStage) || (e.getSource() instanceof ExecuteStage) ||
+				(e.getSource() instanceof WriteBackStage)) {
+			frame.getActivityMonitor().append(e.getUpdate()); //Append new update to existing text
+		}
+		
 		/*
 		 * As a dummy object is used for ALU updates (ALU uses static methods and cannot be instantiated, so a dummy
 		 * Object instance is used) so this if statement must come last to avoid use by any other instances.
@@ -67,7 +72,7 @@ public class RegisterListener implements EventListener {
 				frame.getMulFields()[0].setText(e.getOp1().toString());
 				frame.getMulFields()[1].setText(e.getOp2().toString());
 				frame.getMulFields()[2].setText(e.getResult().toString());
-			}
+			}	
 		}
 	}
 
