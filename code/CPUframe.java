@@ -780,6 +780,11 @@ public class CPUframe extends JFrame {
 		}
 	}
 	
+	
+	/*
+	 * Clear fields upon selecting a file so that the user can run as many programs in succession
+	 * as desired.
+	 */
 	class FileOpenListener implements ActionListener {
 		
 		@Override
@@ -792,6 +797,8 @@ public class CPUframe extends JFrame {
 		            File file = fileChooser.getSelectedFile();
 		            
 		            memory.clearMemory();
+		            activityArea.setText("");
+		            controlUnit.clearRegisters();
 		           
 		            assembler = new AssemblerImpl();
 		            assembler.selectFile(file);
