@@ -33,8 +33,9 @@ public interface MainMemory {
 		
 	
 	/*
-	 * A method for use by the system bus; it prompts a memory read. The data read from a specified
-	 * address in memory is then placed on the system bus for transfer to the CPU.
+	 * A method invoked by the system bus to prompt a memory read. Data is 
+	 * read from the memory address specified by the system bus, and that data 
+	 * is then placed on the system bus for transfer to the CPU.
 	 * 
 	 * @param int address the address of the data to be read.
 	 * @return boolean true if the read is successful, false otherwise.
