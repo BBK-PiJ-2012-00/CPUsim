@@ -16,9 +16,15 @@ public class RegisterFile16 implements RegisterFile {
 	@Override
 	public void write(int index, Data data) {
 		if (index > -1 && index < 16) { //Ensure valid index (0-15)
-			generalPurposeRegisters[index] = data;
-			ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, index, data.toString());
-			updateListener.handleUpDateEvent(updateEvent);
+			if (data == null) { //Indicates clearing of register field on GUI
+				ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, index, "");
+				updateListener.handleUpDateEvent(updateEvent);				
+			}
+			else {
+				generalPurposeRegisters[index] = data;
+				ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, index, data.toString());
+				updateListener.handleUpDateEvent(updateEvent);
+			}
 		}
 		//Otherwise do nothing (throw exception?)
 	}
