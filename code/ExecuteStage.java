@@ -378,9 +378,9 @@ public abstract class ExecuteStage implements Runnable {
 			
 					 
 			case 13: //A HALT instruction (stops instruction cycle). For clarity, resets all registers.
-					 pc.setPC(0);
-					 statusRegister.write(null);
-					 ir.loadIR(null);	
+					 //pc.setPC(0);
+					 //statusRegister.write(null);
+					// ir.loadIR(null);	
 					 
 					 fireUpdate("HALT instruction decoded; end of program");
 					 return false; //Signals end of instruction cycle		
