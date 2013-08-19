@@ -31,7 +31,7 @@ public class ControlLineImpl implements ControlLine {
 	 * -1 is a non-existent memory address. Any other value (0 or greater) signifies a
 	 * transfer from CPU to the memory location specified.
 	 */
-	synchronized public boolean writeToBus(int address, Data data) { //This method now is responsibly only for writing to bus, with accessing lines
+	public synchronized boolean writeToBus(int address, Data data) { //This method now is responsibly only for writing to bus, with accessing lines
 		//delegated to deliverTo...() methods below. Better encapsulation and separation of concerns, as well as better use of bus lines.
 		if (address == -1) { //Indicates transfer from memory to CPU (2nd phase of memory read; delivery from memory to MBR)
 			//no need to place address on address bus -> if address field in AddressLine is null/0, this signifies delivery
@@ -62,6 +62,11 @@ public class ControlLineImpl implements ControlLine {
 			return memory.notify(addressBus.read());
 		}
 		return memory.notify(addressBus.read(), dataBus.read());
+	}
+	
+	
+	public String display() {
+		return null;
 	}
 	
 }
