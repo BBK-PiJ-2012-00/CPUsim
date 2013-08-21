@@ -195,7 +195,7 @@ public abstract class ExecuteStage implements Runnable {
 					Operand op2 = (Operand) genRegisters.read(ir.read().getField2());//access operand stored in second register
 					Operand result = ALU.AdditionUnit(op1, op2); //Have ALU perform operation
 					fireUpdate("Operands " + op1 + " and " + op2 + " loaded from general purpose \nregisters into ALU " +
-							"for ADD operation\n");
+							"for ADD operation: " + op1 + " + " + op2 + "\n");
 					
 					try { //Makes more sense to put the wait here than complicate write back stage
 						wait();
@@ -225,6 +225,8 @@ public abstract class ExecuteStage implements Runnable {
 					op1 = (Operand) genRegisters.read(ir.read().getField1()); //access first operand
 					op2 = (Operand) genRegisters.read(ir.read().getField2()); //access second operand
 					result = ALU.SubtractionUnit(op1, op2);
+					fireUpdate("Operands " + op1 + " and " + op2 + " loaded from general purpose \nregisters into ALU " +
+							"for SUB operation: " + op1 + " - " + op2 + "\n");
 					
 					try { //Makes more sense to put the wait here than complicate write back stage
 						wait();
@@ -235,6 +237,8 @@ public abstract class ExecuteStage implements Runnable {
 					
 					writeBackStage.receive(result);
 					writeBackStage.run();
+					fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
+					fireUpdate("Result operand " + result + " written to r" + ir.read().getField1() + " from ALU\n");
 					
 					try {
 						wait();
@@ -252,6 +256,8 @@ public abstract class ExecuteStage implements Runnable {
 					op1 = (Operand) genRegisters.read(ir.read().getField1()); //access first operand
 					op2 = (Operand) genRegisters.read(ir.read().getField2()); //access second operand
 					result = ALU.DivisionUnit(op1, op2); //op1 / op2
+					fireUpdate("Operands " + op1 + " and " + op2 + " loaded from general purpose \nregisters into ALU " +
+							"for DIV operation: " + op1 + " / " + op2 + "\n");
 					
 					try { //Makes more sense to put the wait here than complicate write back stage
 						wait();
@@ -262,6 +268,8 @@ public abstract class ExecuteStage implements Runnable {
 					
 					writeBackStage.receive(result);
 					writeBackStage.run();
+					fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
+					fireUpdate("Result operand " + result + " written to r" + ir.read().getField1() + " from ALU\n");
 					
 					try {
 						wait();
@@ -279,6 +287,8 @@ public abstract class ExecuteStage implements Runnable {
 					op1 = (Operand) genRegisters.read(ir.read().getField1()); //access first operand
 					op2 = (Operand) genRegisters.read(ir.read().getField2()); //access second operand
 					result = ALU.MultiplicationUnit(op1, op2); //op1 * op2
+					fireUpdate("Operands " + op1 + " and " + op2 + " loaded from general purpose \nregisters into ALU " +
+							"for MUL operation: " + op1 + " * " + op2 + "\n");
 					
 					try { //Makes more sense to put the wait here than complicate write back stage
 						wait();
@@ -289,6 +299,8 @@ public abstract class ExecuteStage implements Runnable {
 					
 					writeBackStage.receive(result);
 					writeBackStage.run();
+					fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
+					fireUpdate("Result operand " + result + " written to r" + ir.read().getField1() + " from ALU\n");
 					
 					try {
 						wait();
@@ -305,6 +317,7 @@ public abstract class ExecuteStage implements Runnable {
 					
 			case 8: //A BR instruction (unconditional branch to memory location in instruction field 1).
 					pc.setPC(ir.read().getField1());
+					fireUpdate("PC set to " + ir.read().getField1() + " as result of " + ir.read().getOpcode() + " operation\n");
 					
 					try {
 						wait();
