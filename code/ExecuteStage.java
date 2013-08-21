@@ -376,7 +376,8 @@ public abstract class ExecuteStage implements Runnable {
 					 }
 					 
 					 else {
-						 fireUpdate("Branch (BRE) not taken as condition code\nvalue does not equal " + ir.read().getField2() + "\n");
+						 fireUpdate("Branch (BRE) not taken as condition code\nvalue does not equal " + 
+								 genRegisters.read(ir.read().getField2()) + " (contents of r" + ir.read().getField2() + ")\n");
 						 
 						 try {
 							wait();
