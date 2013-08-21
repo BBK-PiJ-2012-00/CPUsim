@@ -142,7 +142,7 @@ public abstract class ExecuteStage implements Runnable {
 					
 					
 			case 3: //A MOVE instruction (moving data between registers)
-					this.fireUpdate("Executing MOVE instruction \n");
+					this.fireUpdate("Executing MOVE instruction: \n");
 					
 					if (ir.read().getField2() == 16) { //ConditionCodeRegister destination reference
 						statusRegister.write((Operand)genRegisters.read(ir.read().getField1())); //Write operand from source register
@@ -333,6 +333,7 @@ public abstract class ExecuteStage implements Runnable {
 			case 9: //A BRZ instruction (branch if value in status register is zero).
 					if (statusRegister.read().unwrapInteger() == 0) {
 						pc.setPC(ir.read().getField1()); //If statusRegister holds 0, set PC to new address held in instruction
+						fireUpdate("PC set to " + ir.read().getField1() + " as result of " + ir.read().getOpcode() + " operation\n");
 						
 						try {
 							wait();
@@ -347,6 +348,7 @@ public abstract class ExecuteStage implements Runnable {
 			case 10: //A SKZ instruction (skip the next instruction (increment PC by one) if status register holds 0).
 					 if (statusRegister.read().unwrapInteger() == 0) {
 						 pc.incrementPC();
+						 fireUpdate("PC set to " + ir.read().getField1() + " as result of " + ir.read().getOpcode() + " operation\n");
 						 
 						 try {
 								wait();
@@ -362,29 +364,54 @@ public abstract class ExecuteStage implements Runnable {
 			case 11: //A BRE instruction (branch if status reg. contents = contents of register ref. in instruction)
 					 int genRegRef = ir.read().getField2(); //Reference to register referred to in instruction
 					 if (statusRegister.read().equals((Operand) genRegisters.read(genRegRef))) { //If equal
-						 pc.setPC(ir.read().getField1()); //Set PC to equal address in field1 of instruction in ir	
+						 pc.setPC(ir.read().getField1()); //Set PC to equal address in field1 of instruction in ir
+						 fireUpdate("PC set to " + ir.read().getField1() + " as result of " + ir.read().getOpcode() + " operation\n");
 						 
 						 try {
 								wait();
-							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
+						 } catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						 } 
 					 }
-					 break; //If not equal, do nothing
+					 
+					 else {
+						 fireUpdate("Branch (BRE) not taken as condition code\nvalue does not equal " + ir.read().getField2() + "\n");
+						 
+						 try {
+							wait();
+						 } catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						 } 
+						 
+					 }
+					 break; //If not equal, do nothing 
 					 
 			case 12: //A BRNE instruction (branch if status reg. contents != contents of register ref. in instruction)
 					 genRegRef = ir.read().getField2(); //Reference to register referred to in instruction
 					 if (!(statusRegister.read().equals((Operand) genRegisters.read(genRegRef)))) { //If not equal
-						 pc.setPC(ir.read().getField1()); //Set PC to equal address in field1 of instruction in ir		
+						 pc.setPC(ir.read().getField1()); //Set PC to equal address in field1 of instruction in ir	
+						 fireUpdate("PC set to " + ir.read().getField1() + " as result of " + ir.read().getOpcode() + " operation\n");
 						 
 						 try {
-								wait();
-							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
+							wait();
+						 } catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						 }
 						 
+					 }
+					 
+					 else {
+						 fireUpdate("Branch (BRNE) not taken as condition code\nvalue equals " + ir.read().getField2() + "\n");
+						 
+						 try {
+							wait();
+						 } catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} 
 					 }
 					 break; //If equal, do nothing
 					 
