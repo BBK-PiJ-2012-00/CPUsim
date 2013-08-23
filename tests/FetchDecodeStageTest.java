@@ -27,6 +27,10 @@ import code.TransferInstr;
  * Better than ControlUnitTest; can test each stage separately and more in-depth.
  */
 
+/*
+ * TEST MOVE INSTRUCTION FROM CC TO GEN REG AND VICE VERSA
+ */
+
 public class FetchDecodeStageTest {
 	private FetchDecodeStage fetchDecodeStage;
 	private InstructionRegister ir;

@@ -2,6 +2,7 @@ package tests;
 
 import static org.junit.Assert.*;
 
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,6 +32,11 @@ import code.StandardWriteBackStage;
 import code.StatusRegister;
 import code.TransferInstr;
 import code.WriteBackStage;
+
+/*
+ * In order to be able to test ExecuteStage, the wait() statements need to be commented-out of
+ * the class code. Wait() is required to implement step by step execution in the GUI.
+ */
 
 public class ExecuteStageTest {
 	private FetchDecodeStage fetchDecodeStage; //Required for fetching of instructions before execution can be tested

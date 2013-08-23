@@ -16,10 +16,14 @@ public class ControlLineTest {
 	private MainMemory testMemory;
 	private BusController busController; 
 	
+	private RegisterListener updateListener; //Listener used for GUI updates
+	
 	@Before
 	public void setUp() {
 		testInstr = new TransferInstr(Opcode.STORE, 0, 0);
 		testMemory = MemoryModule.getInstance();
+		updateListener = new RegisterListener(new CPUframe()); //Added to test to check proper instantiation (no nulls)
+		testMemory.registerListener(updateListener);
 		busController = SystemBusController.getInstance();
 		cLine = ((SystemBusController) busController).accessControlLine(); //This solves problem of duplicate MBR modules being
 		//created with the creation of more than one ControlLine; MBR is created upon creation of ControlLine, which would be created

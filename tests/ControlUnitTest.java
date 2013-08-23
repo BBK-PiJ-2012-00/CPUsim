@@ -7,6 +7,8 @@ package tests;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -106,7 +108,7 @@ public class ControlUnitTest {
 	@Test
 	public void fullTest() {
 		memory.clearMemory();
-		assembler.selectFile("src/assemblyPrograms/assemblerTestProgram2");
+		assembler.selectFile(new File("src/assemblyPrograms/assemblerTestProgram2"));
 		assembler.assembleCode();
 		assembler.loadToLoader();
 		((AssemblerImpl) assembler).getLoader().loadToMemory();

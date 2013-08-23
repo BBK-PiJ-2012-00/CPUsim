@@ -2,6 +2,7 @@ package tests;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,15 +18,15 @@ import code.TransferInstr;
 
 public class AssemblerTest {
 	private Assembler assembler;
-	private String testFile;
-	private String testFile2;
+	private File testFile;
+	private File testFile2;
 
 	@Before
 	public void setUp() throws Exception {
 		assembler = new AssemblerImpl();
-		testFile = "src/assemblyPrograms/assemblerTestProgram.txt";
+		testFile = new File("src/assemblyPrograms/assemblerTestProgram.txt");
 		assembler.selectFile(testFile);
-		testFile2 = "src/assemblyPrograms/assemblerTestProgram2";
+		testFile2 = new File("src/assemblyPrograms/assemblerTestProgram2");
 	}
 
 	/*
@@ -218,6 +219,16 @@ public class AssemblerTest {
 		
 		for (int i = 0; i < expected.length; i++) {
 			assertEquals(expected[i].toString(), output[i].toString());
+		}
+	}
+	
+	@Test
+	public void testDisplay() {
+		assembler.selectFile(testFile2);
+		assembler.assembleCode();
+		
+		for (int i = 0; i < assembler.getProgramString().size(); i++) {
+			System.out.println(assembler.getProgramString().get(i));
 		}
 	}
 
