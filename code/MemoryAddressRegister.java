@@ -21,5 +21,5 @@ public interface MemoryAddressRegister {
 	
 	public String display();
 
-	public void registerListener(RegisterListener registerListener);
+	public void registerListener(UpdateListener registerListener);
 }

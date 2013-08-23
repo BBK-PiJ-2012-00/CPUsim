@@ -6,7 +6,7 @@ package code;
  */
 public class MAR implements MemoryAddressRegister {
 	private static MemoryAddressRegister mar;
-	private RegisterListener updateListener;
+	private UpdateListener updateListener;
 	
 	private int registerContents;
 	
@@ -23,7 +23,7 @@ public class MAR implements MemoryAddressRegister {
 		return mar;
 	}
 	
-	public void registerListener(RegisterListener listener) {
+	public void registerListener(UpdateListener listener) {
 		this.updateListener = listener;
 	}
 	
