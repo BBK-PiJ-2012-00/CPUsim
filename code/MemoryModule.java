@@ -13,7 +13,7 @@ public class MemoryModule implements MainMemory {
 	private int pointer; //Points to next available location for storage	
 	private BusController systemBusController; //Reference to system bus
 	
-	private RegisterListener updateListener; //Will perhaps have different listener
+	private UpdateListener updateListener; //Will perhaps have different listener
 	
 	
 	
@@ -163,7 +163,7 @@ public class MemoryModule implements MainMemory {
 		return displayString;
 	}
 	
-	public void registerListener(RegisterListener listener) {
+	public void registerListener(UpdateListener listener) {
 		this.updateListener = listener;
 	}
 	
