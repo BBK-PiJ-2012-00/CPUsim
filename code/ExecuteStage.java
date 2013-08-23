@@ -326,7 +326,6 @@ public abstract class ExecuteStage implements Runnable {
 						e.printStackTrace();
 					}
 					
-					//A branch instruction updates PC to new memory location
 					break;
 					
 				
@@ -354,7 +353,7 @@ public abstract class ExecuteStage implements Runnable {
 						}						
 						
 					}
-					break; //If not 0, do nothing
+					break;
 					
 					
 			case 10: //A SKZ instruction (skip the next instruction (increment PC by one) if status register holds 0).
@@ -380,7 +379,7 @@ public abstract class ExecuteStage implements Runnable {
 								e.printStackTrace();
 						}
 					 }
-					 break; //If not 0, do nothing
+					 break;
 					 
 					 
 			case 11: //A BRE instruction (branch if status reg. contents = contents of register ref. in instruction)
@@ -397,7 +396,7 @@ public abstract class ExecuteStage implements Runnable {
 						 } 
 					 }
 					 
-					 else {
+					 else {  //If not equal, do nothing other than provide activity monitor comment to say branch not taken
 						 fireUpdate("Branch (BRE) not taken as condition code\nvalue does not equal " + 
 								 genRegisters.read(ir.read().getField2()) + " (contents of r" + ir.read().getField2() + ")\n");
 						 
@@ -409,7 +408,7 @@ public abstract class ExecuteStage implements Runnable {
 						 } 
 						 
 					 }
-					 break; //If not equal, do nothing 
+					 break; 
 					 
 			case 12: //A BRNE instruction (branch if status reg. contents != contents of register ref. in instruction)
 					 genRegRef = ir.read().getField2(); //Reference to register referred to in instruction
@@ -426,7 +425,7 @@ public abstract class ExecuteStage implements Runnable {
 						 
 					 }
 					 
-					 else {
+					 else { //If equal, do nothing other than provide activity monitor comment to say branch not taken
 						 fireUpdate("Branch (BRNE) not taken as condition code\nvalue equals " + 
 								 genRegisters.read(ir.read().getField2()) + " (contents of r" + ir.read().getField2() + ")\n");
 						 
@@ -438,7 +437,7 @@ public abstract class ExecuteStage implements Runnable {
 						}
 						 
 					 }
-					 break; //If equal, do nothing
+					 break; 
 					 
 			
 					 
@@ -457,20 +456,21 @@ public abstract class ExecuteStage implements Runnable {
 		return this.writeBackStage;
 	} 
 	
+	
 	public synchronized void run() {
 		active = this.instructionExecute(opcode);
 	}
+	
 	
 	public void setOpcodeValue(int opcode) {
 		this.opcode = opcode;
 	}
 	
+	
 	public boolean isActive() {
 		return this.active;
 	}
 	
-	
-	//public abstract void receive(int opcode);
 	
 	public abstract void forward(Operand result); //For forwarding execution to WriteBackStage
 	
@@ -485,11 +485,6 @@ public abstract class ExecuteStage implements Runnable {
 	
 
 	
-		//what about data loaded into MBR that is data (operand) as opposed to instruction; loaded straight to a register
-		//http://comminfo.rutgers.edu/~muresan/201_JavaProg/11CPU/Lecture11.pdf
-		//have methods to represent storeExecuteCycle, loadExecuteCycle etc, depending on decode of fetched instruction
-		//This is instruction fetch -> only covers fetching of an instruction, not its execution; fetching data from memory
-		//will be part of executing a LOAD instruction, which occurs in execute. Decode determines nature of instruction; 
-		//instructionDecode() method.
+		
 
 }
