@@ -2,7 +2,7 @@ package code;
 
 public class PC implements ProgramCounter {
 	private int nextInstructionPointer; //address of the next instruction to be fetched
-	private RegisterListener updateListener;
+	private UpdateListener updateListener;
 	
 	public int getValue() {
 		return nextInstructionPointer;
@@ -26,7 +26,7 @@ public class PC implements ProgramCounter {
 		return display;
 	}
 	
-	public void registerListener(RegisterListener listener) {
+	public void registerListener(UpdateListener listener) {
 		this.updateListener = listener;
 	}
 	

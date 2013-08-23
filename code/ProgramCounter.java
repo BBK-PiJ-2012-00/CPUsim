@@ -23,7 +23,7 @@ public interface ProgramCounter {
 	 */
 	public void setPC(int address);
 	
-	public void registerListener(RegisterListener listener);
+	public void registerListener(UpdateListener listener);
 	
 	public String display();
 
