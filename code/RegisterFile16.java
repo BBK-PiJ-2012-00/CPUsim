@@ -10,7 +10,7 @@ package code;
 public class RegisterFile16 implements RegisterFile {
 	private Data[] generalPurposeRegisters = new Data[16]; //Enables general purpose registers to hold multiple data types
 	//Should this be of type Operand?
-	private RegisterListener updateListener; //to handle update events every time a register is updated
+	private UpdateListener updateListener; //to handle update events every time a register is updated
 	
 	
 	@Override
@@ -39,7 +39,7 @@ public class RegisterFile16 implements RegisterFile {
 	}
 	
 	@Override
-	public void registerListener(RegisterListener listener) {
+	public void registerListener(UpdateListener listener) {
 		this.updateListener = listener;		
 	}
 	
