@@ -342,6 +342,18 @@ public abstract class ExecuteStage implements Runnable {
 							e.printStackTrace();
 						}
 					}
+					
+					else { //If condition code register doesn't hold 0, provide activity monitor comment to say branch not taken
+						fireUpdate("Branch (BRZ) not taken as condition code\nvalue does not equal 0\n");
+						
+						try {
+							wait();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}						
+						
+					}
 					break; //If not 0, do nothing
 					
 					
@@ -355,8 +367,18 @@ public abstract class ExecuteStage implements Runnable {
 							} catch (InterruptedException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
-							}
+							}						 
+					 }
+					 
+					 else { //If condition code register does not hold value of 0, provide activity monitor comment to say skip not taken
+						 fireUpdate("Skip (SKZ) instruction not executed as condition\ncode value does not equal 0\n");
 						 
+						 try {
+								wait();
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+						}
 					 }
 					 break; //If not 0, do nothing
 					 
@@ -405,14 +427,16 @@ public abstract class ExecuteStage implements Runnable {
 					 }
 					 
 					 else {
-						 fireUpdate("Branch (BRNE) not taken as condition code\nvalue equals " + ir.read().getField2() + "\n");
+						 fireUpdate("Branch (BRNE) not taken as condition code\nvalue equals " + 
+								 genRegisters.read(ir.read().getField2()) + " (contents of r" + ir.read().getField2() + ")\n");
 						 
 						 try {
 							wait();
 						 } catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
-						} 
+						}
+						 
 					 }
 					 break; //If equal, do nothing
 					 
