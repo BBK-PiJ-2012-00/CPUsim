@@ -100,7 +100,7 @@ public class MemoryModule implements MainMemory {
 	}
 	
 	
-	public boolean notify(int address, Data data) { //Method to prompt memory to receive data from system bus (write)
+	public boolean notifyWrite(int address, Data data) { //Method to prompt memory to receive data from system bus (write)
 		//No checking of address being empty or not; up to programmer
 		if (address < 100 && address >= 0) {
 			MEMORY[address] = data;
@@ -112,7 +112,7 @@ public class MemoryModule implements MainMemory {
 		return false;
 	}
 	
-	public boolean notify(int address) { //Absence of data indicates requested memory read as opposed to write (as in reality)
+	public boolean notifyRead(int address) { //Absence of data indicates requested memory read as opposed to write (as in reality)
 		Data dataRead;
 		if (address < 100 && address >=0) {
 			if (MEMORY[address] == null) {

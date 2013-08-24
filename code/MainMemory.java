@@ -28,7 +28,7 @@ public interface MainMemory {
 	 *  @param Data data the data to be written from the data line to memory.
 	 *  @return boolean true if the write is successful, false otherwise.
 	 */
-	public boolean notify(int address, Data data); //Method to prompt memory to receive data from system bus (write)
+	public boolean notifyWrite(int address, Data data); //Method to prompt memory to receive data from system bus (write)
 		//No checking of address being empty or not; up to programmer
 		
 	
@@ -40,7 +40,7 @@ public interface MainMemory {
 	 * @param int address the address of the data to be read.
 	 * @return boolean true if the read is successful, false otherwise.
 	 */
-	public boolean notify(int address); //Absence of data indicates requested memory read as opposed to write (as in reality)
+	public boolean notifyRead(int address); //Absence of data indicates requested memory read as opposed to write (as in reality)
 		//Must return data to system bus for transfer back to cpu
 	
 	
