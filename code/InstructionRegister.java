@@ -20,7 +20,7 @@ public interface InstructionRegister {
 	 */
 	public Instruction read();
 	
-	public void registerListener(RegisterListener listener);
+	public void registerListener(UpdateListener listener);
 	
 	public void clear();
 	
