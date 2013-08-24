@@ -22,6 +22,7 @@ import code.PC;
 import code.ProgramCounter;
 import code.StandardFetchDecodeStage;
 import code.TransferInstr;
+import code.UpdateListener;
 
 /*
  * Better than ControlUnitTest; can test each stage separately and more in-depth.
@@ -59,12 +60,21 @@ public class FetchDecodeStageTest {
 
 	@Before
 	public void setUp() throws Exception {
+		/*
+		 * Listeners are added to all classes that use a listener to prevent null exceptions 
+		 * during testing (serve no functional purpose here).
+		 */
 		pc = new PC();
+		pc.registerListener(new UpdateListener(new TestFrame()));
 		ir = new IR();
+		ir.registerListener(new UpdateListener(new TestFrame()));
+		
 		
 		fetchDecodeStage = new StandardFetchDecodeStage(ir, pc);
+		fetchDecodeStage.registerListener(new UpdateListener(new TestFrame()));
 		
 		memory = MemoryModule.getInstance();
+		memory.registerListener(new UpdateListener(new TestFrame()));
 		
 		testInstrSTORE = new TransferInstr(Opcode.STORE, 0, 99); //source r0, destination address 99
 		testInstrLOAD = new TransferInstr(Opcode.LOAD, 50, 0); //Load contents of address 50 to register 0
@@ -83,7 +93,7 @@ public class FetchDecodeStageTest {
 		
 		testInstrHALT = new HaltInstr(Opcode.HALT); //Halt instruction 
 		
-		memory.notify(50, new OperandImpl(1000)); //Load operand (integer) 1000 to memory address 50		
+		memory.notifyWrite(50, new OperandImpl(1000)); //Load operand (integer) 1000 to memory address 50		
 	}
 
 	/*
