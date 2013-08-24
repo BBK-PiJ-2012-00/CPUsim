@@ -14,7 +14,7 @@ package code;
 public class MBR implements MemoryBufferRegister {
 	private static MemoryBufferRegister MBRinstance;
 	private Data registerContents;
-	private RegisterListener updateListener;
+	private UpdateListener updateListener;
 	
 	private MBR() {
 		//Constructor only explicitly referenced in order to make it private, preventing instantiation
@@ -59,7 +59,7 @@ public class MBR implements MemoryBufferRegister {
 	}
 
 	@Override
-	public void registerListener(RegisterListener listener) {
+	public void registerListener(UpdateListener listener) {
 		this.updateListener = listener;
 		
 	}
