@@ -46,7 +46,23 @@ public class ControlUnitTest {
 	@Before
 	public void setUp() throws Exception {
 		memory = MemoryModule.getInstance();
+		memory.registerListener(new UpdateListener(new TestFrame()));
+		
+		/*
+		 * Listeners are registered with control unit registers to prevent null pointer exceptions during testing,
+		 * although they serve no purpose here.
+		 */
 		controlUnit = new ControlUnitImpl(false); //False parameter deactivates pipelining
+		controlUnit.getPC().registerListener(new UpdateListener(new TestFrame())); 
+		controlUnit.getIR().registerListener(new UpdateListener(new TestFrame()));
+		controlUnit.getRegisters().registerListener(new UpdateListener(new TestFrame()));
+		//controlUnit.getStatusRegister().registerListener(new UpdateListener(new TestFrame()));
+		MBR.getInstance().registerListener(new UpdateListener(new TestFrame()));
+		MAR.getInstance().registerListener(new UpdateListener(new TestFrame()));
+		
+		controlUnit.getFetchDecodeStage().registerListener(new UpdateListener(new TestFrame()));
+		controlUnit.getExecuteStage().registerListener(new UpdateListener(new TestFrame()));
+	
 		assembler = new AssemblerImpl();
 		loader = new LoaderImpl();
 		
@@ -71,7 +87,7 @@ public class ControlUnitTest {
 		
 		testInstrHALT = new HaltInstr(Opcode.HALT); //Halt instruction 
 		
-		memory.notify(50, new OperandImpl(1000)); //Load operand (integer) 1000 to memory address 50
+		memory.notifyWrite(50, new OperandImpl(1000)); //Load operand (integer) 1000 to memory address 50
 		
 	}
 	
@@ -80,13 +96,13 @@ public class ControlUnitTest {
 	 */
 	@Test
 	public void activateTest() { //Test activate() of ControlUnit, which triggers instruction cycle
-		memory.notify(0, testInstrLOAD_2); //Put LOAD instruction into memory addr 0
-		memory.notify(1, testInstrLOAD_4); //Put LOAD instruction into memory addr 1
-		memory.notify(2, testInstrADD); //Load ADD instruction to memory addr 2
-		memory.notify(3, testInstrSTORE_7); //Load STORE instruction to memory addr 3
-		memory.notify(4, testInstrHALT); //Load HALT instruction to memory addr 4
-		memory.notify(5, new OperandImpl(10)); //Load operand 10 to memory address 5
-		memory.notify(6, new OperandImpl(20)); //Load operand 20 to memory address 6
+		memory.notifyWrite(0, testInstrLOAD_2); //Put LOAD instruction into memory addr 0
+		memory.notifyWrite(1, testInstrLOAD_4); //Put LOAD instruction into memory addr 1
+		memory.notifyWrite(2, testInstrADD); //Load ADD instruction to memory addr 2
+		memory.notifyWrite(3, testInstrSTORE_7); //Load STORE instruction to memory addr 3
+		memory.notifyWrite(4, testInstrHALT); //Load HALT instruction to memory addr 4
+		memory.notifyWrite(5, new OperandImpl(10)); //Load operand 10 to memory address 5
+		memory.notifyWrite(6, new OperandImpl(20)); //Load operand 20 to memory address 6
 		
 		//Result of this instruction cycle should be that a value of 30 is stored in memory address 4
 		controlUnit.activate();
