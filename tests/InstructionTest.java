@@ -47,7 +47,7 @@ public class InstructionTest {
 	public void transferInstrToStringTest() {
 		instr = new TransferInstr(Opcode.STORE, 0, 0);
 		String output = instr.toString();
-		String expected = "STORE 0 0";
+		String expected = "STORE r0 0";
 		assertEquals(expected, output);
 	}
 	
@@ -107,7 +107,7 @@ public class InstructionTest {
 	public void arithmeticInstrToStringTest() { //Tests toString()
 		instr = new ArithmeticInstr(Opcode.DIV, 0, 5);
 		String output = instr.toString();
-		String expected = "DIV 0 5";
+		String expected = "DIV r0 r5";
 		assertEquals(expected, output);
 	}
 	
@@ -166,7 +166,7 @@ public class InstructionTest {
 	public void branchInstrToStringTest() {
 		instr = new BranchInstr(Opcode.BRZ, 99);
 		String output = instr.toString();
-		String expected = "BRZ 63"; //99 in decimal is 63 in hex
+		String expected = "BRZ 99";
 		assertEquals(expected, output);
 	}
 	
@@ -224,7 +224,7 @@ public class InstructionTest {
 	public void branchInstrToStringTest_BRE() {
 		instr = new BranchInstr(Opcode.BRE, 5, 14);
 		String output = instr.toString();
-		String expected = "BRE 5 E";
+		String expected = "BRE 5 r14";
 		assertEquals(expected, output);
 	}
 	
