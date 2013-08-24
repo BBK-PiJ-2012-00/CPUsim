@@ -15,6 +15,8 @@ public class ALUtest {
 
 	@Before
 	public void setUp() throws Exception {
+		ALU.registerListener(new UpdateListener(new TestFrame())); //To prevent null pointers during testing
+		
 		op1 = new OperandImpl(5);
 		op2 = new OperandImpl(10);
 		op3 = new OperandImpl(20000000);
