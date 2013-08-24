@@ -16,7 +16,7 @@ public abstract class ExecuteStage implements Runnable {
 	private boolean active;
 	private int opcode;
 	
-	private RegisterListener updateListener;
+	private UpdateListener updateListener;
 	
 	
 	public ExecuteStage(InstructionRegister ir, ProgramCounter pc, RegisterFile genRegisters, Register statusRegister,
@@ -479,7 +479,7 @@ public abstract class ExecuteStage implements Runnable {
 		updateListener.handleUpDateEvent(updateEvent);
 	}
 	
-	public void registerListener(RegisterListener listener) {
+	public void registerListener(UpdateListener listener) {
 		this.updateListener = listener;
 	}
 	

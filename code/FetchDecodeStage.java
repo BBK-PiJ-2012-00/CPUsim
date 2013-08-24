@@ -17,7 +17,7 @@ public abstract class FetchDecodeStage implements Runnable {
 	
 	private int opcodeValue; //This is fetched by control unit to pass to next stage.
 	
-	private RegisterListener updateListener; //Update event listener
+	private UpdateListener updateListener; //Update event listener
 	
 	
 	public FetchDecodeStage(InstructionRegister ir, ProgramCounter pc) {
@@ -126,7 +126,7 @@ public abstract class FetchDecodeStage implements Runnable {
 		updateListener.handleUpDateEvent(updateEvent);		
 	}
 	
-	public void registerListener(RegisterListener listener) {
+	public void registerListener(UpdateListener listener) {
 		this.updateListener = listener;
 	}
 	
