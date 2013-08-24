@@ -14,6 +14,7 @@ public class MainMemoryTest {
 	@Before
 	public void setUp() {
 		memory = MemoryModule.getInstance(); //Constructor is private, so getInstance() must be used
+		memory.registerListener(new UpdateListener(new CPUframe())); //To prevent null pointer, even though not used in test
 		testInstr = new TransferInstr(Opcode.STORE, 0, 0);
 		//Next line stores an ADD instruction to address index 7
 		memory.writeInstruction(new ArithmeticInstr(Opcode.ADD, 1, 1), 7); //Useful for testing memory read operations
@@ -35,35 +36,35 @@ public class MainMemoryTest {
 	}
 	
 	@Test
-	public void notifyTest() { //Tests notify(int address, Data data) method, to be used by SystemBus to prompt memory write
-		assertTrue(memory.notify(99, testInstr)); //Successful write should return true
+	public void notifyWriteTest() { //Tests notifyWrite(int address, Data data) method, to be used by SystemBus to prompt memory write
+		assertTrue(memory.notifyWrite(99, testInstr)); //Successful write should return true
 	}
 	
 	@Test
-	public void notifyTest2() { //Tests notify(int address, Data data) method, to be used by SystemBus to prompt memory write
-		memory.notify(99, testInstr);
+	public void notifyWriteTest2() { //Tests notifyWrite(int address, Data data) method, to be used by SystemBus to prompt memory write
+		memory.notifyWrite(99, testInstr);
 		Data expected = testInstr;
 		Data output = memory.accessAddress(99);
 		assertEquals(expected, output); //Assets that testInstr is written to address 99
 	}
 	
 	@Test
-	public void notifyTestFalseAddress() { //Tests invalid memory address; should return false
-		assertFalse(memory.notify(100, testInstr));		
+	public void notifyWriteTestFalseAddress() { //Tests invalid memory address; should return false
+		assertFalse(memory.notifyWrite(100, testInstr));		
 	}
 	
 	
 	@Test
-	public void readNotifyTest() { //Tests notify(int address), to be used by system bus (memory read).
+	public void readNotifyTest() { //Tests notifyRead(int address), to be used by system bus (memory read).
 		//Uses instruction stored at address 7 (initialised at start of test class)
-		assertTrue(memory.notify(7)); //Should return true for a successful read		
+		assertTrue(memory.notifyRead(7)); //Should return true for a successful read		
 	}
 	
 	//@Test
 	//public void readNotifyTest2() { //Test that read delivers to MBR
 		//Must first write a test value to memory address
-		//memory.notify(47, testInstr); //Writes testInstr to address 47
-		//memory.notify(47); //Reads the contents of address 47, which should be testInstr
+		//memory.notifyWrite(47, testInstr); //Writes testInstr to address 47
+		//memory.notifyRead(47); //Reads the contents of address 47, which should be testInstr
 		//IF MBR were singleton with global access point, this would be testable.
 		//Should test a memory read testing the methods that add up to make a memory read:
 		//A read consists of actions performed by control line and system bus controller; control line
@@ -73,7 +74,7 @@ public class MainMemoryTest {
 	
 	@Test
 	public void readBadNotify() { //Test a case that shouldn't work
-		assertFalse(memory.notify(100)); //100 is invalid address
+		assertFalse(memory.notifyRead(100)); //100 is invalid address
 	}
 	
 //	public boolean notify(int address) { //Absence of data indicates requested memory read as opposed to write (as in reality)
