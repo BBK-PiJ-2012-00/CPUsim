@@ -161,7 +161,7 @@ public class CPUframe extends JFrame {
 		
 		memoryContentsPanel.add(scroller); //Add text area to memory panel
 	
-		RegisterListener memoryListener = new RegisterListener(this);
+		UpdateListener memoryListener = new UpdateListener(this);
 		memory.registerListener(memoryListener);
 
 		//scroller.setBorder(BorderFactory.createTitledBorder(" Main Memory "));
@@ -273,8 +273,8 @@ public class CPUframe extends JFrame {
 		activityContentPanel.setBorder(BorderFactory.createTitledBorder(" Activity Monitor "));
 		activityPanel.setAlignmentX(LEFT_ALIGNMENT);
 		
-		controlUnit.getFetchDecodeStage().registerListener(new RegisterListener(this)); //Register a listener with FD stage
-		controlUnit.getExecuteStage().registerListener(new RegisterListener(this)); //Register a listener with Ex. stage
+		controlUnit.getFetchDecodeStage().registerListener(new UpdateListener(this)); //Register a listener with FD stage
+		controlUnit.getExecuteStage().registerListener(new UpdateListener(this)); //Register a listener with Ex. stage
 		
 		panel1.add(activityPanel);
 		
@@ -307,7 +307,7 @@ public class CPUframe extends JFrame {
 		pcPanel.add(pcField);
 		pcPanel.setBorder(BorderFactory.createTitledBorder(" PC "));
 		
-		RegisterListener registerListener = new RegisterListener(this);
+		UpdateListener registerListener = new UpdateListener(this);
 		controlUnit.getPC().registerListener(registerListener);
 		
 		irField = new JTextField(8);
@@ -708,7 +708,7 @@ public class CPUframe extends JFrame {
 		//so that bus lines touch cpu and memory
 		//Also, insert empty box with min size into panel2 to keep components at fixed heights in the panel
 		
-		ALU.registerListener(new RegisterListener(this));
+		ALU.registerListener(new UpdateListener(this));
 
 		
 		this.getContentPane().add(panel1); //Leftmost panel
@@ -863,7 +863,7 @@ public class CPUframe extends JFrame {
 	
 	/*
 	 * Rather than 12 individual getters for ALU text fields, it is more concise to
-	 * add the fields to arrays for handling by RegisterListener. 
+	 * add the fields to arrays for handling by UpdateListener. 
 	 */
 	
 	public JTextField[] getAddFields() {
@@ -902,7 +902,7 @@ public class CPUframe extends JFrame {
 		return mulFields;
 	}
 	
-	public JTextField[] getAllAluFields() { //Used for reset (called by RegisterListener)
+	public JTextField[] getAllAluFields() { //Used for reset (called by UpdateListener)
 		JTextField[] aluFields = new JTextField[12];
 		aluFields[0] = addOperand1;
 		aluFields[1] = addOperand2;

@@ -5,7 +5,7 @@ package code;
  * addition unit, multiplication unit etc.
  */
 public class ALU {
-	private static RegisterListener updateListener;
+	private static UpdateListener updateListener;
 	
 	private ALU() { //To prevent instantiation; all methods are static (as ALU is like a utility class)
 		super();
@@ -56,7 +56,7 @@ public class ALU {
 		return result;
 	}
 	
-	public static void registerListener(RegisterListener listener) {
+	public static void registerListener(UpdateListener listener) {
 		updateListener = listener;
 	}
 	
