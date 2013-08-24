@@ -59,9 +59,9 @@ public class ControlLineImpl implements ControlLine {
 	
 	public boolean deliverToMemory(boolean isRead) { //If isRead, first stage of read operation, otherwise write.
 		if (isRead) {
-			return memory.notify(addressBus.read());
+			return memory.notifyRead(addressBus.read());
 		}
-		return memory.notify(addressBus.read(), dataBus.read());
+		return memory.notifyWrite(addressBus.read(), dataBus.read());
 	}
 	
 	
