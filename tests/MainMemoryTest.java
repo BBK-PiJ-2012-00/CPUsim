@@ -58,24 +58,15 @@ public class MainMemoryTest {
 	public void readNotifyTest() { //Tests notifyRead(int address), to be used by system bus (memory read).
 		//Uses instruction stored at address 7 (initialised at start of test class)
 		assertTrue(memory.notifyRead(7)); //Should return true for a successful read		
-	}
-	
-	//@Test
-	//public void readNotifyTest2() { //Test that read delivers to MBR
-		//Must first write a test value to memory address
-		//memory.notifyWrite(47, testInstr); //Writes testInstr to address 47
-		//memory.notifyRead(47); //Reads the contents of address 47, which should be testInstr
-		//IF MBR were singleton with global access point, this would be testable.
-		//Should test a memory read testing the methods that add up to make a memory read:
-		//A read consists of actions performed by control line and system bus controller; control line
-		//already tested fine, now need to test system bus controller.
-		
+	}		
 	
 	
 	@Test
 	public void readBadNotify() { //Test a case that shouldn't work
 		assertFalse(memory.notifyRead(100)); //100 is invalid address
 	}
+	
+
 	
 //	public boolean notify(int address) { //Absence of data indicates requested memory read as opposed to write (as in reality)
 //		Data dataRead;

@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import code.MemoryAddressRegister;
 import code.MAR;
+import code.UpdateListener;
 
 public class MARtest {
 	private MemoryAddressRegister mar;
@@ -14,6 +15,7 @@ public class MARtest {
 	@Before
 	public void setUp() {
 		mar = MAR.getInstance();
+		mar.registerListener(new UpdateListener(new TestFrame()));
 	}
 	
 	@Test
