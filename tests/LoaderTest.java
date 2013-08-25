@@ -14,6 +14,7 @@ import code.Instruction;
 import code.TransferInstr;
 import code.ArithmeticInstr;
 import code.Opcode;
+import code.UpdateListener;
 
 public class LoaderTest {
 	private Loader loader;
@@ -24,6 +25,7 @@ public class LoaderTest {
 	public void setUp() throws Exception {
 		loader = new LoaderImpl();
 		memory = MemoryModule.getInstance();
+		memory.registerListener(new UpdateListener(new TestFrame())); //To prevent null pointer exception during testing
 		testProgram = new Data[3];
 		testProgram[0] = new TransferInstr(Opcode.LOAD, 0, 0);
 		testProgram[1] = new TransferInstr(Opcode.LOAD, 1, 1);
