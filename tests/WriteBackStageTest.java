@@ -15,6 +15,7 @@ import code.OperandImpl;
 import code.RegisterFile;
 import code.RegisterFile16;
 import code.StandardWriteBackStage;
+import code.UpdateListener;
 import code.WriteBackStage;
 
 public class WriteBackStageTest {
@@ -32,7 +33,9 @@ public class WriteBackStageTest {
 	@Before
 	public void setUp() throws Exception {
 		ir = new IR();
+		ir.registerListener(new UpdateListener(new TestFrame())); //Dummy listeners instantiated to prevent null pointer exception
 		genRegisters = new RegisterFile16();
+		genRegisters.registerListener(new UpdateListener(new TestFrame()));
 		
 		writeBackStage = new StandardWriteBackStage(ir, genRegisters);	
 		
