@@ -17,6 +17,7 @@ public class SystemBusControllerTest {
 	public void setUp() {
 		sysBusController = SystemBusController.getInstance();
 		memory = MemoryModule.getInstance();
+		memory.registerListener(new UpdateListener(new TestFrame())); //To prevent null pointer exceptions
 		testInstr = new BranchInstr(Opcode.BR, 0);
 	}
 
