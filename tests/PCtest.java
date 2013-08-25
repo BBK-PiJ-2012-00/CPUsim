@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import code.ProgramCounter;
 import code.PC;
+import code.UpdateListener;
 
 public class PCtest {
 	private ProgramCounter pc;
@@ -14,6 +15,7 @@ public class PCtest {
 	@Before
 	public void setUp() throws Exception {
 		pc = new PC();
+		pc.registerListener(new UpdateListener(new TestFrame()));
 	}
 
 	@Test
