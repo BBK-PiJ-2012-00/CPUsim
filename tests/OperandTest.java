@@ -87,7 +87,7 @@ public class OperandTest {
 	@Test
 	public void testIntegerToString() {
 		intOp = new OperandImpl(5);
-		assertEquals("5", intOp.toString());
+		assertEquals("#5", intOp.toString());
 	}
 	
 	@Test
