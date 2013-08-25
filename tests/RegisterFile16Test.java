@@ -11,6 +11,7 @@ import code.OperandImpl;
 import code.RegisterFile;
 import code.RegisterFile16;
 import code.ControlUnitImpl;
+import code.UpdateListener;
 
 public class RegisterFile16Test {
 	RegisterFile registers;
@@ -20,6 +21,7 @@ public class RegisterFile16Test {
 	@Before
 	public void setUp() throws Exception {
 		registers = new RegisterFile16();
+		registers.registerListener(new UpdateListener(new TestFrame())); //To prevent null pointer exception during testing
 		testOperand = new OperandImpl(10);
 	}
 	
