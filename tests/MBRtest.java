@@ -14,6 +14,7 @@ public class MBRtest {
 	@Before
 	public void setUp() {
 		mbr = MBR.getInstance();
+		mbr.registerListener(new UpdateListener(new TestFrame())); //To prevent null pointer exceptions during testing
 		testInstr = new TransferInstr(Opcode.MOVE, 0, 0);
 	}
 	
