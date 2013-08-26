@@ -4,7 +4,6 @@ package code;
  * An interface to represent main memory. Main memory is implemented as an array of 100 slots, each
  * with the capacity for values up to 2^32 (to reflect the fact that the simulator is 32-bit). 
  * 
- * Main memory is in this case a singleton, despite that in reality memory modules can be swapped in and out.
  */
 
 public interface MainMemory {
@@ -58,27 +57,8 @@ public interface MainMemory {
 	public void registerListener(UpdateListener listener);
 	
 	public String display();
-		
 	
-	//Has reference to memory port(s) -> one for input, one for output, or perhaps several for pipelining
-	//Ports can deal with interface to bus
-	
-	//Memory addresses themselves are represented as indexes on an array(list)
-	//Simple array --> no ordering, no moving items up when items are deleted, no growth: fixed size
-	
-	//Accessor/mutator methods can be synchronized to deal with concurrency issues brought about by
-	//pipelining
-	
-	
-	
-	/*
-	 * A wrapper class (Operand) is employed for all other data types (i.e. data that isn't an instructions): This
-	 * avoids using an array of Object, which would entail casting and no security with regard
-	 * to what can be added to the array.
-	 */
-	
-	
-	
+	public void registerBusController(BusController systemBusController);
 	
 
 }
