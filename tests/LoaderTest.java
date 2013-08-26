@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import code.CPUbuilder;
 import code.Data;
 import code.Loader;
 import code.LoaderImpl;
@@ -23,8 +24,9 @@ public class LoaderTest {
 
 	@Before
 	public void setUp() throws Exception {
-		loader = new LoaderImpl();
-		memory = MemoryModule.getInstance();
+		CPUbuilder builder = new CPUbuilder(false);
+		loader = builder.getLoader();
+		memory = builder.getMemoryModule();
 		memory.registerListener(new UpdateListener(new TestFrame())); //To prevent null pointer exception during testing
 		testProgram = new Data[3];
 		testProgram[0] = new TransferInstr(Opcode.LOAD, 0, 0);
@@ -55,6 +57,8 @@ public class LoaderTest {
 			assertEquals(testProgram[i].toString(), memory.accessAddress(i).toString());
 		}
 	}
+	
+	//Test clear!!
 	
 }
 	
