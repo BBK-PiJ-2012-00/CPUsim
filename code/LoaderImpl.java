@@ -9,8 +9,7 @@ import java.util.List;
  */
 public class LoaderImpl implements Loader {
 	private MainMemory memory = MemoryModule.getInstance();
-	//private List<Data> codeBuffer = new ArrayList<Data>(); //To buffer code coming in from memory (amount not known in advance)
-	//ArrayList grows as required, making it more suitable than an array
+	
 	private Data[] programCode; //An array to represent the program to be loaded into memory
 	
 	public void load(Data[] assembledCode) { //For loading code from assmebler to loader
@@ -22,13 +21,16 @@ public class LoaderImpl implements Loader {
 			System.out.println(d.toString());
 		}
 		//this.programCode = codeBuffer.toArray(new Data[codeBuffer.size()]); //Convert codeBuffer to standard array
-		memory.resetPointer(); //This can be removed if relocatable addressing is implemented, then more than one program can be
-		//loaded
+		memory.resetPointer(); //Set memory pointer back to 0
 		memory.loadMemory(programCode);		
 	}
 	
 	public Data[] getProgramCode() {
 		return this.programCode;
+	}
+	
+	public void clear() {
+		this.programCode = null;
 	}
 	
 

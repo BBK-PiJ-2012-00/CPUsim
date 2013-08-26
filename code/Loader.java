@@ -14,5 +14,8 @@ public interface Loader {
 	public void loadToMemory();
 	
 	public Data[] getProgramCode();
+	
+	public void clear();
+	
 
 }
