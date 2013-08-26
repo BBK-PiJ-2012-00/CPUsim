@@ -17,19 +17,28 @@ public class MemoryModule implements MainMemory {
 	
 	
 	
-	private MemoryModule() { //Memory is a singleton to prevent duplicates and inconsistency
-		//systemBus = SystemBus.getInstance(); //This causes stack overflow error; SystemBus creates new controlLine,
-		//which in turn creates new memory module, which creates a new systemBus... until call stack overflows.
+//	private MemoryModule() { //Memory is a singleton to prevent duplicates and inconsistency
+//		//systemBus = SystemBus.getInstance(); //This causes stack overflow error; SystemBus creates new controlLine,
+//		//which in turn creates new memory module, which creates a new systemBus... until call stack overflows.
+//		MEMORY = new Data[100];
+//		pointer = 0;
+//	}
+	
+	public MemoryModule() {
 		MEMORY = new Data[100];
 		pointer = 0;
 	}
 	
-	public synchronized static MainMemory getInstance() {
-		if (memoryModule == null) {
-			memoryModule = new MemoryModule();
-		}
-		return memoryModule;
+	public void registerBusController(BusController systemBusController) {
+		this.systemBusController = systemBusController;
 	}
+	
+//	public synchronized static MainMemory getInstance() {
+//		if (memoryModule == null) {
+//			memoryModule = new MemoryModule();
+//		}
+//		return memoryModule;
+//	}
 	
 	
 	public int getPointer() {
@@ -79,10 +88,6 @@ public class MemoryModule implements MainMemory {
 	 * be put together into one large array to be passed to this method). 
 	 */
 	public void loadMemory(Data[] programCode) {
-	//	int pointerValue = pointer; //Pointer value before loading program code
-	//	if (pointer != 0) {
-	//		pointerValue = pointer; //Save value of pointer so that PC can be set to start address of program, if not 0
-	//	}
 		for (Data line : programCode) {
 			MEMORY[pointer] = line; //Load pointer location with line of program code
 			//System.out.println(MEMORY[pointer].toString());
@@ -90,9 +95,6 @@ public class MemoryModule implements MainMemory {
 		}
 		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, display());
 		updateListener.handleUpDateEvent(updateEvent);
-	//	if (pointerValue != 0) { //Set PC to start address, if not 0 (PC set to 0 by default)
-			
-	//	}
 	}
 	
 	public void setPC() { //Method to send start address of program code via system bus to set PC before execution begins
@@ -121,7 +123,7 @@ public class MemoryModule implements MainMemory {
 			else {
 				dataRead = MEMORY[address];
 			}
-			systemBusController = SystemBusController.getInstance(); //Putting this here breaks awkward creation chain, and is of no consequence 
+			//systemBusController = SystemBusController.getInstance(); //Putting this here breaks awkward creation chain, and is of no consequence 
 			//as there is only ever one system bus instance with global access point.
 			
 			//As this is all performed by the same thread, there should be no issue
