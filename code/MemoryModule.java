@@ -6,7 +6,6 @@ package code;
  */
 
 public class MemoryModule implements MainMemory {
-	private static MainMemory memoryModule = null; //Keeps track of singleton
 	
 	//Array full of null values to start with - should it be initialised to hold 0s (to avoid null pointer exception)?
 	private final Data[] MEMORY; //Array representing main memory itself/
@@ -15,14 +14,7 @@ public class MemoryModule implements MainMemory {
 	
 	private UpdateListener updateListener; //Will perhaps have different listener
 	
-	
-	
-//	private MemoryModule() { //Memory is a singleton to prevent duplicates and inconsistency
-//		//systemBus = SystemBus.getInstance(); //This causes stack overflow error; SystemBus creates new controlLine,
-//		//which in turn creates new memory module, which creates a new systemBus... until call stack overflows.
-//		MEMORY = new Data[100];
-//		pointer = 0;
-//	}
+
 	
 	public MemoryModule() {
 		MEMORY = new Data[100];
@@ -32,13 +24,6 @@ public class MemoryModule implements MainMemory {
 	public void registerBusController(BusController systemBusController) {
 		this.systemBusController = systemBusController;
 	}
-	
-//	public synchronized static MainMemory getInstance() {
-//		if (memoryModule == null) {
-//			memoryModule = new MemoryModule();
-//		}
-//		return memoryModule;
-//	}
 	
 	
 	public int getPointer() {
