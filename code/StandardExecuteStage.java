@@ -2,11 +2,9 @@ package code;
 
 public class StandardExecuteStage extends ExecuteStage {
 
-	public StandardExecuteStage(InstructionRegister ir, ProgramCounter pc,
-			RegisterFile genRegisters, Register statusRegister,
-			WriteBackStage writeBackStage) {
-		super(ir, pc, genRegisters, statusRegister, writeBackStage);
-		// TODO Auto-generated constructor stub
+	public StandardExecuteStage(BusController systemBus, InstructionRegister ir, ProgramCounter pc,	RegisterFile genRegisters,
+			Register statusRegister, WriteBackStage writeBackStage, MemoryBufferRegister mbr, MemoryAddressRegister mar) {
+		super(systemBus, ir, pc, genRegisters, statusRegister, writeBackStage, mbr, mar);
 	}
 	
 //	@Override
@@ -17,6 +15,7 @@ public class StandardExecuteStage extends ExecuteStage {
 	@Override
 	public void forward(Operand result) {
 		this.getWriteBackStage().receive(result);
+		this.getWriteBackStage().run();
 	}
 
 }
