@@ -16,7 +16,7 @@ public class MBR implements MemoryBufferRegister {
 	private Data registerContents;
 	private UpdateListener updateListener;
 	
-	private MBR() {
+	public MBR() {
 		//Constructor only explicitly referenced in order to make it private, preventing instantiation
 		//from outside the class.
 		super(); //Calls default Object constructor.

@@ -10,7 +10,7 @@ public class MAR implements MemoryAddressRegister {
 	
 	private int registerContents;
 	
-	private MAR() {
+	public MAR() {
 		super();
 		//Constructor only made explicit so that it can be made private, enforcing singleton.
 	}
