@@ -51,6 +51,14 @@ public class InstructionTest {
 		assertEquals(expected, output);
 	}
 	
+	@Test
+	public void transferInstrToStringTest2() { //Test moving to condition code register
+		instr = new TransferInstr(Opcode.MOVE, 0, 16);
+		String output = instr.toString();
+		String expected = "MOVE r0 rCC";
+		assertEquals(expected, output);
+	}
+	
 	@Test 
 	public void transferInstrGetOpcodeTest() {
 		instr = new TransferInstr(Opcode.MOVE, 0, 0);
