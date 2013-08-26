@@ -41,16 +41,18 @@ public class ControlUnitImpl implements ControlUnit {
 		
 		//mbr = MBR.getInstance();
 		this.mbr = mbr;
-		mar = MAR.getInstance();
+		mar = new MAR();
 		genRegisters = new RegisterFile16();
 		pc = new PC();
 		ir = new IR();
+		System.out.println("IR hashcode control unit: "+ ir.hashCode());
 		statusRegister = new StatusRegister();
 		
 		if (!pipeliningMode) { //If not pipelined, create standard stages
 			fetchDecodeStage = new StandardFetchDecodeStage(this.systemBus, mar, this.mbr, ir, pc);
 			writeBackStage = new StandardWriteBackStage(ir, genRegisters);
-			executeStage = new StandardExecuteStage(ir, pc, genRegisters, statusRegister, writeBackStage);	
+			executeStage = new StandardExecuteStage(this.systemBus, ir, pc, genRegisters, statusRegister, writeBackStage,
+					this.mbr, mar);	
 		}
 		
 		if (pipeliningMode) { //Queues only required if pipelining enabled
@@ -59,29 +61,29 @@ public class ControlUnitImpl implements ControlUnit {
 		
 	}
 	
-	public ControlUnitImpl(boolean pipeliningMode) {
-		this.pipeliningMode = pipeliningMode;
-		
-		systemBus = SystemBusController.getInstance();
-		
-		mbr = MBR.getInstance();
-		mar = MAR.getInstance();
-		genRegisters = new RegisterFile16();
-		pc = new PC();
-		ir = new IR();
-		statusRegister = new StatusRegister();
-		
-		if (!pipeliningMode) { //If not pipelined, create standard stages
-			fetchDecodeStage = new StandardFetchDecodeStage(systemBus, mar, mbr, ir, pc);
-			writeBackStage = new StandardWriteBackStage(ir, genRegisters);
-			executeStage = new StandardExecuteStage(ir, pc, genRegisters, statusRegister, writeBackStage);	
-		}
-		
-		if (pipeliningMode) { //Queues only required if pipelining enabled
-			fetchToExecuteQueue = new SynchronousQueue<Integer>();
-		}
-		
-	}
+//	public ControlUnitImpl(boolean pipeliningMode) {
+//		this.pipeliningMode = pipeliningMode;
+//		
+//		systemBus = SystemBusController.getInstance();
+//		
+//		mbr = MBR.getInstance();
+//		mar = MAR.getInstance();
+//		genRegisters = new RegisterFile16();
+//		pc = new PC();
+//		ir = new IR();
+//		statusRegister = new StatusRegister();
+//		
+//		if (!pipeliningMode) { //If not pipelined, create standard stages
+//			fetchDecodeStage = new StandardFetchDecodeStage(systemBus, mar, mbr, ir, pc);
+//			writeBackStage = new StandardWriteBackStage(ir, genRegisters);
+//			executeStage = new StandardExecuteStage(ir, pc, genRegisters, statusRegister, writeBackStage);	
+//		}
+//		
+//		if (pipeliningMode) { //Queues only required if pipelining enabled
+//			fetchToExecuteQueue = new SynchronousQueue<Integer>();
+//		}
+//		
+//	}
 	
 	public boolean isActive() {
 		return this.active;
@@ -127,7 +129,7 @@ public class ControlUnitImpl implements ControlUnit {
 		for (int i = 0; i < 16; i++) {
 			genRegisters.write(i, null); //Set each general purpose register to null, clearing them			
 		}
-		//STATUS REGISTER!		
+		statusRegister.write(null);		
 	}
 	
 	/*
