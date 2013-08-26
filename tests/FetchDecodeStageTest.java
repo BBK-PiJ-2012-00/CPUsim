@@ -3,10 +3,13 @@ package tests;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import code.ArithmeticInstr;
 import code.BranchInstr;
+import code.BusController;
+import code.CPUbuilder;
 import code.ControlUnit;
 import code.ControlUnitImpl;
 import code.FetchDecodeStage;
@@ -14,7 +17,11 @@ import code.HaltInstr;
 import code.IR;
 import code.Instruction;
 import code.InstructionRegister;
+import code.MAR;
+import code.MBR;
 import code.MainMemory;
+import code.MemoryAddressRegister;
+import code.MemoryBufferRegister;
 import code.MemoryModule;
 import code.Opcode;
 import code.OperandImpl;
@@ -64,16 +71,23 @@ public class FetchDecodeStageTest {
 		 * Listeners are added to all classes that use a listener to prevent null exceptions 
 		 * during testing (serve no functional purpose here).
 		 */
-		pc = new PC();
+		CPUbuilder builder = new CPUbuilder(false);
+		MemoryAddressRegister mar = builder.getControlUnit().getMAR();
+		mar.registerListener(new UpdateListener(new TestFrame()));
+		MemoryBufferRegister mbr = builder.getControlUnit().getMBR();
+		mbr.registerListener(new UpdateListener(new TestFrame()));
+		
+		
+		pc = builder.getControlUnit().getPC();
 		pc.registerListener(new UpdateListener(new TestFrame()));
-		ir = new IR();
+		ir = builder.getControlUnit().getIR();
 		ir.registerListener(new UpdateListener(new TestFrame()));
 		
 		
-		fetchDecodeStage = new StandardFetchDecodeStage(ir, pc);
+		fetchDecodeStage = new StandardFetchDecodeStage(builder.getBusController(), mar, mbr, ir, pc);
 		fetchDecodeStage.registerListener(new UpdateListener(new TestFrame()));
 		
-		memory = MemoryModule.getInstance();
+		memory = builder.getMemoryModule();
 		memory.registerListener(new UpdateListener(new TestFrame()));
 		
 		testInstrSTORE = new TransferInstr(Opcode.STORE, 0, 99); //source r0, destination address 99
