@@ -65,7 +65,7 @@ public abstract class Instruction implements Data {
 		}
 		if ((OPCODE.getValue() > 10 && OPCODE.getValue() < 13) || OPCODE.getValue() == 1) { //BRE/BRNE/LOAD instructions
 			if (this.getField2() == 16) { //Display condition code register as rCC rather than r16
-				return OPCODE.toString() + " r" + this.getField1() + " rCC";
+				return OPCODE.toString() + " " + this.getField1() + " rCC";
 			}
 			return OPCODE.toString() + " " + this.getField1() + " r" + this.getField2();
 		}
