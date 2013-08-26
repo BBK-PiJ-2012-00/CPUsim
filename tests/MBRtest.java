@@ -13,16 +13,11 @@ public class MBRtest {
 	
 	@Before
 	public void setUp() {
-		mbr = MBR.getInstance();
+		mbr = new MBR();
 		mbr.registerListener(new UpdateListener(new TestFrame())); //To prevent null pointer exceptions during testing
 		testInstr = new TransferInstr(Opcode.MOVE, 0, 0);
 	}
 	
-	@Test
-	public void testIsSingleton() { //Test only once object of the class can ever be created
-		MemoryBufferRegister anotherMBR = MBR.getInstance();
-		assertEquals(mbr.hashCode(), anotherMBR.hashCode()); //Same objects have the same hashcode
-	}
 
 	@Test
 	public void testWrite() {

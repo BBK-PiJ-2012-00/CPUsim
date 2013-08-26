@@ -13,16 +13,11 @@ public class MARtest {
 	private MemoryAddressRegister mar;
 	
 	@Before
-	public void setUp() {
-		mar = MAR.getInstance();
+	public void setUp() {		
+		mar = new MAR();
 		mar.registerListener(new UpdateListener(new TestFrame()));
 	}
 	
-	@Test
-	public void testIsSingleton() {
-		MemoryAddressRegister anotherMAR = MAR.getInstance();
-		assertEquals(mar.hashCode(), anotherMAR.hashCode());
-	}
 
 	@Test
 	public void testRead() {
