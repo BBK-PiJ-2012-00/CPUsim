@@ -13,22 +13,30 @@ import org.junit.Test;
 public class ControlLineTest {
 	private ControlLine cLine;
 	private Instruction testInstr;
-	private MainMemory testMemory;
+	private MainMemory memory;
 	private BusController busController; 
 	
-	private UpdateListener updateListener; //Listener used for GUI updates
+	private MemoryBufferRegister mbr; //Reference to control unit's MBR to check system bus delivers correctly
+	
 	
 	@Before
 	public void setUp() {
+	
+		
+		CPUbuilder builder = new CPUbuilder(false); //Create non-pipelined CPU
 		testInstr = new TransferInstr(Opcode.STORE, 0, 0);
-		testMemory = MemoryModule.getInstance();
-		updateListener = new UpdateListener(new CPUframe()); //Added to test to check proper instantiation (no nulls)
-		testMemory.registerListener(updateListener);
-		busController = SystemBusController.getInstance();
-		cLine = ((SystemBusController) busController).accessControlLine(); //This solves problem of duplicate MBR modules being
-		//created with the creation of more than one ControlLine; MBR is created upon creation of ControlLine, which would be created
-		//twice if instantiated in its own right in this test class; therefore, the solution is to access the same ControlLine
-		//object through the busController, which is required during these tests.  THIS IS NO LONGER A PROBLEM.
+		memory = builder.getMemoryModule();
+		busController = builder.getBusController();
+		cLine = busController.accessControlLine();
+		mbr = builder.getControlUnit().getMBR();
+		
+		/*
+		 * Listeners are added to all classes that use a listener to prevent null exceptions 
+		 * during testing (serve no functional purpose here).
+		 */		
+		mbr.registerListener(new UpdateListener(new TestFrame()));
+		builder.getControlUnit().getMAR().registerListener(new UpdateListener(new TestFrame()));
+		memory.registerListener(new UpdateListener(new TestFrame()));
 	}
 
 	@Test
@@ -46,7 +54,7 @@ public class ControlLineTest {
 	public void deliverToMBRTest2() {
 		cLine.writeToBus(-1, testInstr); //Need writeToBus() method to provide dummy data (writeToBus calls deliverToMBR()).
 		Data expected = testInstr;
-		Data output = MBR.getInstance().read();
+		Data output = mbr.read();
 		assertEquals(expected, output);		
 	}
 	
@@ -73,7 +81,7 @@ public class ControlLineTest {
 		cLine.writeToBus(10, testInstr); //Writes a value to memory
 		cLine.writeToBus(10, null); //Issues a read (as Data value is null)
 		Data expected = testInstr;
-		Data output = MBR.getInstance().read();
+		Data output = mbr.read();
 		assertEquals(expected, output);
 	}
 	
@@ -86,7 +94,7 @@ public class ControlLineTest {
 	@Test public void testWriteToBus_MemoryWriteOperation2() { 
 		cLine.writeToBus(0, testInstr);
 		Data expected = testInstr;
-		Data output = testMemory.accessAddress(0);
+		Data output = memory.accessAddress(0);
 		assertEquals(expected, output);
 		//Checks contents of memory address is loaded with correct instruction when loaded via system bus
 	}
