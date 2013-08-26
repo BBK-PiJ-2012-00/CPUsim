@@ -34,6 +34,8 @@ public class CPUframe extends JFrame {
 	private ControlUnit controlUnit;
 	private MainMemory memory;
 	private Assembler assembler;
+	private Loader loader;
+	private BusController systemBusController;
 	
 	private SwingWorker<Void, Void> executionWorker;
 	
@@ -122,8 +124,15 @@ public class CPUframe extends JFrame {
 	
 	public CPUframe() {
 		//this.assembler = assembler;
-		this.controlUnit =  new ControlUnitImpl(false);
-		this.memory = MemoryModule.getInstance();
+		//this.controlUnit = new ControlUnitImpl(false);
+		//this.memory = MemoryModule.getInstance();
+		
+		CPUbuilder cpuBuilder = new CPUbuilder(false);
+		
+		this.controlUnit = cpuBuilder.getControlUnit();
+		this.memory = cpuBuilder.getMemoryModule();
+		this.loader = cpuBuilder.getLoader();
+		this.systemBusController = cpuBuilder.getBusController();	
 		
 		//setSize(FRAME_WIDTH, FRAME_HEIGHT);
 				
@@ -317,7 +326,7 @@ public class CPUframe extends JFrame {
 		irPanel.add(irField);
 		irPanel.setBorder(BorderFactory.createTitledBorder(" IR "));
 		
-		controlUnit.getIR().registerListener(registerListener);
+		controlUnit.getIR().registerListener(new UpdateListener(this));
 		
 		statusField = new JTextField(4);
 		statusField.setEditable(false);
@@ -326,6 +335,8 @@ public class CPUframe extends JFrame {
 		//statusPanel.setSize(5, 5);
 		statusPanel.add(statusField);
 		statusPanel.setBorder(BorderFactory.createTitledBorder(" CC "));
+		
+		controlUnit.getStatusRegister().registerListener(new UpdateListener(this));
 		
 		controlRegistersPanel1.add(pcPanel);
 		controlRegistersPanel1.add(irPanel);
@@ -342,7 +353,7 @@ public class CPUframe extends JFrame {
 		marPanel.setMaximumSize(new Dimension(75, 60));
 		marPanel.add(marField);
 		marPanel.setBorder(BorderFactory.createTitledBorder(" MAR "));
-		MAR.getInstance().registerListener(registerListener);
+		controlUnit.getMAR().registerListener(registerListener);
 		
 		mbrField = new JTextField(8);
 		mbrField.setEditable(false);
@@ -350,7 +361,7 @@ public class CPUframe extends JFrame {
 		mbrPanel.setMaximumSize(new Dimension(150, 60));
 		mbrPanel.add(mbrField);
 		mbrPanel.setBorder(BorderFactory.createTitledBorder(" MBR "));
-		MBR.getInstance().registerListener(registerListener);
+		controlUnit.getMBR().registerListener(registerListener);
 		
 		controlRegistersPanel2.add(marPanel);
 		controlRegistersPanel2.add(mbrPanel);
@@ -800,7 +811,7 @@ public class CPUframe extends JFrame {
 		            activityArea.setText("");
 		            controlUnit.clearRegisters();
 		           
-		            assembler = new AssemblerImpl();
+		            assembler = new AssemblerImpl(loader);
 		            assembler.selectFile(file);
 		    		assembler.assembleCode();
 		    		assembler.loadToLoader();
