@@ -6,6 +6,10 @@ public interface Register {
 	
 	public void write(Operand operand);
 	
+	public void registerListener(UpdateListener listener);
+	
+	public String display();
+	
 	
 
 }

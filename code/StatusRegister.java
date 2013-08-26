@@ -9,6 +9,7 @@ package code;
  */
 public class StatusRegister implements Register {
 	private Operand contents;
+	private UpdateListener updateListener;
 
 	@Override
 	public Operand read() {
@@ -18,6 +19,24 @@ public class StatusRegister implements Register {
 	@Override
 	public void write(Operand operand) {
 		this.contents = operand;
+		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, this.display());
+		updateListener.handleUpDateEvent(updateEvent);
+	}
+
+	@Override
+	public void registerListener(UpdateListener listener) {
+		this.updateListener = listener;
+		
+	}
+
+	@Override
+	public String display() {
+		String displayString = "";
+		if (this.contents == null) {
+			return displayString; //Will update display with blank string if contents is empty
+		}
+		displayString += this.contents;
+		return displayString;
 	}
 
 }
