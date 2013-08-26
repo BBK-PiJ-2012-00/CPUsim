@@ -16,7 +16,7 @@ public class AssemblerImpl implements Assembler {
 	
 	private File fileReference; //Reference to the text file containing assembly program
 	
-	private Loader loader;
+	private Loader loader; //Reference to loader module
 	
 	private List<String> programString; //Holds program code read from file as array list of Strings
 	private List<String> instructionArray; //For intermediate stage where programString is split into two, instructions being stored
@@ -27,9 +27,10 @@ public class AssemblerImpl implements Assembler {
 	private int operandAddressPointer;
 	
 	
-	public AssemblerImpl() {
+	public AssemblerImpl(Loader loader) {
 		this.programString = new ArrayList<String>();
 		this.lookupTable = new HashMap<String, Integer>();
+		this.loader = loader;
 	}
 	
 	
@@ -66,7 +67,12 @@ public class AssemblerImpl implements Assembler {
 	    }
 	}
 	
-	
+	/*
+	 * (non-Javadoc)
+	 * @see code.Assembler#separateOperands()
+	 * 
+	 * Set to miss header line ONLY if headers are present!! (i.e. if < is first non-blank character)
+	 */
 	@Override
 	public void separateOperands() {
 		operandArray = new ArrayList<String>();
@@ -305,7 +311,7 @@ public class AssemblerImpl implements Assembler {
 	
 	@Override
 	public void loadToLoader() {
-		loader = new LoaderImpl(); //has the effect of resetting the loader each time
+		loader.clear(); //has the effect of resetting the loader each time, ensuring no remnant data from the last use
 		loader.load(this.programCode);
 	}
 	
