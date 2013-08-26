@@ -9,7 +9,9 @@ import org.junit.Test;
 import code.ALU;
 import code.ArithmeticInstr;
 import code.BranchInstr;
+import code.CPUbuilder;
 import code.CPUframe;
+import code.ControlUnit;
 import code.Data;
 import code.ExecuteStage;
 import code.FetchDecodeStage;
@@ -18,6 +20,8 @@ import code.IR;
 import code.Instruction;
 import code.InstructionRegister;
 import code.MainMemory;
+import code.MemoryAddressRegister;
+import code.MemoryBufferRegister;
 import code.MemoryModule;
 import code.Opcode;
 import code.Operand;
@@ -75,7 +79,19 @@ public class ExecuteStageTest {
 
 	@Before
 	public void setUp() throws Exception {
-		//Listeners added to avoid null pointer exceptions but listener functionality not tested here
+		/*
+		 * Listeners are added to all classes that use a listener to prevent null exceptions 
+		 * during testing (serve no functional purpose here).
+		 */
+		
+		CPUbuilder builder = new CPUbuilder(false);
+		ControlUnit controlUnit = builder.getControlUnit(); 
+		//MAR/MBR need to be referenced from control unit to ensure no duplicates, which would fail the tests
+		MemoryAddressRegister mar = controlUnit.getMAR();
+		MemoryBufferRegister mbr = controlUnit.getMBR();
+		mbr.registerListener(new UpdateListener(new TestFrame()));
+		mar.registerListener(new UpdateListener(new TestFrame()));
+		
 		pc = new PC();
 		pc.registerListener(new UpdateListener(new TestFrame()));
 		
@@ -88,13 +104,14 @@ public class ExecuteStageTest {
 		statusRegister = new StatusRegister();
 		
 		
-		fetchDecodeStage = new StandardFetchDecodeStage(ir, pc);
+		fetchDecodeStage = new StandardFetchDecodeStage(builder.getBusController(), mar, mbr, ir, pc);
 		fetchDecodeStage.registerListener(new UpdateListener(new TestFrame()));
 		writeBackStage = new StandardWriteBackStage(ir, genRegisters);
-		executeStage = new StandardExecuteStage(ir, pc, genRegisters, statusRegister, writeBackStage);
+		executeStage = new StandardExecuteStage(builder.getBusController(), ir, pc, genRegisters, statusRegister, writeBackStage,
+				mbr, mar);
 		executeStage.registerListener(new UpdateListener(new TestFrame()));
 		
-		memory = MemoryModule.getInstance();
+		memory = builder.getMemoryModule();
 		memory.registerListener(new UpdateListener(new TestFrame()));
 		
 		testInstrSTORE = new TransferInstr(Opcode.STORE, 0, 99); //source r0, destination address 99
