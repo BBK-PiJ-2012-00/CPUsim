@@ -34,6 +34,31 @@ public class ControlUnitImpl implements ControlUnit {
 	private BlockingQueue<Integer> fetchToExecuteQueue; //Queues that facilitate coordination of stages of instruction cycle
 	private BlockingQueue executeToWriteQueue; //Only during pipelining
 	
+	public ControlUnitImpl(boolean pipeliningMode, MemoryBufferRegister mbr) {
+		this.pipeliningMode = pipeliningMode;
+		
+		systemBus = SystemBusController.getInstance();
+		
+		//mbr = MBR.getInstance();
+		this.mbr = mbr;
+		mar = MAR.getInstance();
+		genRegisters = new RegisterFile16();
+		pc = new PC();
+		ir = new IR();
+		statusRegister = new StatusRegister();
+		
+		if (!pipeliningMode) { //If not pipelined, create standard stages
+			fetchDecodeStage = new StandardFetchDecodeStage(ir, pc);
+			writeBackStage = new StandardWriteBackStage(ir, genRegisters);
+			executeStage = new StandardExecuteStage(ir, pc, genRegisters, statusRegister, writeBackStage);	
+		}
+		
+		if (pipeliningMode) { //Queues only required if pipelining enabled
+			fetchToExecuteQueue = new SynchronousQueue<Integer>();
+		}
+		
+	}
+	
 	public ControlUnitImpl(boolean pipeliningMode) {
 		this.pipeliningMode = pipeliningMode;
 		
@@ -156,6 +181,16 @@ public class ControlUnitImpl implements ControlUnit {
 	@Override
 	public WriteBackStage getWriteBackStage() {
 		return this.writeBackStage;
+	}
+
+	@Override
+	public MemoryBufferRegister getMBR() {
+		return this.mbr;
+	}
+
+	@Override
+	public MemoryAddressRegister getMAR() {
+		return this.mar;
 	}
 	
 	

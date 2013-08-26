@@ -21,13 +21,17 @@ public interface ControlUnit {
 	
 	public void activate(); //Initiate instruction cycle execution
 	
-	public InstructionRegister getIR();//To access IR; for testing purposes
+	public InstructionRegister getIR();//To access IR; for updating GUI display
 	
-	public ProgramCounter getPC(); //To access PC; for testing purposes
+	public ProgramCounter getPC(); //To access PC; for updating GUI display
 	
-	public RegisterFile getRegisters(); //To access general purpose registers, for testing.
+	public RegisterFile getRegisters(); //To access general purpose registers, for updating GUI display.
 	
-	public Register getStatusRegister(); //To access status register, for testing.
+	public Register getStatusRegister(); //To access status register, updating GUI display.
+	
+	public MemoryBufferRegister getMBR(); //Access MBR for updating GUI display
+	
+	public MemoryAddressRegister getMAR(); //Access MAR for updating GUI display
 	
 	public FetchDecodeStage getFetchDecodeStage();
 	
