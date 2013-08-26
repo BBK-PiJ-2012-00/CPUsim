@@ -45,7 +45,8 @@ public class ControlUnitTest {
 
 	@Before
 	public void setUp() throws Exception {
-		memory = MemoryModule.getInstance();
+		CPUbuilder builder = new CPUbuilder(false); //Create simulator components
+		memory = builder.getMemoryModule();
 		memory.registerListener(new UpdateListener(new TestFrame()));
 		
 		/*
@@ -57,14 +58,15 @@ public class ControlUnitTest {
 		controlUnit.getIR().registerListener(new UpdateListener(new TestFrame()));
 		controlUnit.getRegisters().registerListener(new UpdateListener(new TestFrame()));
 		//controlUnit.getStatusRegister().registerListener(new UpdateListener(new TestFrame()));
-		MBR.getInstance().registerListener(new UpdateListener(new TestFrame()));
-		MAR.getInstance().registerListener(new UpdateListener(new TestFrame()));
+		//MBR.getInstance().registerListener(new UpdateListener(new TestFrame()));
+		//MAR.getInstance().registerListener(new UpdateListener(new TestFrame()));
 		
 		controlUnit.getFetchDecodeStage().registerListener(new UpdateListener(new TestFrame()));
 		controlUnit.getExecuteStage().registerListener(new UpdateListener(new TestFrame()));
 	
-		assembler = new AssemblerImpl();
-		loader = new LoaderImpl();
+		loader = builder.getLoader();
+		assembler = new AssemblerImpl(loader);
+		
 		
 		testInstrLOAD_2 = new TransferInstr(Opcode.LOAD, 5, 2); //Load contents of addr. 5 to r2
 		testInstrLOAD_4 = new TransferInstr(Opcode.LOAD, 6, 4); //Load contents of addr. 6 to r4
