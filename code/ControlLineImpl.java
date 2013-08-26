@@ -11,28 +11,19 @@ public class ControlLineImpl implements ControlLine {
 	//private MemoryAddressRegister mar; //Not required (for the time being)
 	
 	
-	public ControlLineImpl() {
+	public ControlLineImpl(MemoryBufferRegister mbr) {
+		this.mbr = mbr;
 		addressBus = new AddressBusImpl();
 		dataBus = new DataBusImpl();
-		memory = MemoryModule.getInstance();
-		mbr = MBR.getInstance();
-		//mar = MAR.getInstance();
 	}
 	
-	/* 
-	 * ControlLine implements only a single writeToBus() method, purposefully not
-	 * differentiating between transfers from CPU to memory, and memory to CPU. This is
-	 * because two separate methods for these two operations would add complexity to
-	 * the concurrency issues surrounding the use of the SystemBus when operating in
-	 * pipelined mode. It is important that all bus data's integrity is maintained,
-	 * and that two threads are prevented from accessing this method at the same time.
-	 * 
-	 * An address value of -1 is used to signify a transfer from main memory to CPU, as
-	 * -1 is a non-existent memory address. Any other value (0 or greater) signifies a
-	 * transfer from CPU to the memory location specified.
-	 */
-	public synchronized boolean writeToBus(int address, Data data) { //This method now is responsibly only for writing to bus, with accessing lines
-		//delegated to deliverTo...() methods below. Better encapsulation and separation of concerns, as well as better use of bus lines.
+	public void registerMemoryModule(MainMemory memory) {
+		this.memory = memory;
+	}	
+	
+	
+	
+	public synchronized boolean writeToBus(int address, Data data) { 
 		if (address == -1) { //Indicates transfer from memory to CPU (2nd phase of memory read; delivery from memory to MBR)
 			//no need to place address on address bus -> if address field in AddressLine is null/0, this signifies delivery
 			//to CPU as opposed to memory (and is true to reality).
@@ -68,5 +59,7 @@ public class ControlLineImpl implements ControlLine {
 	public String display() {
 		return null;
 	}
+	
+	
 	
 }

@@ -5,13 +5,7 @@ package code;
  */
 
 public interface ControlLine {
-	/*
-	 * Synchronous, clock-based coordination of the Bus would result in a more complicated than necessary design, so
-	 * it makes sense to adopt an asynchronous, handshaking-protocol method of sharing the Bus between the CPU and memory.
-	 * 
-	 * Processor issues read -> memory locates address and places contents on bus -> sends back to processor: processor
-	 * waits for the results of the read.  Memory invokes a sendToCPU() method to signal returning data. 
-	 */
+
 	
 	/* 
 	 * ControlLine implements only a single writeToBus() method, purposefully not
@@ -23,9 +17,7 @@ public interface ControlLine {
 	 * 
 	 * An address value of -1 is used to signify a transfer from main memory to CPU, as
 	 * -1 is a non-existent memory address. Any other value (0 or greater) signifies a
-	 * transfer from CPU to the memory location specified.
-	 * 
-	 * This method's implementation must be synchronized.
+	 * transfer from CPU to the memory location specified.	 
 	 * 
 	 * @param int address the address to be written to the address line.
 	 * @param Data data the data to be written to the data line.
@@ -44,7 +36,7 @@ public interface ControlLine {
 	
 	/*
 	 * A method that prompts either the first phase of a memory read, or the final stage of a memory write.
-	 * For the first stage of a memory read, the address value on the address line is passed to main memory, 
+	 * For the first stage of a memory read, the address value on the address line is passed (delivered) to main memory, 
 	 * so that the value held at that address may be loaded onto the address line (during the second stage of
 	 * a memory read). For the final stage of a memory write, the  data line is prompted to load its value into 
 	 * the memory location specified by the address line. These two operations are differentiated by the boolean
@@ -54,6 +46,9 @@ public interface ControlLine {
 	 * @return boolean returns true if the method completed successfully, false otherwise.
 	 */
 	public boolean deliverToMemory(boolean isRead); //Prompts dataLine to load value into memory, completing memory write operation
+
+	public void registerMemoryModule(MainMemory memory);
+
 		
 	
 	
