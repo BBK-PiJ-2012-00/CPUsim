@@ -12,23 +12,10 @@ package code;
  */
 
 public class MBR implements MemoryBufferRegister {
-	private static MemoryBufferRegister MBRinstance;
 	private Data registerContents;
 	private UpdateListener updateListener;
 	
-	public MBR() {
-		//Constructor only explicitly referenced in order to make it private, preventing instantiation
-		//from outside the class.
-		super(); //Calls default Object constructor.
-	}
 	
-	public synchronized static MemoryBufferRegister getInstance() {
-		if (MBRinstance == null) {
-			MBRinstance = new MBR();
-			return MBRinstance;
-		}
-		return MBRinstance;
-	}
 	
 	@Override
 	public boolean write(Data data) { //Successful write returns true

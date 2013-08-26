@@ -5,23 +5,10 @@ package code;
  * class for motivation.
  */
 public class MAR implements MemoryAddressRegister {
-	private static MemoryAddressRegister mar;
 	private UpdateListener updateListener;
 	
 	private int registerContents;
 	
-	public MAR() {
-		super();
-		//Constructor only made explicit so that it can be made private, enforcing singleton.
-	}
-	
-	public synchronized static MemoryAddressRegister getInstance() {
-		if (mar == null) {
-			mar = new MAR();
-			return mar;
-		}
-		return mar;
-	}
 	
 	public void registerListener(UpdateListener listener) {
 		this.updateListener = listener;
