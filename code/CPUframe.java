@@ -860,16 +860,20 @@ public class CPUframe extends JFrame {
 
 
 
-	public JTextComponent getMARfield() {
+	public JTextField getMARfield() {
 		return this.marField;
 	}
 	
-	public JTextComponent getMBRfield() {
+	public JTextField getMBRfield() {
 		return this.mbrField;
 	}
 	
-	public JTextComponent getGenPurposeRegister(int index) {
+	public JTextField getGenPurposeRegister(int index) {
 		return this.genRegisters[index];
+	}
+	
+	public JTextField getStatusRegisterField() {
+		return this.statusField;
 	}
 	
 	/*
