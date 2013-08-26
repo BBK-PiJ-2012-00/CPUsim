@@ -2,30 +2,29 @@ package tests;
 
 import static org.junit.Assert.*;
 
-
 import org.junit.Before;
 import org.junit.Test;
 
 import code.*;
 
 public class SystemBusControllerTest {
+	private CPUbuilder builder;
 	private BusController sysBusController;
 	private MainMemory memory;
 	private Instruction testInstr;
+	private MemoryBufferRegister mbr;
 	
 	@Before
 	public void setUp() {
-		sysBusController = SystemBusController.getInstance();
-		memory = MemoryModule.getInstance();
+		builder = new CPUbuilder(false);
+		sysBusController = builder.getBusController();
+		memory = builder.getMemoryModule();
 		memory.registerListener(new UpdateListener(new TestFrame())); //To prevent null pointer exceptions
+		mbr = builder.getControlUnit().getMBR(); //Get MBR reference
+		mbr.registerListener(new UpdateListener(new TestFrame())); //To prevent null pointer exception
 		testInstr = new BranchInstr(Opcode.BR, 0);
 	}
-
-	@Test
-	public void testIsSingleton() { //Check that only once instance of SystemBusController can be created
-		BusController anotherController = SystemBusController.getInstance();
-		assertEquals(sysBusController, anotherController); //Tests whether the two references refer to the same object
-	}
+	
 	
 	@Test
 	public void testTransferToMemory() { //Initial test for transferToMemory(); successful transfer should return true
@@ -50,12 +49,13 @@ public class SystemBusControllerTest {
 	public void testTransferToCPU2() { //A more thorough test, checking contents of MBR matches data transferred
 		sysBusController.transferToCPU(testInstr);
 		Data expected = testInstr;
-		Data output = MBR.getInstance().read(); //MBR accessed directly
+		Data output = mbr.read(); //MBR accessed directly
 		assertEquals(expected, output);
 		
 		
 	}
-
+	
+	
 		
 
 }
