@@ -83,6 +83,11 @@ public class CPUframe extends JFrame {
 	private JPanel aluDivPanel;
 	private JPanel aluMulPanel;
 	
+	private JPanel systemBusPanel;
+	private JPanel controlLinePanel;
+	private JPanel addressBusPanel;
+	private JPanel dataBusPanel;
+	
 	
 	private JTextArea memoryContentArea;
 	private JTextArea assemblyProgramArea;
@@ -720,6 +725,29 @@ public class CPUframe extends JFrame {
 		//Also, insert empty box with min size into panel2 to keep components at fixed heights in the panel
 		
 		ALU.registerListener(new UpdateListener(this));
+		
+		
+		/*
+		 * System Bus
+		 */
+//		private JPanel systemBusPanel;
+//		private JPanel controlLinePanel;
+//		private JPanel addressBusPanel;
+//		private JPanel dataBusPanel;
+		
+		systemBusPanel = new JPanel();
+		systemBusPanel.setLayout(new BoxLayout(systemBusPanel, BoxLayout.Y_AXIS));//Add bus panels vertically
+		
+		controlLinePanel = new JPanel();
+		controlLinePanel.setPreferredSize(new Dimension(175, 40));
+		JTextField controlLineField = new JTextField(4);
+		controlLineField.setEditable(false);
+		controlLinePanel.add(controlLineField);
+		systemBusPanel.add(controlLinePanel);
+		
+		
+		
+		panel3.add(systemBusPanel);
 
 		
 		this.getContentPane().add(panel1); //Leftmost panel
