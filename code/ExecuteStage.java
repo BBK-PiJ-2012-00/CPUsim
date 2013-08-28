@@ -18,6 +18,8 @@ public abstract class ExecuteStage implements Runnable {
 	
 	private UpdateListener updateListener;
 	
+	private boolean isWaiting;
+	
 	
 	public ExecuteStage(BusController systemBus, InstructionRegister ir, ProgramCounter pc, RegisterFile genRegisters,
 			Register statusRegister, WriteBackStage writeBackStage, MemoryBufferRegister mbr, MemoryAddressRegister mar) {
@@ -43,22 +45,26 @@ public abstract class ExecuteStage implements Runnable {
 					mar.write(ir.read().getField1()); //Load mar with source address of instruction in IR
 					//Request a read from memory via system bus, with address contained in mar
 					
-//					try {
-//						wait();
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
+					isWaiting = true;
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					isWaiting = false;
 					
 					systemBus.transferToMemory(mar.read(), null);
 					this.fireUpdate("Operand " + mbr.read().toString() + " loaded from address " + ir.read().getField1() + " into MBR\n");
 					
-//					try {
-//						wait();
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
+					isWaiting = true;
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					isWaiting = false;
 					
 					mar.write(-1); //Reset MAR
 					
@@ -68,12 +74,14 @@ public abstract class ExecuteStage implements Runnable {
 						
 						this.fireUpdate("Loaded operand " + mbr.read() + " into condition code register\n");
 						
-//						try {
-//							wait();
-//						} catch (InterruptedException e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						}
+						isWaiting = true;
+						try {
+							wait();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						isWaiting = false;
 					}
 					
 					
@@ -83,13 +91,15 @@ public abstract class ExecuteStage implements Runnable {
 					//gives the operand to be moved from mbr to genRegisters at index given in getField2().
 					this.fireUpdate("Operand " + mbr.read() + " loaded into r" + ir.read().getField2() + "\n");
 					
-//					try {
-//						wait();
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
-//					
+					isWaiting = true;
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					isWaiting = false;
+					
 					
 					mbr.write(null); //Reset MBR
 					break;
@@ -100,24 +110,28 @@ public abstract class ExecuteStage implements Runnable {
 						" placed into MAR \n");
 					mar.write(ir.read().getField2()); //Load mar with destination (memory address)
 					
-//					try {
-//						wait();
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
+					isWaiting = true;
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					isWaiting = false;
 					
 					mbr.write(genRegisters.read(ir.read().getField1())); //Write to mbr the data held in genRegisters at index
 					//given by field1(source) of instruction held in IR.
 					this.fireUpdate("Operand " + genRegisters.read(ir.read().getField1()) + " loaded from r" + ir.read().getField1() + 
 							" into MBR\n");
 					
-//					try {
-//						wait();
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
+					isWaiting = true;
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					isWaiting = false;
 					
 					
 					systemBus.transferToMemory(mar.read(), mbr.read()); //Transfer contents of mbr to address specified in mar
@@ -125,12 +139,14 @@ public abstract class ExecuteStage implements Runnable {
 					this.fireUpdate("Operand " + genRegisters.read(ir.read().getField1()) + " stored in memory address " +
 							ir.read().getField2() + "\n");
 					
-//					try {
-//						wait();
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
+					isWaiting = true;
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					isWaiting = false;
 					
 					break;
 					
@@ -145,12 +161,14 @@ public abstract class ExecuteStage implements Runnable {
 						this.fireUpdate("Loaded operand " + genRegisters.read(ir.read().getField1()) + 
 								" into condition code register\n");
 						
-//						try {
-//							wait();
-//						} catch (InterruptedException e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						}
+						isWaiting = true;
+						try {
+							wait();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						isWaiting = false;
 					}
 					
 					else { //Register-register move
@@ -162,23 +180,27 @@ public abstract class ExecuteStage implements Runnable {
 						this.fireUpdate("Operand " + genRegisters.read(ir.read().getField1()) + 
 								" moved into r" + genRegisters.read(ir.read().getField2()) + "\n");
 						
-//						try {
-//							wait();
-//						} catch (InterruptedException e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						}
+						isWaiting = true;
+						try {
+							wait();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						isWaiting = false;
 					}
 					
 					
 					genRegisters.write(ir.read().getField1(), null); //Complete the move by resetting register source
 					
-//					try {
-//						wait();
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
+					isWaiting = true;
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					isWaiting = false;
 					
 					break;
 					
@@ -191,12 +213,14 @@ public abstract class ExecuteStage implements Runnable {
 					fireUpdate("Operands " + op1 + " and " + op2 + " loaded from general purpose \nregisters into ALU " +
 							"for ADD operation: " + op1 + " + " + op2 + "\n");
 					
-//					try { //Makes more sense to put the wait here than complicate write back stage
-//						wait();
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
+					isWaiting = true;
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					isWaiting = false;
 					
 					//writeBackStage.receive(result); //Call write back stage to store result of addition
 					//writeBackStage.run();
@@ -205,12 +229,14 @@ public abstract class ExecuteStage implements Runnable {
 					fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
 					fireUpdate("Result operand " + result + " written to r" + ir.read().getField1() + " from ALU\n");
 					
-//					try { //Makes more sense to put the wait here than complicate write back stage
-//						wait();
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
+					isWaiting = true;
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					isWaiting = false;
 					
 					ALU.clearFields();
 					
@@ -224,12 +250,14 @@ public abstract class ExecuteStage implements Runnable {
 					fireUpdate("Operands " + op1 + " and " + op2 + " loaded from general purpose \nregisters into ALU " +
 							"for SUB operation: " + op1 + " - " + op2 + "\n");
 					
-//					try { //Makes more sense to put the wait here than complicate write back stage
-//						wait();
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
+					isWaiting = true;
+					try {
+						wait(); //Makes more sense to place wait here than to complicate writeBack stage.
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					isWaiting = false;
 					
 					//writeBackStage.receive(result);
 					//writeBackStage.run();
@@ -238,12 +266,14 @@ public abstract class ExecuteStage implements Runnable {
 					fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
 					fireUpdate("Result operand " + result + " written to r" + ir.read().getField1() + " from ALU\n");
 					
-//					try {
-//						wait();
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
+					isWaiting = true;
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					isWaiting = false;
 					
 					ALU.clearFields();
 					
@@ -257,12 +287,14 @@ public abstract class ExecuteStage implements Runnable {
 					fireUpdate("Operands " + op1 + " and " + op2 + " loaded from general purpose \nregisters into ALU " +
 							"for DIV operation: " + op1 + " / " + op2 + "\n");
 					
-//					try { //Makes more sense to put the wait here than complicate write back stage
-//						wait();
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
+					isWaiting = true;
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					isWaiting = false;
 					
 					//writeBackStage.receive(result);
 					//writeBackStage.run();
@@ -271,12 +303,14 @@ public abstract class ExecuteStage implements Runnable {
 					fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
 					fireUpdate("Result operand " + result + " written to r" + ir.read().getField1() + " from ALU\n");
 					
-//					try {
-//						wait();
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
+					isWaiting = true;
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					isWaiting = false;
 					
 					ALU.clearFields();
 					
@@ -290,12 +324,14 @@ public abstract class ExecuteStage implements Runnable {
 					fireUpdate("Operands " + op1 + " and " + op2 + " loaded from general purpose \nregisters into ALU " +
 							"for MUL operation: " + op1 + " * " + op2 + "\n");
 					
-//					try { //Makes more sense to put the wait here than complicate write back stage
-//						wait();
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
+					isWaiting = true;
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					isWaiting = false;
 					
 					//writeBackStage.receive(result);
 					//writeBackStage.run();
@@ -304,12 +340,14 @@ public abstract class ExecuteStage implements Runnable {
 					fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
 					fireUpdate("Result operand " + result + " written to r" + ir.read().getField1() + " from ALU\n");
 					
-//					try {
-//						wait();
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
+					isWaiting = true;
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					isWaiting = false;
 					
 					ALU.clearFields();
 					
@@ -321,12 +359,14 @@ public abstract class ExecuteStage implements Runnable {
 					pc.setPC(ir.read().getField1());
 					fireUpdate("PC set to " + ir.read().getField1() + " as result of " + ir.read().getOpcode() + " operation\n");
 					
-//					try {
-//						wait();
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
+					isWaiting = true;
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					isWaiting = false;
 					
 					break;
 					
@@ -336,23 +376,27 @@ public abstract class ExecuteStage implements Runnable {
 						pc.setPC(ir.read().getField1()); //If statusRegister holds 0, set PC to new address held in instruction
 						fireUpdate("PC set to " + ir.read().getField1() + " as result of " + ir.read().getOpcode() + " operation\n");
 						
-//						try {
-//							wait();
-//						} catch (InterruptedException e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						}
+						isWaiting = true;
+						try {
+							wait();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						isWaiting = false;
 					}
 					
 					else { //If condition code register doesn't hold 0, provide activity monitor comment to say branch not taken
 						fireUpdate("Branch (BRZ) not taken as condition code\nvalue does not equal 0\n");
 						
-//						try {
-//							wait();
-//						} catch (InterruptedException e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						}						
+						isWaiting = true;
+						try {
+							wait();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						isWaiting = false;				
 						
 					}
 					break;
@@ -363,23 +407,29 @@ public abstract class ExecuteStage implements Runnable {
 						 pc.incrementPC();
 						 fireUpdate("PC set to " + ir.read().getField1() + " as result of " + ir.read().getOpcode() + " operation\n");
 						 
-//						 try {
-//							wait();
-//						 } catch (InterruptedException e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						 }						 
+			 			isWaiting = true;
+						try {
+							wait();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+					  	}
+					    isWaiting = false;	
+					    
 					 }
 					 
 					 else { //If condition code register does not hold value of 0, provide activity monitor comment to say skip not taken
 						 fireUpdate("Skip (SKZ) instruction not executed as condition\ncode value does not equal 0\n");
 						 
-//						 try {
-//								wait();
-//							} catch (InterruptedException e) {
-//								// TODO Auto-generated catch block
-//								e.printStackTrace();
-//						}
+						isWaiting = true;
+						try {
+							wait();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						isWaiting = false;			
+								
 					 }
 					 break;
 					 
@@ -390,24 +440,28 @@ public abstract class ExecuteStage implements Runnable {
 						 pc.setPC(ir.read().getField1()); //Set PC to equal address in field1 of instruction in ir
 						 fireUpdate("PC set to " + ir.read().getField1() + " as result of " + ir.read().getOpcode() + " operation\n");
 						 
-//						 try {
-//								wait();
-//						 } catch (InterruptedException e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						 } 
+						isWaiting = true;
+						try {
+							wait();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						isWaiting = false;			
 					 }
 					 
 					 else {  //If not equal, do nothing other than provide activity monitor comment to say branch not taken
 						 fireUpdate("Branch (BRE) not taken as condition code\nvalue does not equal " + 
 								 genRegisters.read(ir.read().getField2()) + " (contents of r" + ir.read().getField2() + ")\n");
 						 
-//						 try {
-//							wait();
-//						 } catch (InterruptedException e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						 } 
+						isWaiting = true;
+						try {
+							wait();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						isWaiting = false;			
 						 
 					 }
 					 break; 
@@ -418,12 +472,15 @@ public abstract class ExecuteStage implements Runnable {
 						 pc.setPC(ir.read().getField1()); //Set PC to equal address in field1 of instruction in ir	
 						 fireUpdate("PC set to " + ir.read().getField1() + " as result of " + ir.read().getOpcode() + " operation\n");
 						 
-//						 try {
-//							wait();
-//						 } catch (InterruptedException e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						 }
+						
+						 isWaiting = true;
+						 try {
+							 wait();
+						 } catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						 }
+						 isWaiting = false;			
 						 
 					 }
 					 
@@ -431,12 +488,14 @@ public abstract class ExecuteStage implements Runnable {
 						 fireUpdate("Branch (BRNE) not taken as condition code\nvalue equals " + 
 								 genRegisters.read(ir.read().getField2()) + " (contents of r" + ir.read().getField2() + ")\n");
 						 
-//						 try {
-//							wait();
-//						 } catch (InterruptedException e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						}
+						 isWaiting = true;
+						 try {							 
+							wait();
+						 } catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						 }
+						 isWaiting = false;			
 						 
 					 }
 					 break; 
@@ -483,6 +542,10 @@ public abstract class ExecuteStage implements Runnable {
 	
 	public void registerListener(UpdateListener listener) {
 		this.updateListener = listener;
+	}
+	
+	public boolean isWaiting() {
+		return isWaiting;
 	}
 	
 
