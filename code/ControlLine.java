@@ -51,6 +51,8 @@ public interface ControlLine {
 
 	public AddressBus getAddressBus();
 
+	public DataBus getDataBus();
+
 		
 	
 	

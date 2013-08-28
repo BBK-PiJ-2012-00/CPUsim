@@ -48,20 +48,34 @@ public class ControlLineImpl implements ControlLine {
 	
 	public boolean deliverToMemory(boolean isRead) { //If isRead, first stage of read operation, otherwise write.
 		if (isRead) {
+			
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			return memory.notifyRead(addressBus.read());
 		}
+		
 		return memory.notifyWrite(addressBus.read(), dataBus.read());
 	}
 	
 	
-	public String display(String update) {
+	public String display() {
 		
-		return update;
+		return null;
 	}
 	
 	@Override
 	public AddressBus getAddressBus() {
 		return this.addressBus;
+	}
+	
+	@Override
+	public DataBus getDataBus() {
+		return this.dataBus;
 	}
 	
 	
