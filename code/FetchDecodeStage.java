@@ -40,6 +40,7 @@ public abstract class FetchDecodeStage implements Runnable {
 		mar.write(pc.getValue()); //Write address value in PC to MAR.
 		
 		this.fireUpdate("Memory address from PC placed into MAR \n");
+		
 		isWaiting = true;
 		try {
 			wait();
@@ -51,6 +52,7 @@ public abstract class FetchDecodeStage implements Runnable {
 		
 		systemBus.transferToMemory(mar.read(), null); //Transfer address from MAR to system bus, prompting read
 		this.fireUpdate("Load contents of memory address " + mar.read() + " into MBR \n");
+		
 		isWaiting = true;
 		try {
 			wait();
@@ -58,13 +60,13 @@ public abstract class FetchDecodeStage implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		isWaiting = false;
-		
+		isWaiting = false;		
 
 		
 		//A Data item should now be in MBR
 		ir.loadIR((Instruction) mbr.read()); //Cast required as mbr holds type data, IR type Instruction; May need to handle exception
 		this.fireUpdate("Load contents of MBR into IR \n");
+		
 		isWaiting = true;
 		try {
 			wait();
@@ -74,9 +76,7 @@ public abstract class FetchDecodeStage implements Runnable {
 		}
 		isWaiting = false;
 		
-		mar.write(-1);//Reset MAR. Repositioned here for user clarity; mem. addr. remains in MAR until instr. in IR.
-		
-		
+		mar.write(-1);//Reset MAR. Repositioned here for user clarity; mem. addr. remains in MAR until instr. in IR.		
 		mbr.write(null); //Clear MBR to reflect that instruction has moved to IR (should it be reset earlier, to better reflect
 		//movement?)
 		
@@ -89,6 +89,7 @@ public abstract class FetchDecodeStage implements Runnable {
 		int opcodeValue = instr.getOpcode().getValue(); //Gets instruction opcode as int value
 		pc.incrementPC(); //Increment PC; done here so that with pipelining, the next instruction can be fetched at this point
 		this.fireUpdate("PC incremented by 1 (ready for next instruction fetch) \n");
+		
 		isWaiting = true;
 		try {
 			wait();
@@ -96,15 +97,9 @@ public abstract class FetchDecodeStage implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		isWaiting = false;
+		isWaiting = false;		
 		
-		
-		
-		//pc.display();
 		return opcodeValue;
-		
-		//this.instructionExecute(opcodeValue);
-		//Add interim references to operand locations, to pass to execute stage?
 		
 	}
 	
@@ -128,6 +123,11 @@ public abstract class FetchDecodeStage implements Runnable {
 		this.updateListener = listener;
 	}
 	
+	
+	/*
+	 * This boolean flag allows the GUI's SwingWorker thread to determine whether the thread is
+	 * waiting on this object. If so, notify() will be called on this object (and not otherwise).
+	 */
 	public boolean isWaiting() {
 		return isWaiting;
 	}
