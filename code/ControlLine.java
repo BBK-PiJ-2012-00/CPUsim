@@ -49,6 +49,8 @@ public interface ControlLine {
 
 	public void registerMemoryModule(MainMemory memory);
 
+	public AddressBus getAddressBus();
+
 		
 	
 	

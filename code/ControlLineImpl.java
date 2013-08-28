@@ -2,9 +2,7 @@ package code;
 
 public class ControlLineImpl implements ControlLine {
 	private AddressBus addressBus;
-	private DataBus dataBus;
-	//public boolean inUse; 
-	
+	private DataBus dataBus;	
 	private MainMemory memory;
 	
 	private MemoryBufferRegister mbr;//Reference to CPU's MBR
@@ -56,8 +54,14 @@ public class ControlLineImpl implements ControlLine {
 	}
 	
 	
-	public String display() {
-		return null;
+	public String display(String update) {
+		
+		return update;
+	}
+	
+	@Override
+	public AddressBus getAddressBus() {
+		return this.addressBus;
 	}
 	
 	
