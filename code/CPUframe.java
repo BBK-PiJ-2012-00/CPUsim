@@ -24,6 +24,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
 import javax.swing.text.JTextComponent;
 
 
@@ -117,7 +119,10 @@ public class CPUframe extends JFrame {
 	private JTextField mulOperand1;
 	private JTextField mulOperand2;
 	private JTextField mulResult;
-
+	
+	private JTextField controlLineField;
+	private JTextField addressBusField;
+	private JTextField dataBusField;
 	
 	private JButton executeButton;
 	private JButton resetButton;
@@ -739,14 +744,40 @@ public class CPUframe extends JFrame {
 		systemBusPanel.setLayout(new BoxLayout(systemBusPanel, BoxLayout.Y_AXIS));//Add bus panels vertically
 		
 		controlLinePanel = new JPanel();
-		controlLinePanel.setPreferredSize(new Dimension(175, 40));
-		JTextField controlLineField = new JTextField(4);
+		controlLinePanel.setPreferredSize(new Dimension(175, 60));
+		controlLinePanel.setBorder(BorderFactory.createTitledBorder("Control Line"));
+		controlLineField = new JTextField(6);
 		controlLineField.setEditable(false);
 		controlLinePanel.add(controlLineField);
 		systemBusPanel.add(controlLinePanel);
 		
+		addressBusPanel = new JPanel();
+		addressBusPanel.setPreferredSize(new Dimension(175, 60));
+		//addressBusPanel.setBackground(Color.blue);
+		Border cyanLine = BorderFactory.createLineBorder(Color.cyan);	
+		addressBusPanel.setBorder(BorderFactory.createTitledBorder(cyanLine, "Address Bus"));
+		//Border addressBusBorder = BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Address Bus");
+		//addressBusPanel.setBorder(addressBusBorder);
+		addressBusField = new JTextField(6);
+		addressBusField.setEditable(false);
+		addressBusPanel.add(addressBusField);
+		systemBusPanel.add(addressBusPanel);
+		
+		dataBusPanel = new JPanel();
+		dataBusPanel.setPreferredSize(new Dimension(175, 60));
+		//dataBusPanel.setBackground(Color.magenta);
+		Border magentaLine = BorderFactory.createLineBorder(Color.magenta);
+		dataBusPanel.setBorder(BorderFactory.createTitledBorder(magentaLine, "Data Bus"));
+		dataBusField = new JTextField(6);
+		dataBusField.setEditable(false);
+		dataBusPanel.add(dataBusField);
+		systemBusPanel.add(dataBusPanel);
 		
 		
+		systemBusPanel.setBorder(BorderFactory.createTitledBorder("System Bus"));
+		
+		
+		panel3.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 10));
 		panel3.add(systemBusPanel);
 
 		
