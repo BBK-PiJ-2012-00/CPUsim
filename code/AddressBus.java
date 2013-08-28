@@ -33,6 +33,10 @@ public interface AddressBus {
 	 * 
 	 * @return int the address on the address line.
 	 */
-	public int read();		
+	public int read();
+
+	public String display();
+
+	public void registerListener(UpdateListener listener);		
 
 }
