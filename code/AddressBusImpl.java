@@ -10,6 +10,7 @@ public class AddressBusImpl implements AddressBus {
 		//Check address validity?
 		this.address = address; //Fire an update event every time bus is written to
 		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, this.display());
+		updateListener.handleUpDateEvent(updateEvent);
 	}
 	
 	/*
@@ -24,6 +25,7 @@ public class AddressBusImpl implements AddressBus {
 	@Override
 	public int read() {
 		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, ""); //Reset address bus display when read by another module
+		updateListener.handleUpDateEvent(updateEvent);
 		return this.address;
 	}
 	
