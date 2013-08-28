@@ -905,7 +905,7 @@ public class CPUframe extends JFrame {
 					System.out.println("f/d notify called");
 				}
 			}
-			else {
+			else if (controlUnit.getExecuteStage().isWaiting()) {
 				synchronized(controlUnit.getExecuteStage()) {
 					controlUnit.getExecuteStage().notify();
 					System.out.println("ex notify called");
