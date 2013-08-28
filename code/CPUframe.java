@@ -892,6 +892,9 @@ public class CPUframe extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			synchronized(systemBusController.accessControlLine()) {
+				systemBusController.accessControlLine().notify();
+			}
 			synchronized(controlUnit.getFetchDecodeStage()) {
 				controlUnit.getFetchDecodeStage().notify();
 			}
@@ -901,6 +904,7 @@ public class CPUframe extends JFrame {
 //			synchronized(controlUnit.getWriteBackStage()) {
 //				controlUnit.getWriteBackStage().notify();
 //			}
+	
 		}
 		
 	}
