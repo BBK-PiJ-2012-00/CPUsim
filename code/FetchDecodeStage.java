@@ -19,6 +19,8 @@ public abstract class FetchDecodeStage implements Runnable {
 	
 	private UpdateListener updateListener; //Update event listener
 	
+	private boolean isWaiting;
+	
 	
 	public FetchDecodeStage(BusController systemBus, MemoryAddressRegister mar, MemoryBufferRegister mbr,
 			InstructionRegister ir, ProgramCounter pc) {
@@ -38,36 +40,39 @@ public abstract class FetchDecodeStage implements Runnable {
 		mar.write(pc.getValue()); //Write address value in PC to MAR.
 		
 		this.fireUpdate("Memory address from PC placed into MAR \n");
-		
-//		try {
-//			wait();
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		isWaiting = true;
+		try {
+			wait();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		isWaiting = false;
 		
 		systemBus.transferToMemory(mar.read(), null); //Transfer address from MAR to system bus, prompting read
 		this.fireUpdate("Load contents of memory address " + mar.read() + " into MBR \n");
-		
-//		try {
-//			wait();
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		isWaiting = true;
+		try {
+			wait();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		isWaiting = false;
 		
 
 		
 		//A Data item should now be in MBR
 		ir.loadIR((Instruction) mbr.read()); //Cast required as mbr holds type data, IR type Instruction; May need to handle exception
 		this.fireUpdate("Load contents of MBR into IR \n");
-		
-//		try {
-//			wait();
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		isWaiting = true;
+		try {
+			wait();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		isWaiting = false;
 		
 		mar.write(-1);//Reset MAR. Repositioned here for user clarity; mem. addr. remains in MAR until instr. in IR.
 		
@@ -84,14 +89,14 @@ public abstract class FetchDecodeStage implements Runnable {
 		int opcodeValue = instr.getOpcode().getValue(); //Gets instruction opcode as int value
 		pc.incrementPC(); //Increment PC; done here so that with pipelining, the next instruction can be fetched at this point
 		this.fireUpdate("PC incremented by 1 (ready for next instruction fetch) \n");
-		
-//		try {
-//			wait();
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-		
+		isWaiting = true;
+		try {
+			wait();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		isWaiting = false;
 		
 		
 		
@@ -122,5 +127,10 @@ public abstract class FetchDecodeStage implements Runnable {
 	public void registerListener(UpdateListener listener) {
 		this.updateListener = listener;
 	}
+	
+	public boolean isWaiting() {
+		return isWaiting;
+	}
+
 	
 }

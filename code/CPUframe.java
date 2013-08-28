@@ -746,7 +746,7 @@ public class CPUframe extends JFrame {
 		controlLinePanel = new JPanel();
 		controlLinePanel.setPreferredSize(new Dimension(175, 60));
 		controlLinePanel.setBorder(BorderFactory.createTitledBorder("Control Line"));
-		controlLineField = new JTextField(6);
+		controlLineField = new JTextField(8);
 		controlLineField.setEditable(false);
 		controlLinePanel.add(controlLineField);
 		systemBusPanel.add(controlLinePanel);
@@ -758,7 +758,7 @@ public class CPUframe extends JFrame {
 		addressBusPanel.setBorder(BorderFactory.createTitledBorder(cyanLine, "Address Bus"));
 		//Border addressBusBorder = BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Address Bus");
 		//addressBusPanel.setBorder(addressBusBorder);
-		addressBusField = new JTextField(6);
+		addressBusField = new JTextField(8);
 		addressBusField.setEditable(false);
 		addressBusPanel.add(addressBusField);
 		systemBusPanel.add(addressBusPanel);
@@ -770,11 +770,12 @@ public class CPUframe extends JFrame {
 		//dataBusPanel.setBackground(Color.magenta);
 		Border magentaLine = BorderFactory.createLineBorder(Color.magenta);
 		dataBusPanel.setBorder(BorderFactory.createTitledBorder(magentaLine, "Data Bus"));
-		dataBusField = new JTextField(6);
+		dataBusField = new JTextField(8);
 		dataBusField.setEditable(false);
 		dataBusPanel.add(dataBusField);
 		systemBusPanel.add(dataBusPanel);
 		
+		systemBusController.accessControlLine().getDataBus().registerListener(new UpdateListener(this));
 		
 		systemBusPanel.setBorder(BorderFactory.createTitledBorder("System Bus"));
 		
@@ -892,15 +893,26 @@ public class CPUframe extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			synchronized(systemBusController.accessControlLine()) {
-				systemBusController.accessControlLine().notify();
+			if (systemBusController.accessControlLine().isWaiting()) {
+				synchronized(systemBusController.accessControlLine()) {
+					systemBusController.accessControlLine().notify();
+					System.out.println("bus notify called");
+				}
 			}
-			synchronized(controlUnit.getFetchDecodeStage()) {
-				controlUnit.getFetchDecodeStage().notify();
+			else if (controlUnit.getFetchDecodeStage().isWaiting()) {
+				synchronized(controlUnit.getFetchDecodeStage()) {
+					controlUnit.getFetchDecodeStage().notify();
+					System.out.println("f/d notify called");
+				}
 			}
-			synchronized(controlUnit.getExecuteStage()) {
-				controlUnit.getExecuteStage().notify();
+			else {
+				synchronized(controlUnit.getExecuteStage()) {
+					controlUnit.getExecuteStage().notify();
+					System.out.println("ex notify called");
+				}
 			}
+			
+			//Use an isWaiting boolean to check which objects have a waiting thread? Set before and after wait() statements
 //			synchronized(controlUnit.getWriteBackStage()) {
 //				controlUnit.getWriteBackStage().notify();
 //			}
@@ -1006,6 +1018,12 @@ public class CPUframe extends JFrame {
 	
 	public JTextField getAddressBusField() {
 		return this.addressBusField;
+	}
+
+
+
+	public JTextField getDataBusField() {
+		return this.dataBusField;
 	}
 
 	

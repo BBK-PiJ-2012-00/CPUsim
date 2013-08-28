@@ -53,6 +53,8 @@ public interface ControlLine {
 
 	public DataBus getDataBus();
 
+	public boolean isWaiting();
+
 		
 	
 	
