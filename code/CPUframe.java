@@ -763,6 +763,8 @@ public class CPUframe extends JFrame {
 		addressBusPanel.add(addressBusField);
 		systemBusPanel.add(addressBusPanel);
 		
+		systemBusController.accessControlLine().getAddressBus().registerListener(new UpdateListener(this));
+		
 		dataBusPanel = new JPanel();
 		dataBusPanel.setPreferredSize(new Dimension(175, 60));
 		//dataBusPanel.setBackground(Color.magenta);
@@ -996,6 +998,10 @@ public class CPUframe extends JFrame {
 	
 	public JTextArea getActivityMonitor() {		
 		return this.activityArea;		
+	}
+	
+	public JTextField getAddressBusField() {
+		return this.addressBusField;
 	}
 
 	
