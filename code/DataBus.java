@@ -29,5 +29,9 @@ public interface DataBus {
 	 * @return Data the data read from the line.
 	 */
 	public Data read();
+
+	public String display();
+
+	public void registerListener(UpdateListener listener);
 	
 }
