@@ -19,10 +19,12 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingWorker;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
@@ -239,6 +241,7 @@ public class CPUframe extends JFrame {
 		subControlPanel1.add(executeButton);
 		
 		helpButton = new JButton("Help!");
+		helpButton.addActionListener(new HelpButtonListener());
 		
 		subControlPanel2.add(helpButton);
 		
@@ -951,11 +954,24 @@ public class CPUframe extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			JDialog helpWindow = new JDialog();
-			
+			try {
+		         FileReader fileReader = new FileReader("src/assemblyPrograms/CPUsim User Manual.txt");
+		         JTextComponent helpPane = new JTextArea();
+		         helpPane.setMaximumSize(new Dimension(500, 500));
+		         helpPane.read(fileReader, null);
+		         fileReader.close();
+		         JScrollPane helpScroller = new JScrollPane(helpPane);
+		        // helpScroller.setSize(500, 500);
+		         JOptionPane.showMessageDialog(CPUframe.this, helpScroller, "User Manual", JOptionPane.INFORMATION_MESSAGE);
+            }
+            catch (IOException iox) {
+                System.err.println(iox);
+             }
 		}
-		
+			
 	}
+		
+	
 	
 	public JTextField getPCfield() {
 		return this.pcField;
