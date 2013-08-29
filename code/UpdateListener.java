@@ -46,6 +46,15 @@ public class UpdateListener implements EventListener {
 			frame.getAddressBusField().setText(e.getUpdate());
 		}
 		
+		else if (e.getSource() instanceof DataBus) {
+			frame.getDataBusField().setText(e.getUpdate());
+		}
+		
+		else if (e.getSource() instanceof ControlLine) {
+			frame.getActivityMonitor().append(e.getUpdate()); //Append new update to existing text
+			frame.getActivityMonitor().setCaretPosition(frame.getActivityMonitor().getDocument().getLength());
+		}
+		
 		else if ((e.getSource() instanceof FetchDecodeStage) || (e.getSource() instanceof ExecuteStage) ||
 				(e.getSource() instanceof WriteBackStage)) {
 			frame.getActivityMonitor().append(e.getUpdate()); //Append new update to existing text

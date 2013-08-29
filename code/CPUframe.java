@@ -751,6 +751,8 @@ public class CPUframe extends JFrame {
 		controlLinePanel.add(controlLineField);
 		systemBusPanel.add(controlLinePanel);
 		
+		systemBusController.accessControlLine().registerListener(new UpdateListener(this));
+		
 		addressBusPanel = new JPanel();
 		addressBusPanel.setPreferredSize(new Dimension(175, 60));
 		//addressBusPanel.setBackground(Color.blue);
@@ -896,27 +898,21 @@ public class CPUframe extends JFrame {
 			if (systemBusController.accessControlLine().isWaiting()) {
 				synchronized(systemBusController.accessControlLine()) {
 					systemBusController.accessControlLine().notify();
-					System.out.println("bus notify called");
+					//System.out.println("bus notify called");
 				}
 			}
 			else if (controlUnit.getFetchDecodeStage().isWaiting()) {
 				synchronized(controlUnit.getFetchDecodeStage()) {
 					controlUnit.getFetchDecodeStage().notify();
-					System.out.println("f/d notify called");
+					//System.out.println("f/d notify called");
 				}
 			}
 			else if (controlUnit.getExecuteStage().isWaiting()) {
 				synchronized(controlUnit.getExecuteStage()) {
 					controlUnit.getExecuteStage().notify();
-					System.out.println("ex notify called");
+					//System.out.println("ex notify called");
 				}
-			}
-			
-			//Use an isWaiting boolean to check which objects have a waiting thread? Set before and after wait() statements
-//			synchronized(controlUnit.getWriteBackStage()) {
-//				controlUnit.getWriteBackStage().notify();
-//			}
-	
+			}	
 		}
 		
 	}
