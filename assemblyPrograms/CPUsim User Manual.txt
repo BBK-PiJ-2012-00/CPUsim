@@ -1,0 +1,18 @@
+
+	
+	*** CPUsim User Manual ***
+
+
+1) SELECTING AND EXECUTING AN ASSEMBLY FILE
+
+	Click on the "Select Assembly File" button in the control panel in the upper left quadrant.  Assembly language files supplied with the programs are all in text file format (.txt).  Once a file has been selected it will automatically be displayed in the Assembly Program window of the GUI, as well as in the Main Memory display on the right hand side.
+
+	To begin execution, click "Execute Program".  This will prompt the first step of execution.  Commentary on the CPU's behaviour can be viewed in the Activity Monitor window, below the assembly program code.  To prompt the program to execute the next step, click on the "Step" button in the control panel.  As the simulator is designed to assist students in understanding the instruction cycle it will not simply cycle through an assembly program automatically; it is necessary to press "Step" to prompt the next step of execution until the assembly program has finished (a HALT instruction is encountered).  
+
+	It is possible to load a different assembly program at any point during the execution of another program; simply click on the "Select Assembly File" button and the interface will be ready to begin execution of the new program.  
+
+	While there is no back button feature to return to the previous step, it is possible to restart the program by either selecting it afresh, or by clicking "Reset".  
+
+
+
+2) ASSEMBLY LANGUAGE, INSTRUCTIONS AND OPERANDS      
