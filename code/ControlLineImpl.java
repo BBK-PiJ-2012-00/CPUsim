@@ -9,8 +9,7 @@ public class ControlLineImpl implements ControlLine {
 	private boolean isWaiting; //So that the SwingWorker thread on the GUI can ascertain if the thread is waiting in this object
 	
 	private UpdateListener updateListener;
-	private String activityMonitorUpdate; //For activity monitor commentary
-	private String operationUpdate; //To display on GUI control line whether the operation is a read or a write
+	
 	
 	public ControlLineImpl(MemoryBufferRegister mbr) {
 		this.mbr = mbr;
