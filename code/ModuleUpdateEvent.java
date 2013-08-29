@@ -17,7 +17,7 @@ public class ModuleUpdateEvent extends EventObject {
 	private Operand result; //the result of the ALU operation (these are all type Operand for correct display on GUI)
 	private String aluUnit; //Which unit (i.e. adder) did the event originate from
 	
-	private boolean controlLine; //True if the source intends to set control line GUI display
+	private boolean controlLineUpdate; //True if the source intends to set control line GUI display
 
 	public ModuleUpdateEvent(Object source, String update) {
 		super(source);
@@ -49,9 +49,9 @@ public class ModuleUpdateEvent extends EventObject {
 	 * this as well as the activity monitor, so it is important to distinguish between updates
 	 * intended for one or the other.
 	 */
-	public ModuleUpdateEvent(Object source, boolean controlLine, String update) {
+	public ModuleUpdateEvent(Object source, boolean controlLineUpdate, String update) {
 		super(source);
-		this.controlLine = controlLine;
+		this.controlLineUpdate = controlLineUpdate;
 		this.update = update;		
 	}
 	
@@ -77,6 +77,10 @@ public class ModuleUpdateEvent extends EventObject {
 	
 	public Operand getOp2() {
 		return this.op2;
+	}
+	
+	public boolean isControlLineUpdate() {
+		return this.controlLineUpdate;
 	}
 
 }
