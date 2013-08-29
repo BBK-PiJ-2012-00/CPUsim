@@ -313,16 +313,21 @@ public class CPUframe extends JFrame {
 		//registerPanel.setMaximumSize(new Dimension(20, 20));
 		registerPanel.setBorder(BorderFactory.createTitledBorder("CPU Registers"));
 		registerPanel.setLayout(new BoxLayout(registerPanel, BoxLayout.Y_AXIS));
+		//registerPanel.setLayout(new BoxLayout(registerPanel, BoxLayout.X_AXIS));
+		
+		JPanel topRegisterPanel = new JPanel();
+		topRegisterPanel.setLayout(new BoxLayout(topRegisterPanel, BoxLayout.X_AXIS));
 		
 		controlRegistersPanel1 = new JPanel();		
-		controlRegistersPanel1.setLayout(new BoxLayout(controlRegistersPanel1, BoxLayout.X_AXIS));
+		//controlRegistersPanel1.setLayout(new BoxLayout(controlRegistersPanel1, BoxLayout.X_AXIS));
+		controlRegistersPanel1.setLayout(new BoxLayout(controlRegistersPanel1, BoxLayout.Y_AXIS));
 		
-		pcField = new JTextField(4);		
+		pcField = new JTextField(6);		
 		pcField.setEditable(false);
 		pcField.setAlignmentX(CENTER_ALIGNMENT);
 		pcField.setAlignmentY(CENTER_ALIGNMENT);
 		pcPanel = new JPanel();
-		pcPanel.setMaximumSize(new Dimension(75, 60));
+		pcPanel.setMaximumSize(new Dimension(125, 60));
 		pcPanel.add(pcField);
 		pcPanel.setBorder(BorderFactory.createTitledBorder(" PC "));
 		
@@ -332,16 +337,16 @@ public class CPUframe extends JFrame {
 		irField = new JTextField(8);
 		irField.setEditable(false);
 		irPanel = new JPanel();
-		irPanel.setMaximumSize(new Dimension(150, 60));
+		irPanel.setMaximumSize(new Dimension(150, 90));
 		irPanel.add(irField);
 		irPanel.setBorder(BorderFactory.createTitledBorder(" IR "));
 		
 		controlUnit.getIR().registerListener(new UpdateListener(this));
 		
-		statusField = new JTextField(4);
+		statusField = new JTextField(6);
 		statusField.setEditable(false);
 		statusPanel = new JPanel();
-		statusPanel.setMaximumSize(new Dimension(75, 60));
+		statusPanel.setMaximumSize(new Dimension(125, 60));
 		//statusPanel.setSize(5, 5);
 		statusPanel.add(statusField);
 		statusPanel.setBorder(BorderFactory.createTitledBorder(" CC "));
@@ -349,20 +354,23 @@ public class CPUframe extends JFrame {
 		controlUnit.getStatusRegister().registerListener(new UpdateListener(this));
 		
 		controlRegistersPanel1.add(pcPanel);
-		controlRegistersPanel1.add(irPanel);
+		//controlRegistersPanel1.add(irPanel);
 		controlRegistersPanel1.add(statusPanel);
-		registerPanel.add(controlRegistersPanel1);
-				
+		controlRegistersPanel1.setBorder(BorderFactory.createEmptyBorder(0, 15, 15, 20));
+		//registerPanel.add(controlRegistersPanel1);
+		
 		
 		controlRegistersPanel2 = new JPanel();
-		controlRegistersPanel2.setLayout(new BoxLayout(controlRegistersPanel2, BoxLayout.X_AXIS));
+		//controlRegistersPanel2.setLayout(new BoxLayout(controlRegistersPanel2, BoxLayout.X_AXIS));
+		controlRegistersPanel2.setLayout(new BoxLayout(controlRegistersPanel2, BoxLayout.Y_AXIS));
 		
-		marField = new JTextField(4);
+		marField = new JTextField(8);
 		marField.setEditable(false);		
 		marPanel = new JPanel();
-		marPanel.setMaximumSize(new Dimension(75, 60));
+		marPanel.setMaximumSize(new Dimension(150, 60));
 		marPanel.add(marField);
-		marPanel.setBorder(BorderFactory.createTitledBorder(" MAR "));
+		Border cyanLine = BorderFactory.createLineBorder(Color.cyan);
+		marPanel.setBorder(BorderFactory.createTitledBorder(cyanLine, " MAR "));
 		controlUnit.getMAR().registerListener(registerListener);
 		
 		mbrField = new JTextField(8);
@@ -370,14 +378,22 @@ public class CPUframe extends JFrame {
 		mbrPanel = new JPanel();
 		mbrPanel.setMaximumSize(new Dimension(150, 60));
 		mbrPanel.add(mbrField);
-		mbrPanel.setBorder(BorderFactory.createTitledBorder(" MBR "));
+		Border magentaLine = BorderFactory.createLineBorder(Color.magenta);
+		mbrPanel.setBorder(BorderFactory.createTitledBorder(magentaLine, " MBR "));
 		controlUnit.getMBR().registerListener(registerListener);
 		
 		controlRegistersPanel2.add(marPanel);
 		controlRegistersPanel2.add(mbrPanel);
+		controlRegistersPanel2.add(irPanel);
+		controlRegistersPanel2.setBorder(BorderFactory.createEmptyBorder(0, 15, 30, 0));
 		
+		topRegisterPanel.add(controlRegistersPanel1);
+		topRegisterPanel.add(controlRegistersPanel2);
+		//topRegisterPanel.setPreferredSize(new Dimension(500, 600));
 		
-		registerPanel.add(controlRegistersPanel2);
+		//registerPanel.add(controlRegistersPanel2);
+		registerPanel.add(topRegisterPanel);
+		//registerPanel.setMinimumSize(new Dimension(10000, 1000));
 		
 		/*
 		 * General purpose registers.
@@ -722,12 +738,14 @@ public class CPUframe extends JFrame {
 		
 		aluPanel.add(aluSubPanel1);
 		aluPanel.add(aluSubPanel2);
-		aluPanel.setMaximumSize(new Dimension(400, 280));
+		aluPanel.setPreferredSize(new Dimension(395, 290));
+		
+		JPanel bufferPanel = new JPanel(); //To separate registers from ALU with some empty space
+		bufferPanel.setPreferredSize(new Dimension(395, 20));
+		panel2.add(bufferPanel);
 		
 		panel2.add(aluPanel);
-		panel2.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); //Set right hand side to 0, and same for panel3
-		//so that bus lines touch cpu and memory
-		//Also, insert empty box with min size into panel2 to keep components at fixed heights in the panel
+		panel2.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5)); 
 		
 		ALU.registerListener(new UpdateListener(this));
 		
@@ -743,20 +761,10 @@ public class CPUframe extends JFrame {
 		systemBusPanel = new JPanel();
 		systemBusPanel.setLayout(new BoxLayout(systemBusPanel, BoxLayout.Y_AXIS));//Add bus panels vertically
 		
-		controlLinePanel = new JPanel();
-		controlLinePanel.setPreferredSize(new Dimension(175, 60));
-		controlLinePanel.setBorder(BorderFactory.createTitledBorder("Control Line"));
-		controlLineField = new JTextField(8);
-		controlLineField.setEditable(false);
-		controlLinePanel.add(controlLineField);
-		systemBusPanel.add(controlLinePanel);
-		
-		systemBusController.accessControlLine().registerListener(new UpdateListener(this));
-		
 		addressBusPanel = new JPanel();
 		addressBusPanel.setPreferredSize(new Dimension(175, 60));
 		//addressBusPanel.setBackground(Color.blue);
-		Border cyanLine = BorderFactory.createLineBorder(Color.cyan);	
+		//Border cyanLine = BorderFactory.createLineBorder(Color.cyan);	
 		addressBusPanel.setBorder(BorderFactory.createTitledBorder(cyanLine, "Address Bus"));
 		//Border addressBusBorder = BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Address Bus");
 		//addressBusPanel.setBorder(addressBusBorder);
@@ -770,7 +778,7 @@ public class CPUframe extends JFrame {
 		dataBusPanel = new JPanel();
 		dataBusPanel.setPreferredSize(new Dimension(175, 60));
 		//dataBusPanel.setBackground(Color.magenta);
-		Border magentaLine = BorderFactory.createLineBorder(Color.magenta);
+		//Border magentaLine = BorderFactory.createLineBorder(Color.magenta);
 		dataBusPanel.setBorder(BorderFactory.createTitledBorder(magentaLine, "Data Bus"));
 		dataBusField = new JTextField(8);
 		dataBusField.setEditable(false);
@@ -778,6 +786,16 @@ public class CPUframe extends JFrame {
 		systemBusPanel.add(dataBusPanel);
 		
 		systemBusController.accessControlLine().getDataBus().registerListener(new UpdateListener(this));
+		
+		controlLinePanel = new JPanel();
+		controlLinePanel.setPreferredSize(new Dimension(175, 60));
+		controlLinePanel.setBorder(BorderFactory.createTitledBorder("Control Line"));
+		controlLineField = new JTextField(8);
+		controlLineField.setEditable(false);
+		controlLinePanel.add(controlLineField);
+		systemBusPanel.add(controlLinePanel);
+		
+		systemBusController.accessControlLine().registerListener(new UpdateListener(this));
 		
 		systemBusPanel.setBorder(BorderFactory.createTitledBorder("System Bus"));
 		
@@ -789,6 +807,7 @@ public class CPUframe extends JFrame {
 		this.getContentPane().add(panel1); //Leftmost panel
 		panel1.setBackground(Color.cyan);
 		this.getContentPane().add(panel2);
+		panel2.setBackground(Color.DARK_GRAY);
 		this.getContentPane().add(panel3);
 		panel3.setBackground(Color.orange);
 		this.getContentPane().add(panel4); //Rightmost panel
