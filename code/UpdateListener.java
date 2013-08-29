@@ -51,8 +51,13 @@ public class UpdateListener implements EventListener {
 		}
 		
 		else if (e.getSource() instanceof ControlLine) {
-			frame.getActivityMonitor().append(e.getUpdate()); //Append new update to existing text
-			frame.getActivityMonitor().setCaretPosition(frame.getActivityMonitor().getDocument().getLength());
+			if (e.isControlLineUpdate()) {
+				frame.getControlLineField().setText(e.getUpdate());
+			}
+			else {
+				frame.getActivityMonitor().append(e.getUpdate()); //Append new update to existing text
+				frame.getActivityMonitor().setCaretPosition(frame.getActivityMonitor().getDocument().getLength());
+			}
 		}
 		
 		else if ((e.getSource() instanceof FetchDecodeStage) || (e.getSource() instanceof ExecuteStage) ||
