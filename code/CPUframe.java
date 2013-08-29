@@ -15,6 +15,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -127,6 +128,8 @@ public class CPUframe extends JFrame {
 	private JButton executeButton;
 	private JButton resetButton;
 	private JButton fileOpenButton;
+	private JButton helpButton;
+	private JButton modeSwitchButton;
 	private JButton stepButton;
 
 	private JScrollPane scroller;
@@ -234,6 +237,13 @@ public class CPUframe extends JFrame {
 		executeButton = new JButton("Execute Program");
 		executeButton.addActionListener(new ExecuteListener());
 		subControlPanel1.add(executeButton);
+		
+		helpButton = new JButton("Help!");
+		
+		subControlPanel2.add(helpButton);
+		
+		modeSwitchButton = new JButton("Pipelined Mode");
+		subControlPanel2.add(modeSwitchButton);
 		
 		stepButton = new JButton("Step");
 		stepButton.setAlignmentX(LEFT_ALIGNMENT);
@@ -936,6 +946,17 @@ public class CPUframe extends JFrame {
 		
 	}
 	
+	
+	class HelpButtonListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JDialog helpWindow = new JDialog();
+			
+		}
+		
+	}
+	
 	public JTextField getPCfield() {
 		return this.pcField;
 	}
@@ -1039,6 +1060,12 @@ public class CPUframe extends JFrame {
 
 	public JTextField getDataBusField() {
 		return this.dataBusField;
+	}
+
+
+
+	public JTextField getControlLineField() {
+		return this.controlLineField;
 	}
 
 	
