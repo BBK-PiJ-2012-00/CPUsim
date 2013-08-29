@@ -8,8 +8,10 @@ public class ControlLineImpl implements ControlLine {
 	private MemoryBufferRegister mbr;//Reference to CPU's MBR
 	//private MemoryAddressRegister mar; //Not required (for the time being)
 	
-	private boolean isWaiting;
+	private boolean isWaiting; //So that the SwingWorker thread on the GUI can ascertain if the thread is waiting in this object
 	
+	private String activityMonitorUpdate; //For activity monitor commentary
+	private String operationUpdate; //To display on GUI control line whether the operation is a read or a write
 	
 	public ControlLineImpl(MemoryBufferRegister mbr) {
 		this.mbr = mbr;
@@ -28,6 +30,7 @@ public class ControlLineImpl implements ControlLine {
 			//no need to place address on address bus -> if address field in AddressLine is null/0, this signifies delivery
 			//to CPU as opposed to memory (and is true to reality).
 			dataBus.put(data); //This is functionally redundant, but will be useful for GUI animation of bus lines
+			
 			isWaiting = true;
 			try {
 				wait();
@@ -36,11 +39,13 @@ public class ControlLineImpl implements ControlLine {
 				e.printStackTrace();
 			}
 			isWaiting = false;
+			
 			return this.deliverToMBR(); //Complete read operation. 
 		}
 		else if (data == null) { //Signifies first phase of a read; MAR places address on address line, prompting memory to
 			//place contents of the address on the address line onto data line for return to MBR.
 			addressBus.put(address);
+			
 			isWaiting = true;
 			try {
 				wait();
@@ -49,11 +54,13 @@ public class ControlLineImpl implements ControlLine {
 				e.printStackTrace();
 			}
 			isWaiting = false;
+			
 			return this.deliverToMemory(true);
 		}
 		//Memory write code:
 		addressBus.put(address);
 		dataBus.put(data);
+		
 		isWaiting = true;
 		try {
 			wait();
@@ -98,6 +105,14 @@ public class ControlLineImpl implements ControlLine {
 	
 	public boolean isWaiting() {
 		return isWaiting;
+	}
+	
+	public void fireActivityUpdate(String update) {
+		//For activity monitor commentary
+	}
+	
+	public void fireOperationUpdate(String update) {
+		//For control line display on GUI (read/write)
 	}
 	
 	
