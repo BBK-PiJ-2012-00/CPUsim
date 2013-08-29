@@ -55,6 +55,12 @@ public interface ControlLine {
 
 	public boolean isWaiting();
 
+	public void fireActivityUpdate(String update);
+	
+	public void registerListener(UpdateListener listener);
+
+	public void fireOperationUpdate(String update);
+
 		
 	
 	

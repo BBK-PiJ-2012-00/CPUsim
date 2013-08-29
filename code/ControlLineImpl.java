@@ -10,6 +10,7 @@ public class ControlLineImpl implements ControlLine {
 	
 	private boolean isWaiting; //So that the SwingWorker thread on the GUI can ascertain if the thread is waiting in this object
 	
+	private UpdateListener updateListener;
 	private String activityMonitorUpdate; //For activity monitor commentary
 	private String operationUpdate; //To display on GUI control line whether the operation is a read or a write
 	
@@ -103,16 +104,25 @@ public class ControlLineImpl implements ControlLine {
 		return this.dataBus;
 	}
 	
+	@Override
 	public boolean isWaiting() {
 		return isWaiting;
 	}
 	
+	@Override
 	public void fireActivityUpdate(String update) {
-		//For activity monitor commentary
+		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, update);
+		updateListener.handleUpDateEvent(updateEvent);
 	}
 	
+	@Override
 	public void fireOperationUpdate(String update) {
 		//For control line display on GUI (read/write)
+	}
+	
+	@Override
+	public void registerListener(UpdateListener listener) {
+		this.updateListener = listener;
 	}
 	
 	
