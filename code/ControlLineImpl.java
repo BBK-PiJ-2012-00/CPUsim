@@ -32,6 +32,14 @@ public class ControlLineImpl implements ControlLine {
 			//to CPU as opposed to memory (and is true to reality).
 			dataBus.put(data); //This is functionally redundant, but will be useful for GUI animation of bus lines
 			
+			//fireOperationUpdate("Memory Read");
+			if (data instanceof Instruction) { //Activity monitor commentary
+				fireActivityUpdate("Instruction " + data.toString() + " placed on data bus from \nmemory.\n");
+			}
+			else {
+				fireActivityUpdate("Operand " + data.toString() + " placed on data bus from \nmemory.\n");
+			}
+			
 			isWaiting = true;
 			try {
 				wait();
@@ -41,11 +49,17 @@ public class ControlLineImpl implements ControlLine {
 			}
 			isWaiting = false;
 			
+			fireOperationUpdate(""); //Clear control line display
+			
 			return this.deliverToMBR(); //Complete read operation. 
 		}
 		else if (data == null) { //Signifies first phase of a read; MAR places address on address line, prompting memory to
 			//place contents of the address on the address line onto data line for return to MBR.
 			addressBus.put(address);
+			
+			fireOperationUpdate("Memory read");
+			fireActivityUpdate("Address " + address + " placed on address line by MAR, prompting\nthe first stage" +
+					"of a memory read.\n");
 			
 			isWaiting = true;
 			try {
@@ -61,6 +75,16 @@ public class ControlLineImpl implements ControlLine {
 		//Memory write code:
 		addressBus.put(address);
 		dataBus.put(data);
+		
+		fireOperationUpdate("Memory write");
+		if (data instanceof Instruction) {
+			fireActivityUpdate("Address " + address + " placed on address bus by MAR \nand instruction " +
+					data.toString() + " placed on data bus by MBR.\n");
+		}
+		else {
+			fireActivityUpdate("Address " + address + " placed on address bus by MAR \nand operand " +
+					data.toString() + " placed on data bus by MBR.\n");
+		}
 		
 		isWaiting = true;
 		try {
@@ -85,6 +109,7 @@ public class ControlLineImpl implements ControlLine {
 		if (isRead) {			
 			return memory.notifyRead(addressBus.read());
 		}
+		fireOperationUpdate(""); //Reset control line as data is written into MBR
 		return memory.notifyWrite(addressBus.read(), dataBus.read());
 	}
 	
@@ -117,7 +142,8 @@ public class ControlLineImpl implements ControlLine {
 	
 	@Override
 	public void fireOperationUpdate(String update) {
-		//For control line display on GUI (read/write)
+		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, true, update); //True reflects update is to control line display
+		updateListener.handleUpDateEvent(updateEvent);
 	}
 	
 	@Override
