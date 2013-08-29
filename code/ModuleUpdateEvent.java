@@ -16,12 +16,17 @@ public class ModuleUpdateEvent extends EventObject {
 	private Operand op2; //op2 is the second ALU operand
 	private Operand result; //the result of the ALU operation (these are all type Operand for correct display on GUI)
 	private String aluUnit; //Which unit (i.e. adder) did the event originate from
+	
+	private boolean controlLine; //True if the source intends to set control line GUI display
 
 	public ModuleUpdateEvent(Object source, String update) {
 		super(source);
 		this.update = update;
 	}
 	
+	/*
+	 * For general purpose register events (register references the specific general purpose register).
+	 */
 	public ModuleUpdateEvent(Object source, int register, String update) {
 		super(source);
 		this.update = update;
@@ -37,6 +42,17 @@ public class ModuleUpdateEvent extends EventObject {
 		this.op1 = new OperandImpl(op1);
 		this.op2 = new OperandImpl(op2);
 		this.result = result;
+	}
+	
+	/*
+	 * A constructor for updates to the control line GUI display; the control line updates both
+	 * this as well as the activity monitor, so it is important to distinguish between updates
+	 * intended for one or the other.
+	 */
+	public ModuleUpdateEvent(Object source, boolean controlLine, String update) {
+		super(source);
+		this.controlLine = controlLine;
+		this.update = update;		
 	}
 	
 	public String getUpdate() {
