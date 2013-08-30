@@ -935,24 +935,30 @@ public class CPUframe extends JFrame {
 		        int returnVal = fileChooser.showOpenDialog(fileOpenButton);
 
 		        if (returnVal == JFileChooser.APPROVE_OPTION) {
-		            currentAssemblyFile = fileChooser.getSelectedFile();
-		            
+		            currentAssemblyFile = fileChooser.getSelectedFile();		           
+	            
 		            memory.clearMemory();
 		            activityArea.setText("");
 		            controlUnit.clearRegisters();
 		           
 		            assembler = new AssemblerImpl(loader);
 		            assembler.selectFile(currentAssemblyFile);
-		    		assembler.assembleCode();
-		    		assembler.loadToLoader();
-		    		assembler.getLoader().loadToMemory();
-		    		memoryContentArea.setText(memory.display()); //update memory display on opening file
-		    		memoryContentArea.setCaretPosition(0); //Scrolls text area to top
+		    		boolean fileFound = assembler.assembleCode();
 		    		
-		    		assemblyProgramArea.setText(assembler.display());
-		    		assemblyProgramArea.setCaretPosition(0);		    		
-		            
-		        }
+		    		if (fileFound) {	 //Only assemble if the file is found	    		
+			    		assembler.loadToLoader();
+			    		assembler.getLoader().loadToMemory();
+			    		memoryContentArea.setText(memory.display()); //update memory display on opening file
+			    		memoryContentArea.setCaretPosition(0); //Scrolls text area to top
+			    		
+			    		assemblyProgramArea.setText(assembler.display());
+			    		assemblyProgramArea.setCaretPosition(0);
+		    		}
+		    		else {
+		    			currentAssemblyFile = null; //Prevent execution from being allowed if file not found	    			
+		    		}
+	            }         
+		        
 		   }
 		}		
 	}
