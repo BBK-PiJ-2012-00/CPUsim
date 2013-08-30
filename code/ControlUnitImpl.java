@@ -39,13 +39,11 @@ public class ControlUnitImpl implements ControlUnit {
 		
 		this.systemBus = systemBus;
 		
-		//mbr = MBR.getInstance();
 		this.mbr = mbr;
 		mar = new MAR();
 		genRegisters = new RegisterFile16();
 		pc = new PC();
 		ir = new IR();
-		System.out.println("IR hashcode control unit: "+ ir.hashCode());
 		statusRegister = new StatusRegister();
 		
 		if (!pipeliningMode) { //If not pipelined, create standard stages
@@ -57,33 +55,11 @@ public class ControlUnitImpl implements ControlUnit {
 		
 		if (pipeliningMode) { //Queues only required if pipelining enabled
 			fetchToExecuteQueue = new SynchronousQueue<Integer>();
+			executeToWriteQueue = new SynchronousQueue<Integer>(); //Integer to reflect that result of arithmetic is passed
 		}
 		
 	}
 	
-//	public ControlUnitImpl(boolean pipeliningMode) {
-//		this.pipeliningMode = pipeliningMode;
-//		
-//		systemBus = SystemBusController.getInstance();
-//		
-//		mbr = MBR.getInstance();
-//		mar = MAR.getInstance();
-//		genRegisters = new RegisterFile16();
-//		pc = new PC();
-//		ir = new IR();
-//		statusRegister = new StatusRegister();
-//		
-//		if (!pipeliningMode) { //If not pipelined, create standard stages
-//			fetchDecodeStage = new StandardFetchDecodeStage(systemBus, mar, mbr, ir, pc);
-//			writeBackStage = new StandardWriteBackStage(ir, genRegisters);
-//			executeStage = new StandardExecuteStage(ir, pc, genRegisters, statusRegister, writeBackStage);	
-//		}
-//		
-//		if (pipeliningMode) { //Queues only required if pipelining enabled
-//			fetchToExecuteQueue = new SynchronousQueue<Integer>();
-//		}
-//		
-//	}
 	
 	public boolean isActive() {
 		return this.active;
@@ -132,6 +108,15 @@ public class ControlUnitImpl implements ControlUnit {
 		statusRegister.write(null);		
 	}
 	
+	public void resetStages() { //Used when restarting an assembly program
+		if (!pipeliningMode) { //If not pipelined, create standard stages
+			fetchDecodeStage = new StandardFetchDecodeStage(this.systemBus, mar, this.mbr, ir, pc);
+			writeBackStage = new StandardWriteBackStage(ir, genRegisters);
+			executeStage = new StandardExecuteStage(this.systemBus, ir, pc, genRegisters, statusRegister, writeBackStage,
+					this.mbr, mar);	
+		}
+	}
+	
 	/*
 	 * If the main thread running through this method controls worker threads in the run method, prompting it
 	 * to pause at every stage, step by step execution could be implemented.  Calling next simply wakes the 
@@ -171,7 +156,7 @@ public class ControlUnitImpl implements ControlUnit {
 	}
 
 	
-	public synchronized FetchDecodeStage getFetchDecodeStage() {
+	public FetchDecodeStage getFetchDecodeStage() {
 		return this.fetchDecodeStage;
 	}
 

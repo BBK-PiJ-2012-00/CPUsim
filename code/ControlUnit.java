@@ -40,6 +40,8 @@ public interface ControlUnit {
 	public WriteBackStage getWriteBackStage();
 	
 	public void clearRegisters();
+	
+	public void resetStages();
 
 		
 	
