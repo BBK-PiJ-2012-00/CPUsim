@@ -857,8 +857,7 @@ public class CPUframe extends JFrame {
 		
 		@Override
 		protected void done() {
-			//memoryContentArea.setText(memory.display());
-			//memoryContentArea.setCaretPosition(0);
+			executionWorker.cancel(true); //Terminate the thread.
 		}
 		
 	}
@@ -868,12 +867,14 @@ public class CPUframe extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			//executionWorker = new ExecutionWorker().execute();
-			executionWorker = new ExecutionWorker();
-			executionWorker.execute();
-//			controlUnit.activate();
-//			memoryContentArea.setText(memory.display());
-//			memoryContentArea.setCaretPosition(0); //Scrolls to top of memory for better view
+			if (executionWorker == null) { //Only create worker thread if the current one is null (to avoid several threads).
+				//executionWorker = new ExecutionWorker().execute();
+				executionWorker = new ExecutionWorker();
+				executionWorker.execute();
+	//			controlUnit.activate();
+	//			memoryContentArea.setText(memory.display());
+	//			memoryContentArea.setCaretPosition(0); //Scrolls to top of memory for better view
+			}
 			
 		}
 		
@@ -887,10 +888,13 @@ public class CPUframe extends JFrame {
 //			memoryContentArea.setText(memory.display());
 //			memoryContentArea.setCaretPosition(0);
 			
+			executionWorker.cancel(true); //Old worker thread needs terminating
 			memory.clearMemory();
             activityArea.setText("");
             controlUnit.clearRegisters();
            // controlUnit.resetStages();
+            
+            
            
             assembler = new AssemblerImpl(loader);
             assembler.selectFile(currentAssemblyFile); //Reopen previously selected assembly file
