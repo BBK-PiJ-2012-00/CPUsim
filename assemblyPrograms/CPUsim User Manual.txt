@@ -1,18 +1,36 @@
 
 	
-	*** CPUsim User Manual ***
+*** CPUsim User Manual ***
 
 
 1) SELECTING AND EXECUTING AN ASSEMBLY FILE
 
-	Click on the "Select Assembly File" button in the control panel in the upper left quadrant.  Assembly language files supplied with the programs are all in text file format (.txt).  Once a file has been selected it will automatically be displayed in the Assembly Program window of the GUI, as well as in the Main Memory display on the right hand side.
+Click on the "Select Assembly File" button in the control panel in the upper left quadrant.  Assembly language files supplied with the program are all in text file format (.txt).  Once a file has been selected it will automatically be displayed in the Assembly Program window of the GUI, as well as in the Main Memory display on the right hand side.
 
-	To begin execution, click "Execute Program".  This will prompt the first step of execution.  Commentary on the CPU's behaviour can be viewed in the Activity Monitor window, below the assembly program code.  To prompt the program to execute the next step, click on the "Step" button in the control panel.  As the simulator is designed to assist students in understanding the instruction cycle it will not simply cycle through an assembly program automatically; it is necessary to press "Step" to prompt the next step of execution until the assembly program has finished (a HALT instruction is encountered).  
+To begin execution, click "Execute Program".  This will prompt the first step of execution.  Commentary on the CPU's behaviour can be viewed in the Activity Monitor window, below the assembly program code.  To prompt the program to execute the next step, click on the "Step" button in the control panel.  As the simulator is designed to assist students in understanding the instruction cycle it will not simply cycle through an assembly program automatically; it is necessary to press "Step" to prompt the next step of execution until the assembly program has finished (a HALT instruction is encountered).  
 
-	It is possible to load a different assembly program at any point during the execution of another program; simply click on the "Select Assembly File" button and the interface will be ready to begin execution of the new program.  
+It is possible to load a different assembly program at any point during the execution of another program; simply click on the "Select Assembly File" button and the interface will be ready to begin execution of the new program.  
 
-	While there is no back button feature to return to the previous step, it is possible to restart the program by either selecting it afresh, or by clicking "Reset".  
+While there is no back button feature to return to the previous step, it is possible to restart the program by either selecting it afresh, or by clicking "Reset". To begin executing the program once more, press "Execute Program" and then "Step" to step through the execution.  
 
 
 
-2) ASSEMBLY LANGUAGE, INSTRUCTIONS AND OPERANDS      
+2) ASSEMBLY LANGUAGE, INSTRUCTIONS AND OPERANDS   
+
+
+3) WRITING CUSTOM ASSEMBLY PROGRAMS
+
+While the simulator is not designed to assist with the writing of new assembly programs, anyone can in theory add to the set of programs included with the application. However, care needs to be taken over the formatting of a custom assembly file.
+
+New assembly files should be created as plain text files, with a .txt extension. If this extension is hidden, the file will not be recognised by the simulator.
+
+Line numbers and the header row are added by the assembler to text files, so there is no need to write these yourself. The first line of the file should be the first instruction (blank lines are ignored by the assembler, so you can use as many of these as you like). Data declarations should be included after all of the instructions have been declared (with the last instruction being a HALT instruction).
+
+Labels can be any combination of letters and number but must be followed by a colon.  Comments are preceded by a #.  Operands should not be preceded by a # in the assembly language file, despite that they appear this way in memory.
+
+You should space out labels, instructions and comments on a line as you would like them to appear in the simulator assembly program display.
+
+The files packaged with the simulator can be viewed in a text editor for reference when writing custom assembly programs.
+
+Format is <Label>  <Instruction/Operand>  <Comment>
+This format is relatively strict, with labels and comments being optional.
