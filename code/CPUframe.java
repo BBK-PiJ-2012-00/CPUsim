@@ -926,11 +926,11 @@ public class CPUframe extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 		    //Handle open button action.
 		    if (e.getSource() == fileOpenButton) {
-		    	//FileFilter txtChooser = new FileNameExtensionFilter("Text File", "txt");
-		    	FileFilter txtFilter = new TextFileFilter();
-		    	fileChooser.setFileFilter(txtFilter);
+	
+		    	//Restricts file chooser to accepting text files and directories only
 		    	fileChooser.setAcceptAllFileFilterUsed(false);
-		    	
+		    	FileFilter txtFilter = new TextFileFilter();
+		    	fileChooser.setFileFilter(txtFilter);		    	
 		    	
 		        int returnVal = fileChooser.showOpenDialog(fileOpenButton);
 
