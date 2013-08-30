@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
+import javax.swing.JOptionPane;
+
 public class AssemblerImpl implements Assembler {
 	private Data[] programCode; //The assembly language program to be passed to the loader 
 	
@@ -58,7 +60,8 @@ public class AssemblerImpl implements Assembler {
 	    } 
 	    catch (FileNotFoundException ex) {
 	    	ex.printStackTrace();
-	    	//Display pop-up error
+	    	this.fileReference = null;
+	    	JOptionPane.showMessageDialog(null, "File not found!", "Error!", JOptionPane.WARNING_MESSAGE);
 	    }	    
 	    finally {
 	    	if (s != null) {
@@ -141,37 +144,42 @@ public class AssemblerImpl implements Assembler {
 	
 	
 	@Override
-	public void assembleCode() {
+	public boolean assembleCode() {
 		this.readAssemblyFile();
-		//Operands assembled first so their symbolic references can be mapped to actual addresses
-		this.separateOperands();
+		if (this.fileReference != null) { //Only assemble if file successfully opened
+			//Operands assembled first so their symbolic references can be mapped to actual addresses
+			this.separateOperands();
+					
+			//Assemble the operands (represented as Strings) to real Operands and put them in programCode
+			for (int i = 0; i < operandArray.size(); i++) {
+				List<String> lineComponents = this.splitCodeLine(operandArray.get(i)); //Break line of code into parts
 				
-		//Assemble the operands (represented as Strings) to real Operands and put them in programCode
-		for (int i = 0; i < operandArray.size(); i++) {
-			List<String> lineComponents = this.splitCodeLine(operandArray.get(i)); //Break line of code into parts
+				Data operand = this.assembleOperand(lineComponents);
+				programCode[operandAddressPointer] = operand; //Add the operand to the data array, at specified address
+				operandAddressPointer++; //Increment so that the next operand will be stored in the next consecutive address
+			}
 			
-			Data operand = this.assembleOperand(lineComponents);
-			programCode[operandAddressPointer] = operand; //Add the operand to the data array, at specified address
-			operandAddressPointer++; //Increment so that the next operand will be stored in the next consecutive address
-		}
-		
-		/*
-		 * Instruction labels must be mapped prior to assembling instructions.
-		 */
-		for (int i = 0; i < instructionArray.size(); i++) {
-			List<String> lineComponents = this.splitCodeLine(instructionArray.get(i));
-			this.mapInstructionLabel(lineComponents, i);
-		}
-		
-
-		//Assemble the instructions represented as Strings into type Instruction, and put into programCode array
-		for (int i = 0; i < instructionArray.size(); i++) { 	
-			List<String> lineComponents = this.splitCodeLine(instructionArray.get(i)); //Break a line of code into parts
+			/*
+			 * Instruction labels must be mapped prior to assembling instructions.
+			 */
+			for (int i = 0; i < instructionArray.size(); i++) {
+				List<String> lineComponents = this.splitCodeLine(instructionArray.get(i));
+				this.mapInstructionLabel(lineComponents, i);
+			}
 			
-			Data instruction = this.assembleInstruction(lineComponents); //Create an instruction/operand from the line components			
-			programCode[i] = instruction; //Add the instruction/operand to an array list, to be later passed into memory
+	
+			//Assemble the instructions represented as Strings into type Instruction, and put into programCode array
+			for (int i = 0; i < instructionArray.size(); i++) { 	
+				List<String> lineComponents = this.splitCodeLine(instructionArray.get(i)); //Break a line of code into parts
+				
+				Data instruction = this.assembleInstruction(lineComponents); //Create an instruction/operand from the line components			
+				programCode[i] = instruction; //Add the instruction/operand to an array list, to be later passed into memory
+			}
+			
+			return true;
 		}
 		
+		return false; //If file not found		
 	}
 	
 	@Override
@@ -357,7 +365,7 @@ public class AssemblerImpl implements Assembler {
 			if (i < 10) { //Line number formatting
 				displayString += "0" + i + "| " + programString.get(i) + "\n"; 
 				//Add blank line between instruction/operand declarations
-				if (!programString.get(i).contains("DATA") && (programString.get(i + 1).contains("DATA"))) {
+				if (!programString.get(i).contains("DATA") && programString.get(i + 1).contains("DATA")) {
 					displayString += "\n";
 				}
 			}

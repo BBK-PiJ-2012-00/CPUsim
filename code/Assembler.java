@@ -46,8 +46,10 @@ public interface Assembler {
 	 * being assembled and added to the programCode array. Instruction labels are also mapped to memory addresses, before
 	 * instructions themselves are assembled and added to programCode. This method relies on many of the other methods
 	 * of the assembler to do this.
+	 * 
+	 * @return true if file found and assembled, false otherwise.
 	 */	
-	public void assembleCode();
+	public boolean assembleCode();
 	
 	/*
 	 * This method assembles the operandArray field into Data (Operand) types, and stores them
