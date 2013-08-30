@@ -77,7 +77,7 @@ public class AssemblerImpl implements Assembler {
 	public void separateOperands() {
 		operandArray = new ArrayList<String>();
 		instructionArray = new ArrayList<String>();
-		for (int i = 1; i < programString.size(); i++) { //Start at 1 to miss out header line
+		for (int i = 0; i < programString.size(); i++) { //Start at 1 to miss out header line
 			if (programString.get(i).contains("DATA")) { //Only operand declarations contain this String sequence
 				operandArray.add(programString.get(i));
 			}
@@ -345,15 +345,31 @@ public class AssemblerImpl implements Assembler {
 		return this.loader;
 	}
 
+	
 	/*
-	 * Not working properly!!
+	 * For GUI display
 	 */
 	@Override
 	public String display() { //Displays assembly language program
-		String displayString = "";
-		for (String line : programString) {
-			displayString += line + "\n";
-		}
+		String displayString = "    <Label>  <Instruction/Operand>  <#Comment>\n\n";
+		for (int i = 0; i < programString.size(); i++) {
+
+			if (i < 10) { //Line number formatting
+				displayString += "0" + i + "| " + programString.get(i) + "\n"; 
+				//Add blank line between instruction/operand declarations
+				if (!programString.get(i).contains("DATA") && (programString.get(i + 1).contains("DATA"))) {
+					displayString += "\n";
+				}
+			}
+			else {
+				displayString += i + "| " + programString.get(i) + "\n";
+				//Add blank line between instruction/operand declarations
+				if (!programString.get(i).contains("DATA") && programString.get(i+1).contains("DATA")) { 
+					displayString += "\n";
+				}
+			}
+		}		
+
 		return displayString;
 	}
 
