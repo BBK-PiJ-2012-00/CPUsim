@@ -107,5 +107,7 @@ public interface Assembler {
 	public Data[] getProgramCode();
 	
 	public String display();
+	
+	public Loader getLoader();
 
 }
