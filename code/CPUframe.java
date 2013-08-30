@@ -857,7 +857,7 @@ public class CPUframe extends JFrame {
 		
 		@Override
 		protected void done() {
-			executionWorker.cancel(true); //Terminate the thread.
+			//executionWorker.cancel(true); //Terminate the thread.
 		}
 		
 	}
@@ -867,13 +867,18 @@ public class CPUframe extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (executionWorker == null) { //Only create worker thread if the current one is null (to avoid several threads).
-				//executionWorker = new ExecutionWorker().execute();
-				executionWorker = new ExecutionWorker();
-				executionWorker.execute();
-	//			controlUnit.activate();
-	//			memoryContentArea.setText(memory.display());
-	//			memoryContentArea.setCaretPosition(0); //Scrolls to top of memory for better view
+			if (currentAssemblyFile != null) { //There must be a file to execute
+				
+				if (executionWorker == null) { //Only create worker thread if the current one is null (to avoid several threads).;
+					executionWorker = new ExecutionWorker();
+					executionWorker.execute();
+				}
+				
+			}
+			else {
+				JLabel noFileErrorMessage = new JLabel("Please select an assembly file first!");
+				JOptionPane.showMessageDialog(null, noFileErrorMessage, "Error!", JOptionPane.WARNING_MESSAGE);
+				//noFileErrorPane.showMessageDialog("")
 			}
 			
 		}
@@ -988,7 +993,7 @@ public class CPUframe extends JFrame {
 		         JScrollPane helpScroller = new JScrollPane(helpPane);
 		         helpScroller.setPreferredSize(new Dimension(600, 600));
 		      
-		         JOptionPane.showMessageDialog(CPUframe.this, helpScroller, "User Manual", JOptionPane.INFORMATION_MESSAGE);
+		         JOptionPane.showMessageDialog(null, helpScroller, "User Manual", JOptionPane.INFORMATION_MESSAGE);
             }
             catch (IOException iox) {
                 System.err.println(iox);
