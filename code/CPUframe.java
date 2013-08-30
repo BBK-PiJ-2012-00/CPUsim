@@ -29,6 +29,8 @@ import javax.swing.SwingWorker;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.JTextComponent;
 
 
@@ -924,6 +926,12 @@ public class CPUframe extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 		    //Handle open button action.
 		    if (e.getSource() == fileOpenButton) {
+		    	//FileFilter txtChooser = new FileNameExtensionFilter("Text File", "txt");
+		    	FileFilter txtFilter = new TextFileFilter();
+		    	fileChooser.setFileFilter(txtFilter);
+		    	fileChooser.setAcceptAllFileFilterUsed(false);
+		    	
+		    	
 		        int returnVal = fileChooser.showOpenDialog(fileOpenButton);
 
 		        if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -948,6 +956,7 @@ public class CPUframe extends JFrame {
 		   }
 		}		
 	}
+	
 	
 	class StepExecutionListener implements ActionListener { //Implements step execution (notifies worker thread)
 
