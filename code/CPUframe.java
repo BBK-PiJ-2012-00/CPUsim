@@ -956,12 +956,16 @@ public class CPUframe extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			try {
 		         FileReader fileReader = new FileReader("src/assemblyPrograms/CPUsim User Manual.txt");
-		         JTextComponent helpPane = new JTextArea();
-		         helpPane.setMaximumSize(new Dimension(500, 500));
-		         helpPane.read(fileReader, null);
+		         JTextArea helpPane = new JTextArea();
+		         helpPane.setEditable(false);
+		         helpPane.setLineWrap(true); //Wrap lines to fit display area
+		         helpPane.setWrapStyleWord(true); //Wrap lines on word boundaries
+		         helpPane.read(fileReader, null); //Read the text file
+		         
 		         fileReader.close();
 		         JScrollPane helpScroller = new JScrollPane(helpPane);
-		        // helpScroller.setSize(500, 500);
+		         helpScroller.setPreferredSize(new Dimension(600, 600));
+		      
 		         JOptionPane.showMessageDialog(CPUframe.this, helpScroller, "User Manual", JOptionPane.INFORMATION_MESSAGE);
             }
             catch (IOException iox) {
