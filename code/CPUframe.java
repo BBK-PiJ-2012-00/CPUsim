@@ -878,7 +878,6 @@ public class CPUframe extends JFrame {
 			else {
 				JLabel noFileErrorMessage = new JLabel("Please select an assembly file first!");
 				JOptionPane.showMessageDialog(null, noFileErrorMessage, "Error!", JOptionPane.WARNING_MESSAGE);
-				//noFileErrorPane.showMessageDialog("")
 			}
 			
 		}
@@ -954,7 +953,11 @@ public class CPUframe extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (systemBusController.accessControlLine().isWaiting()) {
+			if (currentAssemblyFile == null) { //To alert user to fact that they should select a file first
+				JLabel noFileErrorMessage = new JLabel("Please select an assembly file first!");
+				JOptionPane.showMessageDialog(null, noFileErrorMessage, "Error!", JOptionPane.WARNING_MESSAGE);
+			}
+			else if (systemBusController.accessControlLine().isWaiting()) {
 				synchronized(systemBusController.accessControlLine()) {
 					systemBusController.accessControlLine().notify();
 					//System.out.println("bus notify called");
