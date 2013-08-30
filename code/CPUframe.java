@@ -42,6 +42,8 @@ public class CPUframe extends JFrame {
 	private Loader loader;
 	private BusController systemBusController;
 	
+	private File currentAssemblyFile; //To hold a reference to the current assembly program to facilitate restarting the program.
+	
 	private SwingWorker<Void, Void> executionWorker;
 	
 	
@@ -881,9 +883,25 @@ public class CPUframe extends JFrame {
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
+//			memory.clearMemory();
+//			memoryContentArea.setText(memory.display());
+//			memoryContentArea.setCaretPosition(0);
+			
 			memory.clearMemory();
-			memoryContentArea.setText(memory.display());
-			memoryContentArea.setCaretPosition(0);
+            activityArea.setText("");
+            controlUnit.clearRegisters();
+           // controlUnit.resetStages();
+           
+            assembler = new AssemblerImpl(loader);
+            assembler.selectFile(currentAssemblyFile); //Reopen previously selected assembly file
+    		assembler.assembleCode();
+    		assembler.loadToLoader();
+    		assembler.getLoader().loadToMemory();
+    		memoryContentArea.setText(memory.display()); //update memory display on opening file
+    		memoryContentArea.setCaretPosition(0); //Scrolls text area to top
+    		
+    		assemblyProgramArea.setText(assembler.display());
+    		assemblyProgramArea.setCaretPosition(0);		
 		}
 	}
 	
@@ -901,17 +919,17 @@ public class CPUframe extends JFrame {
 		        int returnVal = fileChooser.showOpenDialog(fileOpenButton);
 
 		        if (returnVal == JFileChooser.APPROVE_OPTION) {
-		            File file = fileChooser.getSelectedFile();
+		            currentAssemblyFile = fileChooser.getSelectedFile();
 		            
 		            memory.clearMemory();
 		            activityArea.setText("");
 		            controlUnit.clearRegisters();
 		           
 		            assembler = new AssemblerImpl(loader);
-		            assembler.selectFile(file);
+		            assembler.selectFile(currentAssemblyFile);
 		    		assembler.assembleCode();
 		    		assembler.loadToLoader();
-		    		((AssemblerImpl) assembler).getLoader().loadToMemory();
+		    		assembler.getLoader().loadToMemory();
 		    		memoryContentArea.setText(memory.display()); //update memory display on opening file
 		    		memoryContentArea.setCaretPosition(0); //Scrolls text area to top
 		    		
