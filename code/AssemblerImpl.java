@@ -172,7 +172,10 @@ public class AssemblerImpl implements Assembler {
 			for (int i = 0; i < instructionArray.size(); i++) { 	
 				List<String> lineComponents = this.splitCodeLine(instructionArray.get(i)); //Break a line of code into parts
 				
-				Data instruction = this.assembleInstruction(lineComponents); //Create an instruction/operand from the line components			
+				Data instruction = this.assembleInstruction(lineComponents); //Create an instruction/operand from the line components
+				if (instruction == null) { //Only happens if an error occurs in instruction parsing
+					return false; //Signals an error to GUI code, prevents loading of assembly file
+				}
 				programCode[i] = instruction; //Add the instruction/operand to an array list, to be later passed into memory
 			}
 			
@@ -201,8 +204,25 @@ public class AssemblerImpl implements Assembler {
 				if (destinationString.equals("CC")) { //A load instruction may reference condition code/status register
 					destination = 16;
 				}
+				
 				else {
-					destination = Integer.parseInt(destinationString);
+					//Error handling for register destination reference
+					try {
+						destination = Integer.parseInt(destinationString);
+						if (destination < 0 || destination > 16) { //Illegal register reference
+							throw new IllegalStateException("Bad register reference in LOAD/BRE/BRNE instruction");
+						}
+					}
+					catch (NumberFormatException nfe) {
+						JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register destination\n" +
+								"reference in LOAD/BRE/BRNE instruction!", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+						return null; //Prevent further parsing
+					}
+					catch (IllegalStateException ise) {
+						JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register destination\n" +
+								"reference in LOAD/BRE/BRNE instruction! Register references should\n be between r0 to r16, or rCC.");
+						return null; //Prevent further parsing
+					}
 				}				
 				
 				int source = lookupTable.get(instructionParts.get(i+1)); //Memory addresses are always symbolic
