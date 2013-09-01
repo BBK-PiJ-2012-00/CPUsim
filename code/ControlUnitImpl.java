@@ -66,6 +66,7 @@ public class ControlUnitImpl implements ControlUnit {
 	}
 	
 	public void activate() { 
+		System.out.println("Just activated control unit.");
 		this.active = true;
 		this.launch();
 	}
@@ -84,9 +85,15 @@ public class ControlUnitImpl implements ControlUnit {
 				
 				fetchDecodeStage.run();
 				int opcode = fetchDecodeStage.getOpcodeValue();
-				executeStage.setOpcodeValue(opcode);
-				executeStage.run();
-				this.active = executeStage.isActive();
+				if (opcode == -1) { //fetchDecodeStage.getOpcodeValue() returns -1 if interrupted, meaning SwingWorker.cancel()
+					//has been called from CPUframe. Execution should not continue as a result.
+					this.active = false;
+				}
+				else {
+					executeStage.setOpcodeValue(opcode);
+					executeStage.run();
+					this.active = executeStage.isActive();
+				}
 			
 				//this.active = executeStage.instructionExecute(opcode); //Returns false if HALT encountered
 				
@@ -100,6 +107,7 @@ public class ControlUnitImpl implements ControlUnit {
 	public void clearRegisters() {
 		pc.setPC(0);
 		ir.loadIR(null);
+		System.out.println("About to write -1 to MBR as part of reset.");
 		mar.write(-1); // -1 triggers clear
 		mbr.write(null);
 		for (int i = 0; i < 16; i++) {
