@@ -11,7 +11,6 @@ public class CPUbuilder {
 	private ControlLine controlLine;
 	
 	private MemoryBufferRegister mbr;
-	private MemoryAddressRegister mar;
 	
 	private ControlUnit controlUnit;
 	
@@ -22,23 +21,22 @@ public class CPUbuilder {
 	}
 	
 	public void createComponents(boolean pipelined) {
-		memory = MemoryModule.getInstance(); //To be replaced by new	
-		//Memory needs a reference to the BusController
 		
-		//systemBusController = SystemBusController.getInstance();
+		memory = new MemoryModule(); 
 		
-		mbr = MBR.getInstance();
-		mar = MAR.getInstance();
+		mbr = new MBR();
 		
 		controlLine = new ControlLineImpl(mbr);
 		controlLine.registerMemoryModule(memory);
 		systemBusController = new SystemBusController(controlLine);
 		
+		memory.registerBusController(systemBusController);
+		
 		if (pipelined) {
-			controlUnit = new ControlUnitImpl(pipelined, mbr);
+			controlUnit = new ControlUnitImpl(pipelined, mbr, systemBusController);
 		}
 		else {
-			controlUnit = new ControlUnitImpl(false, mbr);
+			controlUnit = new ControlUnitImpl(false, mbr, systemBusController);
 		}	
 		
 		loader = new LoaderImpl(memory);
@@ -46,9 +44,6 @@ public class CPUbuilder {
 		
 	}
 	
-	public void buildCPU() {
-		
-	}
 	
 	public MainMemory getMemoryModule() {
 		return this.memory;
@@ -60,6 +55,10 @@ public class CPUbuilder {
 	
 	public Loader getLoader() {
 		return this.loader;
+	}
+	
+	public ControlUnit getControlUnit() {
+		return this.controlUnit;
 	}
 
 }

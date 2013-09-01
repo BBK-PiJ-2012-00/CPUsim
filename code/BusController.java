@@ -28,5 +28,7 @@ public interface BusController {
 	 * @return true if transfer successful, false otherwise.
 	 */	 
 	 boolean transferToCPU(Data data);
+	 
+	 public ControlLine accessControlLine(); //For GUI updates
 
 }

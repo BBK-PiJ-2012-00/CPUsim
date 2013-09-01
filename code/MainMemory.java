@@ -17,7 +17,7 @@ public interface MainMemory {
 	 * @param Instruction instr the instruction to be written into memory.
 	 * @param int index the memory location where the instruction is to be written.
 	 */
-	public void writeInstruction(Instruction instr, int index); //For use by Loader to write instructions into memory		
+	//public void writeInstruction(Instruction instr, int index); //For use by Loader to write instructions into memory		
 	
 	/*
 	 * A method invoked by the system bus for writing data to memory; it prompts memory to receive data

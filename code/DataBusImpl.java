@@ -27,7 +27,7 @@ public class DataBusImpl implements DataBus {
 	@Override
 	public String display() {
 		String displayString = "";
-		if (this.data == null) {
+		if (data == null) {
 			return displayString;
 		}
 		displayString += data.toString();

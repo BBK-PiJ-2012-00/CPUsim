@@ -61,6 +61,8 @@ public interface ControlLine {
 
 	public void fireOperationUpdate(String update);
 
+	public void resetWaitStatus();
+
 		
 	
 	

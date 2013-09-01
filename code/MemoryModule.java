@@ -49,20 +49,20 @@ public class MemoryModule implements MainMemory {
 		return MEMORY[index];
 	}
 	
-	//Should take Data type as parameter, not Instruction (what about Operands are not type Instruction!)
-	//May even be obsolete, as notify() below could be used
-	//May take an array as a parameter, depdening on Loader implementation
-	public void writeInstruction(Instruction instr, int index) { //For use by Loader to write instructions into memory
-		MEMORY[index] = instr; 
-		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, display());
-		updateListener.handleUpDateEvent(updateEvent);
-		//As this is only used by loader, it should take the address of the first instruction loaded into memory
-		//and transfer this address via the address bus to the MAR, and on to the PC to begin execution.
-		//A method can be called to do this; transferFirstInstruction().
-		//When a user selects a program to load, this should prompt the sim to the point where the PC is loaded
-		//but is waiting to begin execution.
-		//So it simply causes MAR to set the PC, and then the sim waits for user to press 'start'.
-	}
+//	//Should take Data type as parameter, not Instruction (what about Operands are not type Instruction!)
+//	//May even be obsolete, as notify() below could be used
+//	//May take an array as a parameter, depdening on Loader implementation
+//	public void writeInstruction(Instruction instr, int index) { //For use by Loader to write instructions into memory
+//		MEMORY[index] = instr; 
+//		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, display());
+//		updateListener.handleUpDateEvent(updateEvent);
+//		//As this is only used by loader, it should take the address of the first instruction loaded into memory
+//		//and transfer this address via the address bus to the MAR, and on to the PC to begin execution.
+//		//A method can be called to do this; transferFirstInstruction().
+//		//When a user selects a program to load, this should prompt the sim to the point where the PC is loaded
+//		//but is waiting to begin execution.
+//		//So it simply causes MAR to set the PC, and then the sim waits for user to press 'start'.
+//	}
 	
 	
 	/*
@@ -116,6 +116,7 @@ public class MemoryModule implements MainMemory {
 			return true;
 		}
 		//Throw exception if address invalid? This would disrupt program flow (possibly)
+		System.out.println("Returning false from memory's notifyRead()");
 		return false;
 	}
 	

@@ -492,7 +492,7 @@ public class AssemblerImpl implements Assembler {
 	 */
 	@Override
 	public String display() { //Displays assembly language program with line numbers
-		String displayString = "     <Label>  <Instruction/Operand>  <#Comment>\n\n";
+		String displayString = "     <Label>:  <Instruction/Operand>  <#Comment>\n\n";
 		int lineReference = 0; //For display of line numbers, including blank lines
 		for (int i = 0; i < programString.size(); i++) {
 			if (lineReference < 10) { //Line number formatting

@@ -107,7 +107,6 @@ public class ControlUnitImpl implements ControlUnit {
 	public void clearRegisters() {
 		pc.setPC(0);
 		ir.loadIR(null);
-		System.out.println("About to write -1 to MBR as part of reset.");
 		mar.write(-1); // -1 triggers clear
 		mbr.write(null);
 		for (int i = 0; i < 16; i++) {

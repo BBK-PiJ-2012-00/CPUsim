@@ -7,7 +7,7 @@ package code;
  */
 
 public class BranchInstr extends Instruction {
-	private int branchTarget; //28-bit branch target field
+	private int branchTarget; //branch target field
 	private int register; //Field for use by BRE and BRNE opcodes only (register references the register whose contents is to
 	//be compared to a control register to determine whether the branch is to be taken or not.
 	
