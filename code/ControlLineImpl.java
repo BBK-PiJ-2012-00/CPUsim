@@ -25,10 +25,8 @@ public class ControlLineImpl implements ControlLine {
 	
 	public synchronized boolean writeToBus(int address, Data data) { 
 		if (address == -1) { //Indicates transfer from memory to CPU (2nd phase of memory read; delivery from memory to MBR)
-			System.out.println("I've charged off into writeToBus, 2nd phase of read block!!");
 			dataBus.put(data); 
 			
-			//fireOperationUpdate("Memory Read");
 			if (data instanceof Instruction) { //Activity monitor commentary
 				fireActivityUpdate("Instruction " + data.toString() + " placed on data bus from \nmemory.\n");
 			}
@@ -40,10 +38,10 @@ public class ControlLineImpl implements ControlLine {
 			try {
 				wait();
 			} catch (InterruptedException e) {
-				System.out.println("I was interrupted. No biggie.");
 				e.printStackTrace();
 				clear();
-				//return false;
+				isWaiting = false;
+				return false;
 			}
 			isWaiting = false;
 			
@@ -54,7 +52,6 @@ public class ControlLineImpl implements ControlLine {
 		
 		else if (data == null) { //Signifies first phase of a read; MAR places address on address line, prompting memory to
 			//place contents of the address on the address line onto data line for return to MBR.
-			System.out.println("In first phase of memory read in control line");
 			addressBus.put(address);
 			
 			fireOperationUpdate("Memory read");
@@ -65,12 +62,11 @@ public class ControlLineImpl implements ControlLine {
 			try {
 				wait();
 			} catch (InterruptedException e) {
-				System.out.println("I was interrupted. No biggie.");
 				e.printStackTrace();
 				clear();
-				//return false;
+				isWaiting = false;
+				return false;
 			}
-			System.out.println("Interrupted exception handled, isWaiting about to be set to false");
 			isWaiting = false;
 			
 			return this.deliverToMemory(true);
@@ -94,10 +90,10 @@ public class ControlLineImpl implements ControlLine {
 		try {
 			wait();
 		} catch (InterruptedException e) {
-			System.out.println("I was interrupted. No biggie.");
 			e.printStackTrace();
 			clear();
-			//return false;
+			isWaiting = false;
+			return false;
 		}
 		isWaiting = false;
 		
@@ -107,16 +103,13 @@ public class ControlLineImpl implements ControlLine {
 	
 	
 	public boolean deliverToMBR() { //Prompts dataLine to load its value into MBR, completing memory read operation
-		System.out.println("In deliver to MBR");
 		return mbr.write(dataBus.read());		
 	}
 	
 	
 	
 	public boolean deliverToMemory(boolean isRead) { //If isRead, first stage of read operation, otherwise write.
-		System.out.println("Entered deliver to memory");
 		if (isRead) {	
-			System.out.println("In is read; calling memory.notifyRead()");
 			return memory.notifyRead(addressBus.read());
 		}
 		fireOperationUpdate(""); //Reset control line as data is written into MBR
@@ -166,6 +159,9 @@ public class ControlLineImpl implements ControlLine {
 		isWaiting = false;
 	}
 	
+	/*
+	 * To clear system bus lines in event of SwingWorker thread being cancelled (resets GUI display).
+	 */
 	public void clear() {
 		addressBus.put(-1);
 		dataBus.put(null);

@@ -41,26 +41,22 @@ public class SystemBusController implements BusController {
 	
 	private ControlLine controlLine;
 	
-	//References to CPU (MAR, MBR) and main memory
 	
-	private SystemBusController() {
-		controlLine = new ControlLineImpl();
+	public SystemBusController(ControlLine controlLine) {
+		this.controlLine = controlLine;
 	}
 	
-	public ControlLine accessControlLine() { //For testing purposes only.
+
+	
+	public ControlLine accessControlLine() { //For GUI display; access to control line is required
 		return this.controlLine;
 	}
 	
-	/*
-	 * Singleton global access point.
-	 */
-	public synchronized static BusController getInstance() { //Synchronized to ensure no concurrency issues with pipelining
-		if (systemBus == null) {
-			systemBus = new SystemBusController();
-			return systemBus;
-		}
-		return systemBus;
+	public void registerMemoryModule(MainMemory memory) {
+		controlLine.registerMemoryModule(memory);
 	}
+	
+
 
 	@Override
 	public boolean transferToMemory(int memoryAddress, Data data) {
@@ -76,6 +72,7 @@ public class SystemBusController implements BusController {
 	public boolean transferToCPU(Data data) { //Called by memory
 		return controlLine.writeToBus(-1, data); //-1 to reflect transfer to CPU (non-existent memory address) -> still necessary!?
 	}
+	
 		
 
 }
