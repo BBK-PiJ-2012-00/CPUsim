@@ -343,8 +343,9 @@ public class AssemblerImpl implements Assembler {
 		}
 			
 		else { //Opcode not found
-			JOptionPane.showMessageDialog(null, "Assembly program syntax error: invalid opcode encountered. Please\n" +
-						"ensure all instruction opcodes are valid.");
+			JOptionPane.showMessageDialog(null, "Assembly program syntax error: invalid opcode encountered:\n   \"" +
+					instructionParts.get(0) + "\" is not recognised. \nPlease ensure all instruction opcodes are valid.", 
+					"Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 			return null; //Prevents further parsing
 
 		}		
