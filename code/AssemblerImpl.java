@@ -84,6 +84,9 @@ public class AssemblerImpl implements Assembler {
 			if (programString.get(i).contains("DATA")) { //Only operand declarations contain this String sequence
 				operandArray.add(programString.get(i));
 			}
+			else if (programString.get(i).trim().startsWith("#")) {
+				//Do nothing; don't add comment lines to instruction or operand arrays
+			}
 			else {
 				instructionArray.add(programString.get(i));
 			}
@@ -488,23 +491,33 @@ public class AssemblerImpl implements Assembler {
 	 * For GUI display
 	 */
 	@Override
-	public String display() { //Displays assembly language program
-		String displayString = "    <Label>  <Instruction/Operand>  <#Comment>\n\n";
+	public String display() { //Displays assembly language program with line numbers
+		String displayString = "     <Label>  <Instruction/Operand>  <#Comment>\n\n";
+		int lineReference = 0; //For display of line numbers, including blank lines
 		for (int i = 0; i < programString.size(); i++) {
-
-			if (i < 10) { //Line number formatting
-				displayString += "0" + i + "| " + programString.get(i) + "\n"; 
+			if (lineReference < 10) { //Line number formatting
+				displayString += "0" + lineReference + "|  " + programString.get(i) + "\n"; 
 				//Add blank line between instruction/operand declarations
 				if (!programString.get(i).contains("DATA") && programString.get(i + 1).contains("DATA")) {
-					displayString += "\n";
+					if (lineReference == 9) { 
+						lineReference++;
+						displayString += lineReference + "|\n";
+					}
+					else { //Line reference is less than 9, therefore leading 0 is required for neatness
+						lineReference++;
+						displayString += "0" + lineReference + "|\n";
+					}
 				}
+				lineReference++;
 			}
 			else {
-				displayString += i + "| " + programString.get(i) + "\n";
+				displayString += lineReference + "|  " + programString.get(i) + "\n";
 				//Add blank line between instruction/operand declarations
 				if (!programString.get(i).contains("DATA") && programString.get(i+1).contains("DATA")) { 
-					displayString += "\n";
+					lineReference++;
+					displayString += lineReference + "|\n";
 				}
+				lineReference++;
 			}
 		}		
 
