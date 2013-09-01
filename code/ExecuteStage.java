@@ -49,8 +49,9 @@ public abstract class ExecuteStage implements Runnable {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						isWaiting = false;
+						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
 					isWaiting = false;
 					
@@ -61,8 +62,9 @@ public abstract class ExecuteStage implements Runnable {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						isWaiting = false;
+						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
 					isWaiting = false;
 					
@@ -78,8 +80,9 @@ public abstract class ExecuteStage implements Runnable {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
+							isWaiting = false;
+							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
 						isWaiting = false;
 					}
@@ -95,8 +98,9 @@ public abstract class ExecuteStage implements Runnable {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						isWaiting = false;
+						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
 					isWaiting = false;
 					
@@ -114,8 +118,9 @@ public abstract class ExecuteStage implements Runnable {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						isWaiting = false;
+						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
 					isWaiting = false;
 					
@@ -128,8 +133,9 @@ public abstract class ExecuteStage implements Runnable {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						isWaiting = false;
+						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
 					isWaiting = false;
 					
@@ -143,8 +149,9 @@ public abstract class ExecuteStage implements Runnable {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						isWaiting = false;
+						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
 					isWaiting = false;
 					
@@ -165,8 +172,9 @@ public abstract class ExecuteStage implements Runnable {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
+							isWaiting = false;
+							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
 						isWaiting = false;
 					}
@@ -184,8 +192,9 @@ public abstract class ExecuteStage implements Runnable {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
+							isWaiting = false;
+							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
 						isWaiting = false;
 					}
@@ -197,8 +206,9 @@ public abstract class ExecuteStage implements Runnable {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						isWaiting = false;
+						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
 					isWaiting = false;
 					
@@ -217,8 +227,9 @@ public abstract class ExecuteStage implements Runnable {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						isWaiting = false;
+						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
 					isWaiting = false;
 					
@@ -233,8 +244,9 @@ public abstract class ExecuteStage implements Runnable {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						isWaiting = false;
+						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
 					isWaiting = false;
 					
@@ -254,8 +266,9 @@ public abstract class ExecuteStage implements Runnable {
 					try {
 						wait(); //Makes more sense to place wait here than to complicate writeBack stage.
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						isWaiting = false;
+						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
 					isWaiting = false;
 					
@@ -270,8 +283,9 @@ public abstract class ExecuteStage implements Runnable {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						isWaiting = false;
+						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
 					isWaiting = false;
 					
@@ -291,8 +305,9 @@ public abstract class ExecuteStage implements Runnable {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						isWaiting = false;
+						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
 					isWaiting = false;
 					
@@ -307,8 +322,9 @@ public abstract class ExecuteStage implements Runnable {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						isWaiting = false;
+						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
 					isWaiting = false;
 					
@@ -328,8 +344,9 @@ public abstract class ExecuteStage implements Runnable {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						isWaiting = false;
+						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
 					isWaiting = false;
 					
@@ -344,8 +361,9 @@ public abstract class ExecuteStage implements Runnable {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						isWaiting = false;
+						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
 					isWaiting = false;
 					
@@ -363,8 +381,9 @@ public abstract class ExecuteStage implements Runnable {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						isWaiting = false;
+						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
 					isWaiting = false;
 					
@@ -380,8 +399,9 @@ public abstract class ExecuteStage implements Runnable {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
+							isWaiting = false;
+							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
 						isWaiting = false;
 					}
@@ -393,8 +413,9 @@ public abstract class ExecuteStage implements Runnable {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
+							isWaiting = false;
+							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
 						isWaiting = false;				
 						
@@ -411,8 +432,9 @@ public abstract class ExecuteStage implements Runnable {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
+							isWaiting = false;
+							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					  	}
 					    isWaiting = false;	
 					    
@@ -425,8 +447,9 @@ public abstract class ExecuteStage implements Runnable {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
+							isWaiting = false;
+							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
 						isWaiting = false;			
 								
@@ -444,8 +467,9 @@ public abstract class ExecuteStage implements Runnable {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
+							isWaiting = false;
+							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
 						isWaiting = false;			
 					 }
@@ -458,8 +482,9 @@ public abstract class ExecuteStage implements Runnable {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
+							isWaiting = false;
+							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
 						isWaiting = false;			
 						 
@@ -477,8 +502,9 @@ public abstract class ExecuteStage implements Runnable {
 						 try {
 							 wait();
 						 } catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							 e.printStackTrace();
+							 isWaiting = false;
+							 return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						 }
 						 isWaiting = false;			
 						 
@@ -492,8 +518,9 @@ public abstract class ExecuteStage implements Runnable {
 						 try {							 
 							wait();
 						 } catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							 e.printStackTrace();
+							 isWaiting = false;
+							 return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						 }
 						 isWaiting = false;			
 						 
