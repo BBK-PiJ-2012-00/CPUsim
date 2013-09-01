@@ -45,9 +45,10 @@ public interface Assembler {
 	 * ready for passing to the loader. Operands are first mapped from symbolic to physical memory addresses before
 	 * being assembled and added to the programCode array. Instruction labels are also mapped to memory addresses, before
 	 * instructions themselves are assembled and added to programCode. This method relies on many of the other methods
-	 * of the assembler to do this.
+	 * of the assembler to do this.  If any syntax errors in the assembly program are encountered, this method returns
+	 * false, signalling to the GUI code that the file open operation should be cancelled.
 	 * 
-	 * @return true if file found and assembled, false otherwise.
+	 * @return true if file found and assembled without errors, false otherwise.
 	 */	
 	public boolean assembleCode();
 	
@@ -55,6 +56,8 @@ public interface Assembler {
 	 * This method assembles the operandArray field into Data (Operand) types, and stores them
 	 * in the programCode array. They are stored at an index that exceeds what will be the last
 	 * address of the instruction code so that operands appear in memory at the end of the program.
+	 * Returns null if assembly of an instruction was unsuccessful due to invalid assembly
+	 * program syntax. 
 	 * 
 	 * @param List<String> operandParts represents one line of program code broken up into an array for
 	 * easier interpretation.
@@ -66,7 +69,8 @@ public interface Assembler {
 	
 	/*
 	 * Assembles the program instructions held in instructionArray as Strings to objects of type Data
-	 * (Instruction).  
+	 * (Instruction).  Returns null if assembly of an instruction was unsuccessful due to invalid assembly
+	 * program syntax. 
 	 * 
 	 * @param List<String> instructionParts one line of code representing an instruction broken into
 	 * an array for easier interpretation.
@@ -77,7 +81,7 @@ public interface Assembler {
 	/*
 	 * A method for mapping instruction labels to memory addresses. The memory addresses are
 	 * absolute but could also be used as an offset from a base address, if the loader implements
-	 * relocatable addressing as an extension.  
+	 * relocatable addressing as an extension.
 	 * 
 	 * @param List<String> lineParts a line of code broken up into an array, for simpler interpretation.
 	 * @param int lineNum the line number of the line of code, which is used as an address reference.

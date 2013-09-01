@@ -96,13 +96,21 @@ public class AssemblerImpl implements Assembler {
 	
 	@Override
 	public Data assembleOperand(List<String> operandParts) {
-		//All operand part arrays will contain 3 parts: symbol, DATA declaration, and operand value
-		String symbol = operandParts.get(0).substring(0, operandParts.get(0).length() -1); //Trim semicolon from symbol
-		lookupTable.put(symbol, operandAddressPointer); //Map symbol to address		
+		//All operand part arrays will contain 3 parts: label, DATA declaration, and operand value
+		String label = operandParts.get(0).substring(0, operandParts.get(0).length() -1); //Trim semicolon from label
+		lookupTable.put(label, operandAddressPointer); //Map label to address		
 		
 		String operandString = operandParts.get(2); //Operand value as String
-		int operandValue = Integer.parseInt(operandString);
-		//Handle exception for illegal operands!
+		int operandValue;
+		try {
+			operandValue = Integer.parseInt(operandString);
+		}
+		catch (NumberFormatException nfe) {
+			JOptionPane.showMessageDialog(null, "Assembly program syntax error: Invalid operand declaration \"" + operandString +
+					"\".");
+			return null;
+		}
+		
 		Data operand = new OperandImpl(operandValue);
 		
 		return operand;		
@@ -133,6 +141,8 @@ public class AssemblerImpl implements Assembler {
 		return splitLine;		
 	}
 	
+	
+	@Override
 	public void mapInstructionLabel(List<String> instructionParts, int lineNum) {
 		if (instructionParts.get(0).endsWith(":")) {
 			String label = instructionParts.get(0).substring(0, instructionParts.get(0).length() - 1); //Trim colon from end
@@ -154,6 +164,9 @@ public class AssemblerImpl implements Assembler {
 				List<String> lineComponents = this.splitCodeLine(operandArray.get(i)); //Break line of code into parts
 				
 				Data operand = this.assembleOperand(lineComponents);
+				if (operand == null) { //Indicates an error in assembling an operand
+					return false; //Signals error to GUI code and prevents loading of invalid assembly file
+				}
 				programCode[operandAddressPointer] = operand; //Add the operand to the data array, at specified address
 				operandAddressPointer++; //Increment so that the next operand will be stored in the next consecutive address
 			}
@@ -212,18 +225,19 @@ public class AssemblerImpl implements Assembler {
 				try {
 					destination = Integer.parseInt(destinationString);
 					if (destination < 0 || destination > 16) { //Illegal register reference
-						throw new IllegalStateException("Invalid register reference in LOAD/BRE/BRNE instruction");
+						throw new IllegalStateException("Invalid register reference in " + opcode + " instruction");
 					}
 				}
 				catch (NumberFormatException nfe) {
-					JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register destination\n" +
-							"reference in LOAD/BRE/BRNE instruction!", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register\n" +
+							"reference \"" + instructionParts.get(2) + "\" in " + opcode + " instruction!", 
+							"Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 					return null; //Prevent further parsing
 				}
 				catch (IllegalStateException ise) {
-					JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register destination\n" +
-							"reference in " + opcode + " instruction! Register references should\n be between r0 to r16 (or " +
-							"rCC as the destination register of LOAD or MOVE instructions).",
+					JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register\n" +
+							"reference \"" + instructionParts.get(2) + "\" in " + opcode + " instruction! Register " +
+							"references should\n be between r0 to r15 (or rCC as the destination register of LOAD or MOVE instructions).",
 							"Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 					return null; //Prevent further parsing
 				}
@@ -278,13 +292,14 @@ public class AssemblerImpl implements Assembler {
 				}
 			}
 			catch (NumberFormatException nfe) {
-				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register destination\n" +
-						"reference in STORE instruction!", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register reference\n" +
+						"\"" + instructionParts.get(1) + "\" in STORE instruction!", "Assembly Program Error", 
+						JOptionPane.WARNING_MESSAGE);
 				return null; //Prevent further parsing
 			}
 			catch (IllegalStateException ise) {
-				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register destination\n" +
-						"reference in STORE instruction! Register references should\nbe between r0 to r16.",
+				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register reference\n" +
+						"\"" + instructionParts.get(1) + "\" in STORE instruction! Register references should\nbe between r0 to r15.",
 						"Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 				return null; //Prevent further parsing
 			}
@@ -310,14 +325,16 @@ public class AssemblerImpl implements Assembler {
 				}
 			}
 			catch (NumberFormatException nfe) {
-				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register destination\n" +
-						"reference in " + opcode + " instruction!", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register\n" +
+						"reference \"" + instructionParts.get(1) + "\" in " + opcode + " instruction!", 
+						"Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 				return null; //Prevent further parsing
 			}
 			catch (IllegalStateException ise) {
 				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register " +
-						"reference in " + opcode + " instruction! Register \nreferences should be between r0 to r16 (or rCC " +
-						"as the register destination for \nLOAD or MOVE instructions).", "Assembly Program Error", 
+						"reference \"" + instructionParts.get(1) + "\" in " + opcode + " instruction! Register \nreferences should " +
+						"be between r0 to r15 (or rCC as the register destination for \nLOAD or MOVE instructions).",
+						"Assembly Program Error", 
 						JOptionPane.WARNING_MESSAGE);
 				return null; //Prevent further parsing
 			}
@@ -331,31 +348,54 @@ public class AssemblerImpl implements Assembler {
 			else {
 				destination = Integer.parseInt(destinationString);
 			}	
-			//register source to leave an integer reference
-			//int destination = Integer.parseInt(destinationString);
 			
 			if (opcode.equals("MOVE")) {
 				data = new TransferInstr(Opcode.MOVE, source, destination);
 				return data;
 			}
 			
+			//Additional error handling for arithmetic instructions, as these cannot reference rCC (r16)
 			if (opcode.equals("ADD")) {
-				data = new ArithmeticInstr(Opcode.ADD, source, destination);
+				try {
+					data = new ArithmeticInstr(Opcode.ADD, source, destination);
+				}
+				catch (IllegalStateException ise) {
+					JOptionPane.showMessageDialog(null, ise.getMessage(), "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+					return null; //Prevent further parsing
+				}
 				return data;
 			}
 			
 			if (opcode.equals("SUB")) {
-				data = new ArithmeticInstr(Opcode.SUB, source, destination);
+				try {
+					data = new ArithmeticInstr(Opcode.SUB, source, destination);
+				}
+				catch (IllegalStateException ise) {
+					JOptionPane.showMessageDialog(null, ise.getMessage(), "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+					return null; //Prevent further parsing
+				}
 				return data;
 			}
 			
 			if (opcode.equals("DIV")) {
-				data = new ArithmeticInstr(Opcode.DIV, source, destination);
+				try {
+					data = new ArithmeticInstr(Opcode.DIV, source, destination);
+				}
+				catch (IllegalStateException ise) {
+					JOptionPane.showMessageDialog(null, ise.getMessage(), "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+					return null; //Prevent further parsing
+				}
 				return data;
 			}
 			
 			if (opcode.equals("MUL")) {
-				data = new ArithmeticInstr(Opcode.MUL, source, destination);
+				try {
+					data = new ArithmeticInstr(Opcode.MUL, source, destination);
+				}
+				catch (IllegalStateException ise) {
+					JOptionPane.showMessageDialog(null, ise.getMessage(), "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+					return null; //Prevent further parsing
+				}
 				return data;
 			}				
 		}
