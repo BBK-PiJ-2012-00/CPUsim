@@ -50,7 +50,7 @@ public class AssemblerImpl implements Assembler {
 	    try {
 	        s = new Scanner(new BufferedReader(new FileReader(fileReference)));
 	
-	        while (s.hasNextLine()) {
+	        while (s.hasNextLine()) {	        	
 	        	line = s.nextLine();
 	        	if (line.length() != 0) { //Don't add blank lines to the array
 	        		// System.out.println(line); //For testing
@@ -102,6 +102,7 @@ public class AssemblerImpl implements Assembler {
 		
 		String operandString = operandParts.get(2); //Operand value as String
 		int operandValue = Integer.parseInt(operandString);
+		//Handle exception for illegal operands!
 		Data operand = new OperandImpl(operandValue);
 		
 		return operand;		
@@ -120,6 +121,7 @@ public class AssemblerImpl implements Assembler {
 			String[] halvedLine = line.split("[\\#]");
 			line = halvedLine[0]; 
 		}
+		//What if a line is a comment? I.e. only a comment on that line and nothing else?
 		
 		sc = new Scanner(line);
 		sc.useDelimiter(delimiterPattern);
@@ -137,7 +139,7 @@ public class AssemblerImpl implements Assembler {
 	public void mapInstructionLabel(List<String> instructionParts, int lineNum) {
 		if (instructionParts.get(0).endsWith(":")) {
 			String label = instructionParts.get(0).substring(0, instructionParts.get(0).length() - 1); //Trim colon from end
-			lookupTable.put(label, lineNum);			
+			lookupTable.put(label, lineNum);
 		}
 		return;
 	}
@@ -160,13 +162,12 @@ public class AssemblerImpl implements Assembler {
 			}
 			
 			/*
-			 * Instruction labels must be mapped prior to assembling instructions.
+			 * Instruction labels (if present) must be mapped prior to assembling instructions. 
 			 */
 			for (int i = 0; i < instructionArray.size(); i++) {
 				List<String> lineComponents = this.splitCodeLine(instructionArray.get(i));
-				this.mapInstructionLabel(lineComponents, i);
-			}
-			
+				this.mapInstructionLabel(lineComponents, i); 		
+			}			
 	
 			//Assemble the instructions represented as Strings into type Instruction, and put into programCode array
 			for (int i = 0; i < instructionArray.size(); i++) { 	
@@ -188,152 +189,165 @@ public class AssemblerImpl implements Assembler {
 	@Override
 	public Data assembleInstruction(List<String> instructionParts) {
 		Data data = null;
-		for (int i = 0; i < instructionParts.size(); i++) { //Go through the list of instruction/data parts
+		if (instructionParts.get(0).endsWith(":")) { //Indicates presence of a label
+			instructionParts.remove(0); //Remove label (already added to the lookup table)
+		}
+		
+		//for (int i = 0; i < instructionParts.size(); i++) { //Go through the list of instruction/data parts
+		System.out.println("Instruction part at 0: " + instructionParts.get(0));
+		
 
-			//This means a memory source and register destination are specified (these opcodes all follow same format)
-			if (instructionParts.get(i).equals("LOAD") || instructionParts.get(i).equals("BRE") ||
-					instructionParts.get(i).equals("BRNE")) { 
-				
-				String opcode = instructionParts.get(i);
-				
-				String destinationString = instructionParts.get(i+2).substring(1); //Trim leading 'r' off
-				//register source to leave an integer reference
-				
-				int destination;
-				
-				if (destinationString.equals("CC")) { //A load instruction may reference condition code/status register
-					destination = 16;
-				}
-				
-				else {
-					//Error handling for register destination reference
-					try {
-						destination = Integer.parseInt(destinationString);
-						if (destination < 0 || destination > 16) { //Illegal register reference
-							throw new IllegalStateException("Bad register reference in LOAD/BRE/BRNE instruction");
-						}
-					}
-					catch (NumberFormatException nfe) {
-						JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register destination\n" +
-								"reference in LOAD/BRE/BRNE instruction!", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
-						return null; //Prevent further parsing
-					}
-					catch (IllegalStateException ise) {
-						JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register destination\n" +
-								"reference in LOAD/BRE/BRNE instruction! Register references should\n be between r0 to r16, or rCC.");
-						return null; //Prevent further parsing
-					}
-				}				
-				
-				int source = lookupTable.get(instructionParts.get(i+1)); //Memory addresses are always symbolic
-				
-				if (opcode.equals("LOAD")) {
-					data = new TransferInstr(Opcode.LOAD, source, destination);
-					return data;
-				}
-				
-				if (opcode.equals("BRE")) {
-					data = new BranchInstr(Opcode.BRE, source, destination);
-					return data;
-				}
-				
-				if (opcode.equals("BRNE")) {
-					data = new BranchInstr(Opcode.BRNE, source, destination);
-					return data;
-				}
-				
-				
+		//This means a memory source and register destination are specified (these opcodes all follow same format)
+		if (instructionParts.get(0).equals("LOAD") || instructionParts.get(0).equals("BRE") ||
+				instructionParts.get(0).equals("BRNE")) { 
+			
+			String opcode = instructionParts.get(0);
+			
+			//String destinationString = instructionParts.get(i+2).substring(1); //Trim leading 'r' off
+			String destinationString = instructionParts.get(2).substring(1); //Trim leading 'r' off
+			//register source to leave an integer reference
+			
+			int destination;
+			
+			if (destinationString.equals("CC")) { //A load instruction may reference condition code/status register
+				destination = 16;
 			}
 			
-			if (instructionParts.get(i).equals("STORE")) { //This means a register source and memory destination are specified
-				int destination = lookupTable.get(instructionParts.get(i+2)); //Look up symbolic destination
-				
-				String sourceString = instructionParts.get(i+1).substring(1);//Trim leading 'r' off
-				//register source to leave an integer reference
-				int source = Integer.parseInt(sourceString);				
-				
-				data = new TransferInstr(Opcode.STORE, source, destination);
-				return data;
-			}
-			
-			//Register to register opcodes all follow this block (all register-register)
-			if (instructionParts.get(i).equals("MOVE") || instructionParts.get(i).equals("ADD") || 
-					instructionParts.get(i).equals("SUB") || instructionParts.get(i).equals("DIV") ||
-					instructionParts.get(i).equals("MUL")) {
-				
-				String opcode = instructionParts.get(i);
-								
-				//Register source, register destination
-				String sourceString = instructionParts.get(i+1).substring(1);
-				int source = Integer.parseInt(sourceString);
-				
-				int destination;
-				
-				String destinationString = instructionParts.get(i+2).substring(1); //Trim leading 'r' off
-				if (destinationString.equals("CC")) { //A load instruction may reference condition code/status register
-					destination = 16;
-				}
-				else {
+			else {
+				//Error handling for register destination reference
+				try {
 					destination = Integer.parseInt(destinationString);
-				}	
-				//register source to leave an integer reference
-				//int destination = Integer.parseInt(destinationString);
-				
-				if (opcode.equals("MOVE")) {
-					data = new TransferInstr(Opcode.MOVE, source, destination);
-					return data;
+					if (destination < 0 || destination > 16) { //Illegal register reference
+						throw new IllegalStateException("Bad register reference in LOAD/BRE/BRNE instruction");
+					}
 				}
-				
-				if (opcode.equals("ADD")) {
-					data = new ArithmeticInstr(Opcode.ADD, source, destination);
-					return data;
+				catch (NumberFormatException nfe) {
+					JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register destination\n" +
+							"reference in LOAD/BRE/BRNE instruction!", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+					return null; //Prevent further parsing
 				}
-				
-				if (opcode.equals("SUB")) {
-					data = new ArithmeticInstr(Opcode.SUB, source, destination);
-					return data;
+				catch (IllegalStateException ise) {
+					JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register destination\n" +
+							"reference in LOAD/BRE/BRNE instruction! Register references should\n be between r0 to r16, or rCC.");
+					return null; //Prevent further parsing
 				}
-				
-				if (opcode.equals("DIV")) {
-					data = new ArithmeticInstr(Opcode.DIV, source, destination);
-					return data;
-				}
-				
-				if (opcode.equals("MUL")) {
-					data = new ArithmeticInstr(Opcode.MUL, source, destination);
-					return data;
-				}				
-			}
+			}				
 			
-			//These opcodes have the same instruction format; just a symbolic memory address
-			if (instructionParts.get(i).equals("BR") || instructionParts.get(i).equals("BRZ")) {
-				String opcode = instructionParts.get(i);
-				int destination = lookupTable.get(instructionParts.get(i+1)); //Get value for symbolic memory address ref.
-				
-				if (opcode.equals("BR")) {
-					data = new BranchInstr(Opcode.BR, destination);
-				}
-				else {
-					data = new BranchInstr(Opcode.BRZ, destination);
-				}
+			//int source = lookupTable.get(instructionParts.get(i+1)); //Memory addresses are always symbolic
+			int source = lookupTable.get(instructionParts.get(1)); //Memory addresses are always symbolic
+			
+			if (opcode.equals("LOAD")) {
+				data = new TransferInstr(Opcode.LOAD, source, destination);
 				return data;
 			}
 			
-			if (instructionParts.get(i).equals("SKZ") || instructionParts.get(i).equals("HALT")) {
-				
-				String opcode = instructionParts.get(i);
-				
-				if (opcode.equals("SKZ")) {
-					data = new BranchInstr(Opcode.SKZ);
-				}
-				else {
-					data = new HaltInstr(Opcode.HALT);
-				}
+			if (opcode.equals("BRE")) {
+				data = new BranchInstr(Opcode.BRE, source, destination);
 				return data;
 			}
+			
+			if (opcode.equals("BRNE")) {
+				data = new BranchInstr(Opcode.BRNE, source, destination);
+				return data;
+			}			
 			
 		}
 		
+		
+		else if (instructionParts.get(0).equals("STORE")) { //This means a register source and memory destination are specified
+			int destination = lookupTable.get(instructionParts.get(2)); //Look up symbolic destination
+			
+			String sourceString = instructionParts.get(1).substring(1);//Trim leading 'r' off
+			//register source to leave an integer reference
+			int source = Integer.parseInt(sourceString);				
+			
+			data = new TransferInstr(Opcode.STORE, source, destination);
+			return data;
+		}
+		
+		//Register to register opcodes all follow this block (all register-register)
+		else if (instructionParts.get(0).equals("MOVE") || instructionParts.get(0).equals("ADD") || 
+				instructionParts.get(0).equals("SUB") || instructionParts.get(0).equals("DIV") ||
+				instructionParts.get(0).equals("MUL")) {
+			
+			String opcode = instructionParts.get(0);
+							
+			//Register source, register destination
+			String sourceString = instructionParts.get(1).substring(1);
+			int source = Integer.parseInt(sourceString);
+			
+			int destination;
+			
+			String destinationString = instructionParts.get(2).substring(1); //Trim leading 'r' off
+			if (destinationString.equals("CC")) { //A load instruction may reference condition code/status register
+				destination = 16;
+			}
+			else {
+				destination = Integer.parseInt(destinationString);
+			}	
+			//register source to leave an integer reference
+			//int destination = Integer.parseInt(destinationString);
+			
+			if (opcode.equals("MOVE")) {
+				data = new TransferInstr(Opcode.MOVE, source, destination);
+				return data;
+			}
+			
+			if (opcode.equals("ADD")) {
+				data = new ArithmeticInstr(Opcode.ADD, source, destination);
+				return data;
+			}
+			
+			if (opcode.equals("SUB")) {
+				data = new ArithmeticInstr(Opcode.SUB, source, destination);
+				return data;
+			}
+			
+			if (opcode.equals("DIV")) {
+				data = new ArithmeticInstr(Opcode.DIV, source, destination);
+				return data;
+			}
+			
+			if (opcode.equals("MUL")) {
+				data = new ArithmeticInstr(Opcode.MUL, source, destination);
+				return data;
+			}				
+		}
+		
+		//These opcodes have the same instruction format; just a symbolic memory address
+		else if (instructionParts.get(0).equals("BR") || instructionParts.get(0).equals("BRZ")) {
+			String opcode = instructionParts.get(0);
+			System.out.println(lookupTable);
+			int destination = lookupTable.get(instructionParts.get(1)); //Get value for symbolic memory address ref.
+			
+			if (opcode.equals("BR")) {
+				data = new BranchInstr(Opcode.BR, destination);
+			}
+			else {
+				data = new BranchInstr(Opcode.BRZ, destination);
+			}
+			return data;
+		}
+		
+		else if (instructionParts.get(0).equals("SKZ") || instructionParts.get(0).equals("HALT")) {
+			
+			String opcode = instructionParts.get(0);
+			
+			if (opcode.equals("SKZ")) {
+				data = new BranchInstr(Opcode.SKZ);
+			}
+			else {
+				data = new HaltInstr(Opcode.HALT);
+			}
+			return data;
+		}
+			
+		else { //Opcode not found
+			JOptionPane.showMessageDialog(null, "Assembly program syntax error: invalid opcode encountered. Please\n" +
+						"ensure all instruction opcodes are valid.");
+			return null; //Prevents further parsing
+
+		}		
 		return data;
 	}
 	
