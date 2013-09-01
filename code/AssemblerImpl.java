@@ -129,10 +129,7 @@ public class AssemblerImpl implements Assembler {
 			splitLine.add(sc.next());
 		}
 		sc.close();			
-	
-//		for (String str : splitLine) {
-//			System.out.println(str);
-//		}
+
 		return splitLine;		
 	}
 	
@@ -189,13 +186,10 @@ public class AssemblerImpl implements Assembler {
 	@Override
 	public Data assembleInstruction(List<String> instructionParts) {
 		Data data = null;
+		
 		if (instructionParts.get(0).endsWith(":")) { //Indicates presence of a label
 			instructionParts.remove(0); //Remove label (already added to the lookup table)
-		}
-		
-		//for (int i = 0; i < instructionParts.size(); i++) { //Go through the list of instruction/data parts
-		System.out.println("Instruction part at 0: " + instructionParts.get(0));
-		
+		}		
 
 		//This means a memory source and register destination are specified (these opcodes all follow same format)
 		if (instructionParts.get(0).equals("LOAD") || instructionParts.get(0).equals("BRE") ||
@@ -218,7 +212,7 @@ public class AssemblerImpl implements Assembler {
 				try {
 					destination = Integer.parseInt(destinationString);
 					if (destination < 0 || destination > 16) { //Illegal register reference
-						throw new IllegalStateException("Bad register reference in LOAD/BRE/BRNE instruction");
+						throw new IllegalStateException("Invalid register reference in LOAD/BRE/BRNE instruction");
 					}
 				}
 				catch (NumberFormatException nfe) {
@@ -228,13 +222,22 @@ public class AssemblerImpl implements Assembler {
 				}
 				catch (IllegalStateException ise) {
 					JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register destination\n" +
-							"reference in LOAD/BRE/BRNE instruction! Register references should\n be between r0 to r16, or rCC.");
+							"reference in " + opcode + " instruction! Register references should\n be between r0 to r16 (or " +
+							"rCC as the destination register of LOAD or MOVE instructions).",
+							"Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 					return null; //Prevent further parsing
 				}
 			}				
 			
-			//int source = lookupTable.get(instructionParts.get(i+1)); //Memory addresses are always symbolic
-			int source = lookupTable.get(instructionParts.get(1)); //Memory addresses are always symbolic
+			int source;
+			try {
+				source = lookupTable.get(instructionParts.get(1)); //Memory addresses are always symbolic
+			}
+			catch (NullPointerException npe) {
+				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Label reference \"" + 
+						instructionParts.get(1) + "\" has not been declared.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+				return null; //Prevent further parsing
+			}
 			
 			if (opcode.equals("LOAD")) {
 				data = new TransferInstr(Opcode.LOAD, source, destination);
@@ -255,11 +258,36 @@ public class AssemblerImpl implements Assembler {
 		
 		
 		else if (instructionParts.get(0).equals("STORE")) { //This means a register source and memory destination are specified
-			int destination = lookupTable.get(instructionParts.get(2)); //Look up symbolic destination
+			int destination;
+			try {
+				destination = lookupTable.get(instructionParts.get(2)); //Look up symbolic destination
+			}
+			catch (NullPointerException npe) {
+				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Label reference \"" + 
+						instructionParts.get(2) + "\" has not been declared.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+				return null; //Prevent further parsing
+			}
 			
 			String sourceString = instructionParts.get(1).substring(1);//Trim leading 'r' off
-			//register source to leave an integer reference
-			int source = Integer.parseInt(sourceString);				
+			int source;
+			try {
+				//register source to leave an integer reference
+				source = Integer.parseInt(sourceString);	
+				if (source < 0 || source > 15) { //rCC not included in store instructions, hence 15 is upper bound
+					throw new IllegalStateException("Invalid register reference in STORE instruction");
+				}
+			}
+			catch (NumberFormatException nfe) {
+				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register destination\n" +
+						"reference in STORE instruction!", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+				return null; //Prevent further parsing
+			}
+			catch (IllegalStateException ise) {
+				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register destination\n" +
+						"reference in STORE instruction! Register references should\nbe between r0 to r16.",
+						"Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+				return null; //Prevent further parsing
+			}
 			
 			data = new TransferInstr(Opcode.STORE, source, destination);
 			return data;
@@ -274,7 +302,25 @@ public class AssemblerImpl implements Assembler {
 							
 			//Register source, register destination
 			String sourceString = instructionParts.get(1).substring(1);
-			int source = Integer.parseInt(sourceString);
+			int source;
+			try {
+				source = Integer.parseInt(sourceString);
+				if (source < 0 || source > 16) { //rCC references allowed in MOVE instruction (ArithmeticInstr catches error)
+					throw new IllegalStateException("Illegal register reference");
+				}
+			}
+			catch (NumberFormatException nfe) {
+				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register destination\n" +
+						"reference in " + opcode + " instruction!", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+				return null; //Prevent further parsing
+			}
+			catch (IllegalStateException ise) {
+				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register " +
+						"reference in " + opcode + " instruction! Register \nreferences should be between r0 to r16 (or rCC " +
+						"as the register destination for \nLOAD or MOVE instructions).", "Assembly Program Error", 
+						JOptionPane.WARNING_MESSAGE);
+				return null; //Prevent further parsing
+			}
 			
 			int destination;
 			
@@ -318,7 +364,16 @@ public class AssemblerImpl implements Assembler {
 		else if (instructionParts.get(0).equals("BR") || instructionParts.get(0).equals("BRZ")) {
 			String opcode = instructionParts.get(0);
 			System.out.println(lookupTable);
-			int destination = lookupTable.get(instructionParts.get(1)); //Get value for symbolic memory address ref.
+			int destination;
+			
+			try {
+				destination = lookupTable.get(instructionParts.get(1)); //Get value for symbolic memory address ref.
+			}
+			catch (NullPointerException npe) {
+				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Label reference \"" + 
+						instructionParts.get(1) + "\" has not been declared.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+				return null; //Prevent further parsing
+			}
 			
 			if (opcode.equals("BR")) {
 				data = new BranchInstr(Opcode.BR, destination);
