@@ -1,4 +1,6 @@
-<Label> <Instruction/Variable> <Comments>
+
+
 L1:  LOAD var1, r0 #Load r0 with contents of memory address referred to by var1
+     HALT
 
 var1: DATA 7

@@ -1,0 +1,24 @@
+
+
+   #Some random comment
+             LOAD var1, r0
+             LOAD var2, r1
+             ADD r0, r1
+             STORE r0, var3
+             LOAD var5, r2
+	#And another random comment
+             LOAD var1, r3
+             BR Fudge
+             SUB r2, r3
+Fudge:        ADD r2, r3
+             STORE r2, var4
+             LOAD var5, rCC  #rCC references the status/condition code register
+             BRNE Foo, r2
+             MUL r2, r3
+Foo:      HALT
+
+var1:      DATA 5
+var2:      DATA 10
+var3:      DATA 0   #Variables initialised to 0 used to reference STORE locations
+var4:      DATA 0
+var5:      DATA 20
