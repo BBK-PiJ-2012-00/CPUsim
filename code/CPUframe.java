@@ -873,7 +873,11 @@ public class CPUframe extends JFrame {
 				
 				if (executionWorker == null) { //Only create worker thread if the current one is null (to avoid several threads).;
 					executionWorker = new ExecutionWorker();
+					System.out.println("Created new thread, ready to exectute.");
 					executionWorker.execute();
+				}
+				else {
+					System.out.println("Execution worker isn't null, so nothing created.");
 				}
 				
 			}
@@ -895,11 +899,15 @@ public class CPUframe extends JFrame {
 //			memoryContentArea.setCaretPosition(0);
 			
 			executionWorker.cancel(true); //Old worker thread needs terminating
+			executionWorker = null;
+			
+			//controlUnit.getFetchDecodeStage().resetWaitStatus();
+			//systemBusController.accessControlLine().resetWaitStatus();
+			
 			memory.clearMemory();
             activityArea.setText("");
             controlUnit.clearRegisters();
-           // controlUnit.resetStages();
-            
+           // controlUnit.resetStages();    
             
            
             assembler = new AssemblerImpl(loader);
@@ -907,11 +915,15 @@ public class CPUframe extends JFrame {
     		assembler.assembleCode();
     		assembler.loadToLoader();
     		assembler.getLoader().loadToMemory();
-    		memoryContentArea.setText(memory.display()); //update memory display on opening file
-    		memoryContentArea.setCaretPosition(0); //Scrolls text area to top
+    	//	memoryContentArea.setText(memory.display()); //update memory display on opening file
+    	//	memoryContentArea.setCaretPosition(0); //Scrolls text area to top
     		
     		assemblyProgramArea.setText(assembler.display());
-    		assemblyProgramArea.setCaretPosition(0);		
+    		assemblyProgramArea.setCaretPosition(0);
+    		
+//    		executionWorker.cancel(true); //Old worker thread needs terminating
+//    		executionWorker = null; //Must be reset to null to allow for creation of new thread when Execute Program pressed
+    		
 		}
 	}
 	
@@ -943,9 +955,9 @@ public class CPUframe extends JFrame {
 		           
 		            assembler = new AssemblerImpl(loader);
 		            assembler.selectFile(currentAssemblyFile);
-		    		boolean fileFound = assembler.assembleCode();
+		    		boolean fileAcceptable = assembler.assembleCode();
 		    		
-		    		if (fileFound) {	 //Only assemble if the file is found	    		
+		    		if (fileAcceptable) {	 //Only load if the file is found / valid assembly code    		
 			    		assembler.loadToLoader();
 			    		assembler.getLoader().loadToMemory();
 			    		memoryContentArea.setText(memory.display()); //update memory display on opening file
@@ -975,21 +987,24 @@ public class CPUframe extends JFrame {
 			else if (systemBusController.accessControlLine().isWaiting()) {
 				synchronized(systemBusController.accessControlLine()) {
 					systemBusController.accessControlLine().notify();
-					//System.out.println("bus notify called");
+					System.out.println("bus notify called");
 				}
 			}
 			else if (controlUnit.getFetchDecodeStage().isWaiting()) {
 				synchronized(controlUnit.getFetchDecodeStage()) {
 					controlUnit.getFetchDecodeStage().notify();
-					//System.out.println("f/d notify called");
+					System.out.println("f/d notify called");
 				}
 			}
 			else if (controlUnit.getExecuteStage().isWaiting()) {
 				synchronized(controlUnit.getExecuteStage()) {
 					controlUnit.getExecuteStage().notify();
-					//System.out.println("ex notify called");
+					System.out.println("ex notify called");
 				}
-			}	
+			}
+			else {
+				System.out.println("No action taken by Step button.");
+			}
 		}
 		
 	}
