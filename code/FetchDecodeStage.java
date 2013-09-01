@@ -45,23 +45,37 @@ public abstract class FetchDecodeStage implements Runnable {
 		try {
 			wait();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			isWaiting = false;
+			return; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 		}
 		isWaiting = false;
 		
-		systemBus.transferToMemory(mar.read(), null); //Transfer address from MAR to system bus, prompting read
+		System.out.println("I'm carrying on!");
+		
+		//Transfer address from MAR to system bus, prompting read
+		boolean successfulTransfer = systemBus.transferToMemory(mar.read(), null); 
+		if (!successfulTransfer) { 
+			//If SwingWorker is cancelled and thread of execution is interrupted, successfulTransfer will be false and the
+			//method should not execute any further
+			return;
+		}
+		
+		System.out.println("Reentered f/d stage from bus");
+		
 		this.fireUpdate("Load contents of memory address " + mar.read() + " into MBR \n");
+		
 		
 		isWaiting = true;
 		try {
 			wait();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			isWaiting = false;
+			return; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 		}
-		isWaiting = false;		
-
+		isWaiting = false;	
+		
 		
 		//A Data item should now be in MBR
 		ir.loadIR((Instruction) mbr.read()); //Cast required as mbr holds type data, IR type Instruction; May need to handle exception
@@ -71,8 +85,9 @@ public abstract class FetchDecodeStage implements Runnable {
 		try {
 			wait();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			isWaiting = false;
+			return; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 		}
 		isWaiting = false;
 		
@@ -94,8 +109,10 @@ public abstract class FetchDecodeStage implements Runnable {
 		try {
 			wait();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			isWaiting = false;
+			return -1; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called). -1 signals to control
+			//unit to stop execution.
 		}
 		isWaiting = false;		
 		
@@ -131,6 +148,15 @@ public abstract class FetchDecodeStage implements Runnable {
 	public boolean isWaiting() {
 		return isWaiting;
 	}
-
+	
+	/*
+	 * This method is used when assembly program execution is reset/restarted midway through;
+	 * if isWaiting has just been set to false and the worker thread is cancelled, when it comes to
+	 * stepping through execution after the restart, the "Step" button won't work as it uses the status
+	 * of isWaiting to determine whether to resume execution or not.
+	 */
+	public void resetWaitStatus() {
+		isWaiting = false;
+	}
 	
 }
