@@ -16,7 +16,7 @@ public class ArithmeticInstr extends Instruction {
 			throw new IllegalStateException("Invalid opcode for this instruction type.");//Ensures opcode supplied to constructor is an arithmetic opcode
 		}
 		//Restrictions on register reference fields of instruction; must comply with number of general purpose registers in CPU
-		if (registerDest < 0 || registerDest > 16) { //0-15 general purpose, 16 is status register which is user-visible
+		if (registerDest < 0 || registerDest > 15) { //0-15 general purpose
 			throw new IllegalStateException("Invalid register destination reference; must be between 0 and 16 inclusive.");
 		}
 		if (registerInput < 0 || registerInput > 15) {
