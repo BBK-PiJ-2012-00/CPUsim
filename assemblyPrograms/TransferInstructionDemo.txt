@@ -1,0 +1,17 @@
+
+# This program demonstrates transfer instructions:
+# LOAD, STORE and MOVE.
+
+LOAD operand4, r0 #Load operand4 into r0
+LOAD operand7, r1
+MOVE r1, rCC #Move operand held in r1 to rCC
+MOVE r0, r1
+STORE r1, location0 #Store operand held in r1 
+#to memory address referred to by location0
+HALT #To terminate program execution  	
+	
+operand4: DATA 4
+operand7: DATA 7
+location0: DATA 0 #Declared to provide a storage
+	#destination that doesn't involve
+	#overwriting other operands in memory

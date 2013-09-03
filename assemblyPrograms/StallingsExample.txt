@@ -1,0 +1,17 @@
+
+# This program is based on the example on pp.93 of 
+# Stallings' Computer Architecture textbook. The 
+# textbook example uses an accumulator (AC), which
+# will be emulated using r0 and r1 in this
+# demonstration as the simulator is RISC-based and
+# only LOAD and STORE operations access memory. 
+
+	LOAD operand3, r0
+	LOAD operand2, r1 
+	ADD r0, r1
+	STORE r0, operand2
+	HALT #To terminate program execution
+	
+operand3: DATA 3
+operand2: DATA 2
+
