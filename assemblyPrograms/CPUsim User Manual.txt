@@ -11,11 +11,48 @@ To begin execution, click "Execute Program".  This will prompt the first step of
 
 It is possible to load a different assembly program at any point during the execution of another program; simply click on the "Select Assembly File" button and the interface will be ready to begin execution of the new program.  
 
-While there is no back button feature to return to the previous step, it is possible to restart the program by either selecting it afresh, or by clicking "Reset". To begin executing the program once more, press "Execute Program" and then "Step" to step through the execution.  
+While there is no back button feature to return to the previous step, it is possible to restart the program by either selecting it afresh, or by clicking "Reset". To begin executing the program once more, press "Execute Program" and then "Step" to step through the execution.
+
+
+2) THE INTERFACE
+
+Assembly Program 
+This area is for the display of a selected assembly language program. Line numbers are on the left hand side for clarity.
+
+Activity Monitor 
+This area displays a running commentary on the activities carried out by the CPU and updates with every step of the chosen program's execution.
+
+CPU  
 
 
 
-2) ASSEMBLY LANGUAGE, INSTRUCTIONS AND OPERANDS   
+3) ASSEMBLY LANGUAGE, INSTRUCTIONS AND OPERANDS  
+
+Assembly language is of the format <label>: <instruction/operand declaration> #<comment>.
+Labels are optional and are used to provide symbolic memory addressing, removing the need
+for physical memory address references. When used in combination with instruction declarations, labels allow for the memory location where that instruction is stored to be referenced by branch instructions.  
+
+	L1: ADD r7, r8
+	    BR L1
+
+When the branch instruction above is encountered, the program counter is set to the address of the instruction ADD r7, r8, so that it will be the next instruction fetched.
+
+	operand4: DATA 4
+
+The label "operand4" is used in place of a physical memory address reference. The DATA declaration simply implies to the assembler that the integer operand of value 4 should be stored in memory at a location that can be referenced in LOAD or STORE instruction declarations by the label operand4.  For example:
+
+	LOAD operand4, r3
+	STORE r9, operand4
+
+When executing the LOAD instruction, whatever is held at the memory address referenced by the label "operand4" will be loaded (via the MBR) into r3.  The STORE instruction will cause the value held in r9 to be stored in the location referred to by the label "operand 4".  For this reason, it is necessary to declare an operand if a storage location in memory is required so that that location may be referenced by STORE instructions.  For example:
+
+	STORE r9, locationX
+
+	locationX: DATA 0
+
+Declaring locationX and storing an arbitrary operand there allows the STORE instruction to reference a memory location, from which the stored operand could later be fetched back into the CPU's registers if desired.    
+
+	 
 
 
 3) WRITING CUSTOM ASSEMBLY PROGRAMS
