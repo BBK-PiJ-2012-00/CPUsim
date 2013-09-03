@@ -21,6 +21,8 @@ public class AssemblerImpl implements Assembler {
 	private Loader loader; //Reference to loader module
 	
 	private List<String> programString; //Holds program code read from file as array list of Strings
+	private List<String> displayProgram; //Holds program code exactly as it appears in text file for GUI display
+	private List<String> leadingComments; //To store initial comments at start of file (those not embedded in code)
 	private List<String> instructionArray; //For intermediate stage where programString is split into two, instructions being stored
 	private List<String> operandArray; //in instructionArray, operands being stored in operandArray (as Strings)
 		
@@ -31,6 +33,8 @@ public class AssemblerImpl implements Assembler {
 	
 	public AssemblerImpl(Loader loader) {
 		this.programString = new ArrayList<String>();
+		this.displayProgram = new ArrayList<String>();
+		this.leadingComments = new ArrayList<String>();
 		this.lookupTable = new HashMap<String, Integer>();
 		this.loader = loader;
 	}
@@ -46,13 +50,23 @@ public class AssemblerImpl implements Assembler {
 	public void readAssemblyFile() {
 		String line;
 		Scanner s = null;
+		boolean leadingCommentsFinished = false; //To signal end of any leading comments
 
 	    try {
 	        s = new Scanner(new BufferedReader(new FileReader(fileReference)));
 	
 	        while (s.hasNextLine()) {	        	
 	        	line = s.nextLine();
-	        	if (line.length() != 0) { //Don't add blank lines to the array
+	        	displayProgram.add(line);
+	        	if (!leadingCommentsFinished && line.length() != 0) {
+	        		if (line.startsWith("#")) {
+	        			leadingComments.add(line); //Add any comments at beginning of file to separate list for better display        			
+	        		}
+	        		else {
+	        			leadingCommentsFinished = true;
+	        		}
+	        	}
+	        	if (line.length() != 0 && leadingCommentsFinished) { //Don't add blank lines to the array
 	        		// System.out.println(line); //For testing
 		            programString.add(line);
 	        	}	           
@@ -493,6 +507,15 @@ public class AssemblerImpl implements Assembler {
 	@Override
 	public String display() { //Displays assembly language program with line numbers
 		String displayString = "     <Label>:  <Instruction/Operand>  <#Comment>\n\n";
+		
+		if (leadingComments.size() > 0) { //Display leading comments, if there are any
+			for (int i = 0; i < leadingComments.size(); i++) {
+				displayString += leadingComments.get(i) + "\n";
+			}
+			displayString += "\n"; //Add extra space for clarity
+		}
+		
+		
 		int lineReference = 0; //For display of line numbers, including blank lines
 		for (int i = 0; i < programString.size(); i++) {
 			if (lineReference < 10) { //Line number formatting
@@ -523,6 +546,28 @@ public class AssemblerImpl implements Assembler {
 
 		return displayString;
 	}
+	
+	
+	/*
+	 * For GUI display
+	 */
+//	@Override
+//	public String display() { //Displays assembly language program with line numbers
+//		String displayString = "     <Label>:  <Instruction/Operand>  <#Comment>\n\n";
+//		int lineReference = 0; //For display of line numbers, including blank lines
+//		for (int i = 0; i < displayProgram.size(); i++) {
+//			if (lineReference < 10) { //Line number formatting
+//				displayString += "0" + lineReference + "|  " + displayProgram.get(i) + "\n";		
+//				lineReference++;
+//			}
+//			else {
+//				displayString += lineReference + "|  " + displayProgram.get(i) + "\n";
+//				lineReference++;
+//			}
+//		}		
+//
+//		return displayString;
+//	}
 
 
 	
