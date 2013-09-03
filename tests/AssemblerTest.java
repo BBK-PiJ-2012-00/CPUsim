@@ -28,7 +28,7 @@ public class AssemblerTest {
 		CPUbuilder builder = new CPUbuilder(false);
 		assembler = new AssemblerImpl(builder.getLoader());
 		testFile = new File("src/assemblyPrograms/assemblerTestProgram.txt");
-		testFile2 = new File("src/assemblyPrograms/assemblerTestProgram2");
+		testFile2 = new File("src/assemblyPrograms/assemblerTestProgram2.txt");
 	}
 
 	/*
@@ -43,7 +43,7 @@ public class AssemblerTest {
 			output += ((AssemblerImpl) assembler).getProgramString().get(i) + "\n";
 			//System.out.println(((AssemblerImpl) assembler).getProgramString().get(i));
 		}
-		String expected = "<Label> <Instruction/Variable> <Comments>\nL1:  LOAD var1, r0 #Load r0 with contents " + 
+		String expected = "L1:  LOAD var1, r0 #Load r0 with contents " + 
 				"of memory address referred to by var1\n     HALT\n" +	"var1: DATA 7\n";
 		assertEquals(expected, output);
 	}
@@ -245,5 +245,7 @@ public class AssemblerTest {
 			System.out.println(assembler.getProgramString().get(i));
 		}
 	}
+	
+	//Test error handling (best tested on GUI, leading comments, that lables are stripped off
 
 }
