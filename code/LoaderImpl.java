@@ -1,11 +1,8 @@
 package code;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /*
  * Initially, the Loader simply loads program code into memory and doesn't perform any address resolution,
- * as addressing is initially absolute and not symbolic.
+ * as addressing is initially absolute.
  */
 public class LoaderImpl implements Loader {
 	private MainMemory memory; //Reference to main memory
