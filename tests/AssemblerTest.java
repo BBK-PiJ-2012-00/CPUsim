@@ -276,11 +276,55 @@ public class AssemblerTest {
 		assertFalse(assembler.assembleCode());
 	}
 	
+	
 	@Test
 	public void testBadDataDeclaration() { //Checks that omitting DATA keyword causes assembleCode() to return false.
 		assembler.selectFile(new File("src/testAssemblyPrograms/badDataDeclaration.txt"));
 		assertFalse(assembler.assembleCode());
 	}
+	
+	
+	@Test
+	public void testFileNotFound() { //Checks that if a file is not found the error is handled (with pop up error message)
+		assembler.selectFile(new File("src/aNonExistentFile.txt"));
+		assertFalse(assembler.assembleCode());		
+	}
+	
+	
+	@Test
+	public void testInvalidOpcode() { //Tests that invalid opcodes prevent assembly and provide pop up warning
+		assembler.selectFile(new File("src/testAssemblyPrograms/invalidOpcodeDeclaration.txt"));
+		assertFalse(assembler.assembleCode());
+	}
+	
+	@Test
+	public void testUndeclaredLabelReference() { //Tests that undeclared label references prevent assembly and provide relevant warning
+		assembler.selectFile(new File("src/testAssemblyPrograms/badLabel.txt"));
+		assertFalse(assembler.assembleCode());
+	}
+	
+	@Test
+	public void testBadRegisterReferenceLOAD() { //Tests invalid register reference in LOAD instruction is caught with warning
+		assembler.selectFile(new File("src/testAssemblyPrograms/badRegisterRefLOAD.txt"));
+		assertFalse(assembler.assembleCode());
+	}
+	
+	@Test
+	public void testBadRegisterReferenceSTORE() { //Tests invalid register reference in STORE instruction is caught with warning
+		assembler.selectFile(new File("src/testAssemblyPrograms/badRegisterRefSTORE.txt"));
+		assertFalse(assembler.assembleCode());
+	}
+	
+	@Test
+	public void testBadRegisterReferenceMOVE() { //Tests invalid register reference in MOVE instruction is caught with warning
+		assembler.selectFile(new File("src/testAssemblyPrograms/badRegisterRefMOVE.txt"));
+		assertFalse(assembler.assembleCode());
+	}
+	//ERROR!!! Second register being bad not caught!!!
+	
+	
+	
+	
 	
 		
 		
