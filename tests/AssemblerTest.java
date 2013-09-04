@@ -189,12 +189,19 @@ public class AssemblerTest {
 			
 	}
 	
+	/*
+	 * Test assembly of a full program containing a variety of operands and instructions. This tests
+	 * that labels are correctly removed and also that blank lines are skipped in processing the file
+	 * (there is a blank line containing a tab and space characters between operand and instruction 
+	 * declarations in the test file).
+	 */
+	
 	@Test
-	public void testAssembly() { //Test assembly of a full program containing a variety of operands and instructions
+	public void testAssembly() { 
 		assembler.selectFile(testFile2);
 		assembler.assembleCode();
 		
-		String[] expectedArray = new String[19]; //Hexadecimal representation
+		String[] expectedArray = new String[19];
         expectedArray[0] = "LOAD 14 r0";
         expectedArray[1] = "LOAD 15 r1";
         expectedArray[2] = "ADD r0 r1";
@@ -238,15 +245,6 @@ public class AssemblerTest {
 		}
 	}
 	
-//	@Test
-//	public void testDisplay() {
-//		assembler.selectFile(testFile2);
-//		assembler.assembleCode();
-//		
-//		for (int i = 0; i < assembler.getProgramString().size(); i++) {
-//			System.out.println(assembler.getProgramString().get(i));
-//		}
-//	}
 	
 	@Test
 	public void testLeadingComments() { //Tests that any initial comments are correctly separated from main code
@@ -263,7 +261,32 @@ public class AssemblerTest {
 		
 	}
 	
-	//Test error handling (best tested on GUI) file not found, bad assembly language; leading comments
-	//Test no blank lines in readFile!!
+	
+	/*
+	 * Tests that invalid operand declarations in an assembly file throw an error and prevent further
+	 * assembly; to allow such a file to be assembled would cause errors in the simulator. The expected
+	 * NumberFormatException is caught by the assembler and displays a pop up to the user alerting them
+	 * to the problem. This test asserts that the assembleCode() method returns false (which it should 
+	 * in the event of an assembly error). In practice, a return value of false prevents the GUI from
+	 * displaying and executing the file, ensuring the user cannot run it.
+	 */
+	@Test
+	public void testBadOperandDeclaration() { //Tests that invalid operand declarations throw an error and prevent assembly
+		assembler.selectFile(new File("src/testAssemblyPrograms/badOperandTest.txt"));			
+		assertFalse(assembler.assembleCode());
+	}
+	
+	@Test
+	public void testBadDataDeclaration() { //Checks that omitting DATA keyword causes assembleCode() to return false.
+		assembler.selectFile(new File("src/testAssemblyPrograms/badDataDeclaration.txt"));
+		assertFalse(assembler.assembleCode());
+	}
+	
+		
+		
+	
+	//Test error handling (best tested on GUI) file not found, bad assembly language;
+	
+	//Display code is tested using GUI
 
 }
