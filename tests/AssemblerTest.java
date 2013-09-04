@@ -22,6 +22,7 @@ public class AssemblerTest {
 	private Assembler assembler;
 	private File testFile;
 	private File testFile2;
+	private File testFile3;
 
 	@Before
 	public void setUp() throws Exception {
@@ -29,6 +30,7 @@ public class AssemblerTest {
 		assembler = new AssemblerImpl(builder.getLoader());
 		testFile = new File("src/assemblyPrograms/assemblerTestProgram.txt");
 		testFile2 = new File("src/assemblyPrograms/assemblerTestProgram2.txt");
+		testFile3 = new File("src/assemblyPrograms/TransferInstructionDemo.txt");
 	}
 
 	/*
@@ -236,16 +238,32 @@ public class AssemblerTest {
 		}
 	}
 	
+//	@Test
+//	public void testDisplay() {
+//		assembler.selectFile(testFile2);
+//		assembler.assembleCode();
+//		
+//		for (int i = 0; i < assembler.getProgramString().size(); i++) {
+//			System.out.println(assembler.getProgramString().get(i));
+//		}
+//	}
+	
 	@Test
-	public void testDisplay() {
-		assembler.selectFile(testFile2);
+	public void testLeadingComments() { //Tests that any initial comments are correctly separated from main code
+		assembler.selectFile(testFile3);
 		assembler.assembleCode();
+		List<String> leadingCommentsOutput = assembler.getLeadingComments();
+		List<String> expected = new ArrayList<String>();
+		expected.add(0, "# This program demonstrates transfer instructions:");
+		expected.add(1, "# LOAD, STORE and MOVE.");
 		
-		for (int i = 0; i < assembler.getProgramString().size(); i++) {
-			System.out.println(assembler.getProgramString().get(i));
+		for (int i = 0; i < expected.size(); i++) { //Compare contents of the two lists
+			assertEquals(expected.get(i), leadingCommentsOutput.get(i));
 		}
+		
 	}
 	
-	//Test error handling (best tested on GUI, leading comments, that lables are stripped off
+	//Test error handling (best tested on GUI) file not found, bad assembly language; leading comments
+	//Test no blank lines in readFile!!
 
 }
