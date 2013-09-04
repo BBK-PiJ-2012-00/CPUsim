@@ -131,7 +131,7 @@ public class AssemblerImpl implements Assembler {
 		}
 		catch (NumberFormatException nfe) {
 			JOptionPane.showMessageDialog(null, "Assembly program syntax error: Invalid operand declaration \"" + operandString +
-					"\".");
+					"\".", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 			return null;
 		}
 		
