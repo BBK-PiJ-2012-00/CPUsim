@@ -324,7 +324,7 @@ public class AssemblerImpl implements Assembler {
 			}
 			catch (IllegalStateException ise) {
 				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register reference\n" +
-						"\"" + instructionParts.get(1) + "\" in STORE instruction! Register references should\nbe between r0 to r15.",
+						"\"" + instructionParts.get(1) + "\" in STORE instruction! Register references should\nbe between r0 and r15.",
 						"Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 				return null; //Prevent further parsing
 			}
@@ -370,8 +370,28 @@ public class AssemblerImpl implements Assembler {
 			if (destinationString.equals("CC")) { //A load instruction may reference condition code/status register
 				destination = 16;
 			}
+			
 			else {
-				destination = Integer.parseInt(destinationString);
+				try {
+					destination = Integer.parseInt(destinationString);
+					if (destination < 0 || destination > 16) { //rCC references allowed in MOVE instruction (ArithmeticInstr catches error)
+						throw new IllegalStateException("Illegal register reference");
+					}
+				}
+				catch (NumberFormatException nfe) {
+					JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register\n" +
+							"reference \"" + instructionParts.get(2) + "\" in " + opcode + " instruction!", 
+							"Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+					return null; //Prevent further parsing
+				}
+				catch (IllegalStateException ise) {
+					JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register " +
+							"reference \"" + instructionParts.get(2) + "\" in " + opcode + " instruction! Register \nreferences should " +
+							"be between r0 to r15 (or rCC as the register destination for \nLOAD or MOVE instructions).",
+							"Assembly Program Error", 
+							JOptionPane.WARNING_MESSAGE);
+					return null; //Prevent further parsing
+				}
 			}	
 			
 			if (opcode.equals("MOVE")) {
