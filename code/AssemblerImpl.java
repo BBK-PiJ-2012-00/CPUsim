@@ -102,7 +102,7 @@ public class AssemblerImpl implements Assembler {
 	public void separateOperands() {
 		operandArray = new ArrayList<String>();
 		instructionArray = new ArrayList<String>();
-		for (int i = 0; i < programString.size(); i++) { //Start at 1 to miss out header line
+		for (int i = 0; i < programString.size(); i++) { 
 			if (programString.get(i).contains("DATA")) { //Only operand declarations contain this String sequence
 				operandArray.add(programString.get(i));
 			}
@@ -464,8 +464,9 @@ public class AssemblerImpl implements Assembler {
 		}
 			
 		else { //Opcode not found
-			JOptionPane.showMessageDialog(null, "Assembly program syntax error: invalid opcode encountered:\n   \"" +
-					instructionParts.get(0) + "\" is not recognised. \nPlease ensure all instruction opcodes are valid.", 
+			JOptionPane.showMessageDialog(null, "Assembly program syntax error: invalid opcode encountered:\n        \"" +
+					instructionParts.get(0) + "\" is not recognised. \nPlease ensure all instruction opcodes are valid " +
+					"and that all operand \ndeclarations are of the format <Label>: DATA <integer>", 
 					"Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 			return null; //Prevents further parsing
 
