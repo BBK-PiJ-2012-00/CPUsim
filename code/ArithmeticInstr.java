@@ -17,10 +17,12 @@ public class ArithmeticInstr extends Instruction {
 		}
 		//Restrictions on register reference fields of instruction; must comply with number of general purpose registers in CPU
 		if (registerDest < 0 || registerDest > 15) { //0-15 general purpose
-			throw new IllegalStateException("Invalid register destination reference; must be between 0 and 16 inclusive.");
+			throw new IllegalStateException("Invalid register reference; must be \nbetween 0 and 15 inclusive " +
+					"(rCC not applicable to arithmetic instructions");
 		}
 		if (registerInput < 0 || registerInput > 15) {
-			throw new IllegalStateException("Invalid register input reference; must be between 0 and 15 inclusive.");
+			throw new IllegalStateException("Invalid register reference; must be \nbetween 0 and 15 inclusive " +
+					"(rCC not applicable to arithmetic instructions.");
 		}
 		this.registerDest = registerDest;
 		this.registerInput = registerInput;
