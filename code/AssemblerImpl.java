@@ -80,7 +80,6 @@ public class AssemblerImpl implements Assembler {
 	        }
 	    } 
 	    catch (FileNotFoundException ex) {
-	    	ex.printStackTrace();
 	    	this.fileReference = null;
 	    	JOptionPane.showMessageDialog(null, "File not found!", "Error!", JOptionPane.WARNING_MESSAGE);
 	    }	    
