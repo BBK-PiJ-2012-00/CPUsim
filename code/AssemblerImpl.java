@@ -505,6 +505,12 @@ public class AssemblerImpl implements Assembler {
 		return this.programCode;
 	}
 	
+	@Override
+	public List<String> getLeadingComments() {
+		return this.leadingComments;
+	}
+	
+	@Override
 	public Loader getLoader() { //Returns reference to loader, for testing
 		return this.loader;
 	}

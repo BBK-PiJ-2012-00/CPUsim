@@ -116,4 +116,6 @@ public interface Assembler {
 	
 	public Loader getLoader();
 
+	public List<String> getLeadingComments();
+
 }
