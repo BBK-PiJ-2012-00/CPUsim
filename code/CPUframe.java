@@ -3,6 +3,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -44,13 +45,11 @@ public class CPUframe extends JFrame {
 	private Loader loader;
 	private BusController systemBusController;
 	
+	private boolean pipeliningEnabled;
+	
 	private File currentAssemblyFile; //To hold a reference to the current assembly program to facilitate restarting the program.
 	
 	private SwingWorker<Void, Void> executionWorker;
-	
-	
-	private static final int FRAME_WIDTH = 1800;
-	private static final int FRAME_HEIGHT = 1600;
 	
 	private JFileChooser fileChooser;
 	
@@ -59,20 +58,20 @@ public class CPUframe extends JFrame {
 	private JPanel panel3;
 	private JPanel panel4;
 	
-	private JPanel memoryPanel;
-	private JPanel memoryContentsPanel;	
+//	private JPanel memoryPanel;
+//	private JPanel memoryContentsPanel;	
 	
-	private JPanel controlPanel;
-	private JPanel subControlPanel1; //panel to contain open and execute buttons (horizontal layout)
-	private JPanel subControlPanel2; //Additional panel for any additional buttons
-	private JPanel subControlPanel3;
+//	private JPanel controlPanel;
+//	private JPanel subControlPanel1; //panel to contain open and execute buttons (horizontal layout)
+//	private JPanel subControlPanel2; //Additional panel for any additional buttons
+//	private JPanel subControlPanel3;
 	
-	private JPanel assemblerPanel;
-	private JPanel assemblerContentPanel;
+//	private JPanel assemblerPanel;
+//	private JPanel assemblerContentPanel;
 	
-	private JPanel activityContentPanel;
-	private JPanel activityPanel;
-	private JScrollPane activityScroller;
+//	private JPanel activityContentPanel;
+//	private JPanel activityPanel;
+//	private JScrollPane activityScroller;
 	
 	
 	private JPanel registerPanel; //A panel to hold all cpu registers
@@ -132,32 +131,29 @@ public class CPUframe extends JFrame {
 	private JTextField addressBusField;
 	private JTextField dataBusField;
 	
-	private JButton executeButton;
-	private JButton resetButton;
-	private JButton fileOpenButton;
-	private JButton helpButton;
-	private JButton modeSwitchButton;
-	private JButton stepButton;
-
-	private JScrollPane scroller;
-	private JScrollPane assemblerScroller;
+	private Font buttonFont;
 	
-	public CPUframe() {
-		//this.assembler = assembler;
-		//this.controlUnit = new ControlUnitImpl(false);
-		//this.memory = MemoryModule.getInstance();
-		
-		CPUbuilder cpuBuilder = new CPUbuilder(false);
+//	private JButton executeButton;
+//	private JButton resetButton;
+	private JButton fileOpenButton;
+//	private JButton helpButton;
+//	private JButton modeSwitchButton;
+//	private JButton stepButton;
+
+//	private JScrollPane scroller;
+//	private JScrollPane assemblerScroller;
+	
+	public CPUframe() {	
+		CPUbuilder cpuBuilder = new CPUbuilder(false); //Create CPU components
 		
 		this.controlUnit = cpuBuilder.getControlUnit();
 		this.memory = cpuBuilder.getMemoryModule();
 		this.loader = cpuBuilder.getLoader();
 		this.systemBusController = cpuBuilder.getBusController();	
 		
-		//setSize(FRAME_WIDTH, FRAME_HEIGHT);
-				
-		createComponents();
+		buttonFont = new Font("andale mono", Font.PLAIN, 13);
 		
+		createComponents();		
 		
 	}
 	
@@ -172,6 +168,7 @@ public class CPUframe extends JFrame {
 		//panel2 = new JPanel();
 		panel3 = new JPanel();
 		panel4 = new JPanel();
+		panel4.setBorder(BorderFactory.createEmptyBorder(5, 10, 10, 10));
 		
 		
 		
@@ -179,14 +176,16 @@ public class CPUframe extends JFrame {
 		 * Code for memory display.
 		 *
 		 */		
-		memoryContentsPanel = new JPanel(); //A panel to store the scrollpane and text area for memory display
+		JPanel memoryContentsPanel = new JPanel(); //A panel to store the scrollpane and text area for memory display
+		memoryContentsPanel.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5));
 		
 		memoryContentArea = new JTextArea(35, 12);
+		//memoryContentArea.setFont(textFont);
 		memoryContentArea.setText(memory.display()); //Text area for memory display
 		memoryContentArea.setCaretPosition(0);
 		memoryContentArea.setEditable(false); //Memory display is not editable
 		
-		scroller = new JScrollPane(memoryContentArea);		
+		JScrollPane scroller = new JScrollPane(memoryContentArea);		
 		
 		memoryContentsPanel.add(scroller); //Add text area to memory panel
 	
@@ -196,7 +195,7 @@ public class CPUframe extends JFrame {
 		//scroller.setBorder(BorderFactory.createTitledBorder(" Main Memory "));
 		//memoryPanel.add(scroller);
 		
-		memoryPanel = new JPanel(); //Main panel for all memory related items
+		JPanel memoryPanel = new JPanel(); //Main panel for all memory related items
 		memoryPanel.setLayout(new BoxLayout(memoryPanel, BoxLayout.Y_AXIS));
 		memoryPanel.add(memoryContentsPanel);
 		
@@ -208,103 +207,40 @@ public class CPUframe extends JFrame {
 		memoryPanel.setBorder(BorderFactory.createTitledBorder(" Main Memory "));
 		
 		panel4.add(memoryPanel);
-		//panel4.setBorder(BorderFactory.createEmptyBorder());
 		
 		
 		/*
-		 * Panel 1: control buttons, assembler and activity monitor
+		 * Panel 1: assembler and activity monitor
 		 */
 		
 		panel1 = new JPanel();
 		panel1.setLayout(new BoxLayout(panel1, BoxLayout.Y_AXIS));
-		panel1.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		panel1.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5));
 		//panel1.setBackground(Color.cyan);
 		panel1.setMaximumSize(new Dimension(0, 1000)); //Use Box to keep things rigid
 		
-		controlPanel = new JPanel(); //Container panel for all control buttons
-		controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.Y_AXIS));
-		//controlPanel.setAlignmentX(LEFT_ALIGNMENT);
-		controlPanel.setMaximumSize(new Dimension(200, 500));
-		
-		subControlPanel1 = new JPanel();
-		subControlPanel1.setLayout(new BoxLayout(subControlPanel1, BoxLayout.X_AXIS));
-		//subControlPanel1.setBorder(BorderFactory.createTitledBorder(" Control Panel "));
-		
-		subControlPanel2 = new JPanel();
-		subControlPanel2.setLayout(new BoxLayout(subControlPanel2, BoxLayout.X_AXIS));
-		
-		subControlPanel3 = new JPanel();
-		subControlPanel3.setLayout(new BoxLayout(subControlPanel3, BoxLayout.X_AXIS));
-		
-		fileOpenButton = new JButton("Select Assembly File");
-		fileOpenButton.addActionListener(new FileOpenListener());
-		//subControlPanel1.add(fileOpenButton);	
-		controlPanel.add(fileOpenButton);
-		
-		fileChooser = new JFileChooser("src/assemblyPrograms");	
-		
-		executeButton = new JButton("Execute Program");
-		executeButton.addActionListener(new ExecuteListener());
-		//subControlPanel1.add(executeButton);
-		//subControlPanel2.add(executeButton);
-		controlPanel.add(executeButton);
 
-		
-		helpButton = new JButton("Help!");
-		helpButton.addActionListener(new HelpButtonListener());
-		
-		//subControlPanel2.add(helpButton);
-		//subControlPanel3.add(helpButton);
-		controlPanel.add(helpButton);
-
-		
-		modeSwitchButton = new JButton("Pipelined Mode");
-		//subControlPanel1.add(modeSwitchButton);
-		controlPanel.add(modeSwitchButton);
-		
-		stepButton = new JButton("Step");
-		stepButton.setAlignmentX(LEFT_ALIGNMENT);
-		stepButton.addActionListener(new StepExecutionListener());
-		
-		//subControlPanel1.add(stepButton);
-		controlPanel.add(stepButton);
-		
-		resetButton = new JButton("Reset");
-		resetButton.addActionListener(new ResetListener());
-		controlPanel.add(resetButton);
-		//resetButton.setAlignmentX(CENTER_ALIGNMENT);
-		//memoryPanel.add(resetButton);
-		//subControlPanel1.add(resetButton);
-		
-		
-		//controlPanel.add(subControlPanel1);
-		//controlPanel.add(subControlPanel2);
-		//controlPanel.add(subControlPanel3);
-		
-		controlPanel.setBorder(BorderFactory.createTitledBorder( " Control Panel "));
-		
-		//panel1.add(controlPanel);
 	
 		/*
 		 * Assembler display in panel 1
 		 */
 		JPanel assemblerBufferPanel = new JPanel(); //To make border equal to controlPanel above
-		assemblerContentPanel = new JPanel();
-		assemblyProgramArea = new JTextArea(15, 30);
+		JPanel assemblerContentPanel = new JPanel();
+		assemblyProgramArea = new JTextArea(20, 32);
 		assemblyProgramArea.setEditable(false);
 		assemblyProgramArea.setCaretPosition(0);
 		
-		assemblerScroller = new JScrollPane(assemblyProgramArea);
+		JScrollPane assemblerScroller = new JScrollPane(assemblyProgramArea);
 		
 		assemblerBufferPanel.add(assemblerScroller);
 		
 		assemblerContentPanel.add(assemblerBufferPanel);
 		
-		assemblerPanel = new JPanel();
+		JPanel assemblerPanel = new JPanel();
 		//assemblerPanel.setLayout(new BoxLayout(assemblerPanel, BoxLayout.Y_AXIS));
 		assemblerPanel.add(assemblerContentPanel);		
-		assemblerPanel.setAlignmentX(LEFT_ALIGNMENT);
-		assemblerPanel.setAlignmentY(BOTTOM_ALIGNMENT);
+		//assemblerPanel.setAlignmentX(LEFT_ALIGNMENT);
+		//assemblerPanel.setAlignmentY(BOTTOM_ALIGNMENT);
 		
 		
 		assemblerContentPanel.setBorder(BorderFactory.createTitledBorder(" Assembly Program "));
@@ -316,21 +252,21 @@ public class CPUframe extends JFrame {
 		 * Activity Monitor display in panel1
 		 */
 		JPanel activityBufferPanel = new JPanel(); //To make border equal to controlPanel and assembly above
-		activityContentPanel = new JPanel();
-		activityArea = new JTextArea(15, 30);
+		JPanel activityContentPanel = new JPanel();
+		activityArea = new JTextArea(18, 32);
 		activityArea.setEditable(false);
 		
-		activityScroller = new JScrollPane(activityArea);
+		JScrollPane activityScroller = new JScrollPane(activityArea);
 		
 		activityBufferPanel.add(activityScroller);
 		
 		activityContentPanel.add(activityBufferPanel);
 		
-		activityPanel = new JPanel();
+		JPanel activityPanel = new JPanel();
 		activityPanel.add(activityContentPanel);			
 		
 		activityContentPanel.setBorder(BorderFactory.createTitledBorder(" Activity Monitor "));
-		activityPanel.setAlignmentX(LEFT_ALIGNMENT);
+		//activityPanel.setAlignmentX(LEFT_ALIGNMENT);
 		
 		controlUnit.getFetchDecodeStage().registerListener(new UpdateListener(this)); //Register a listener with FD stage
 		controlUnit.getExecuteStage().registerListener(new UpdateListener(this)); //Register a listener with Ex. stage
@@ -699,7 +635,7 @@ public class CPUframe extends JFrame {
 		 * For aluSubPanel2, containing mul and div units
 		 */
 		
-		aluSubPanel2 = new JPanel();
+		JPanel aluSubPanel2 = new JPanel();
 		aluSubPanel2.setLayout(new BoxLayout(aluSubPanel2, BoxLayout.Y_AXIS));			
 
 		JLabel divOperand1Label = new JLabel("Operand 1:");
@@ -728,7 +664,7 @@ public class CPUframe extends JFrame {
 		divResultPanel.add(divResultLabel);
 		divResultPanel.add(divResult);		
 		
-		aluDivPanel = new JPanel();
+		JPanel aluDivPanel = new JPanel();
 		aluDivPanel.setLayout(new BoxLayout(aluDivPanel, BoxLayout.Y_AXIS));
 		aluDivPanel.add(divOperand1Panel);
 		aluDivPanel.add(divOperand2Panel);
@@ -783,12 +719,12 @@ public class CPUframe extends JFrame {
 		aluPanel.setMaximumSize(new Dimension(400, 290));
 		
 		JPanel bufferPanel = new JPanel(); //To separate registers from ALU with some empty space
-		bufferPanel.setPreferredSize(new Dimension(400, 20));
-		bufferPanel.setMaximumSize(new Dimension(400, 290));
+		bufferPanel.setPreferredSize(new Dimension(400, 35));
+		bufferPanel.setMaximumSize(new Dimension(400, 35));
 		panel2.add(bufferPanel);
 		
 		panel2.add(aluPanel);
-		panel2.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5)); 
+		panel2.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5));
 		
 		ALU.registerListener(new UpdateListener(this));
 		
@@ -796,15 +732,11 @@ public class CPUframe extends JFrame {
 		/*
 		 * System Bus
 		 */
-//		private JPanel systemBusPanel;
-//		private JPanel controlLinePanel;
-//		private JPanel addressBusPanel;
-//		private JPanel dataBusPanel;
 		
-		systemBusPanel = new JPanel();
+		JPanel systemBusPanel = new JPanel();
 		systemBusPanel.setLayout(new BoxLayout(systemBusPanel, BoxLayout.Y_AXIS));//Add bus panels vertically
 		
-		addressBusPanel = new JPanel();
+		JPanel addressBusPanel = new JPanel();
 		addressBusPanel.setPreferredSize(new Dimension(175, 60));
 		//addressBusPanel.setBackground(Color.blue);
 		//Border cyanLine = BorderFactory.createLineBorder(Color.cyan);	
@@ -818,7 +750,7 @@ public class CPUframe extends JFrame {
 		
 		systemBusController.accessControlLine().getAddressBus().registerListener(new UpdateListener(this));
 		
-		dataBusPanel = new JPanel();
+		JPanel dataBusPanel = new JPanel();
 		dataBusPanel.setPreferredSize(new Dimension(175, 60));
 		//dataBusPanel.setBackground(Color.magenta);
 		//Border magentaLine = BorderFactory.createLineBorder(Color.magenta);
@@ -830,7 +762,7 @@ public class CPUframe extends JFrame {
 		
 		systemBusController.accessControlLine().getDataBus().registerListener(new UpdateListener(this));
 		
-		controlLinePanel = new JPanel();
+		JPanel controlLinePanel = new JPanel();
 		controlLinePanel.setPreferredSize(new Dimension(175, 60));
 		controlLinePanel.setBorder(BorderFactory.createTitledBorder("Control Line"));
 		controlLineField = new JTextField(8);
@@ -843,24 +775,111 @@ public class CPUframe extends JFrame {
 		systemBusPanel.setBorder(BorderFactory.createTitledBorder("System Bus"));
 		
 		
-		panel3.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 10));
+		panel3.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 10));
 		
 		
 		panel3.add(systemBusPanel);
 		
 		JPanel panel3BufferPanel = new JPanel();
-		panel3BufferPanel.setPreferredSize(new Dimension(150, 100));
+		panel3BufferPanel.setPreferredSize(new Dimension(150, 80));
 		panel3.add(panel3BufferPanel); //To separate system bus and control panel displays
+		
+		
+		/*
+		 * Control panel
+		 */
+		JPanel controlPanel = new JPanel(); //Container panel for all control buttons
+		controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.Y_AXIS));
+		//controlPanel.setPreferredSize(new Dimension(200, 200));
+		controlPanel.setMaximumSize(new Dimension(200, 250));
+		
+		JPanel subControlPanel1 = new JPanel();
+		subControlPanel1.setLayout(new BoxLayout(subControlPanel1, BoxLayout.X_AXIS));
+		//subControlPanel1.setMaximumSize(new Dimension(190, 50));
+		subControlPanel1.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+		
+		JPanel subControlPanel2 = new JPanel();
+		subControlPanel2.setLayout(new BoxLayout(subControlPanel2, BoxLayout.X_AXIS));
+		
+		JPanel subControlPanel3 = new JPanel();
+		subControlPanel3.setLayout(new BoxLayout(subControlPanel3, BoxLayout.X_AXIS));
+		subControlPanel3.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+		
+		JPanel subControlPanel4 = new JPanel();
+		subControlPanel4.setLayout(new BoxLayout(subControlPanel4, BoxLayout.X_AXIS));
+		
+		JPanel subControlPanel5 = new JPanel();
+		subControlPanel5.setLayout(new BoxLayout(subControlPanel5, BoxLayout.X_AXIS));
+		subControlPanel5.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+		
+		fileOpenButton = new JButton("Select Assembly File");
+		fileOpenButton.addActionListener(new FileOpenListener());
+		//subControlPanel1.add(fileOpenButton);	
+		subControlPanel1.add(fileOpenButton);
+		controlPanel.add(subControlPanel1);		
+		
+		fileChooser = new JFileChooser("src/assemblyPrograms");	
+		
+		
+		JButton executeButton = new JButton("Execute Program");
+		executeButton.addActionListener(new ExecuteListener());
+		//subControlPanel1.add(executeButton);
+		//subControlPanel2.add(executeButton);
+		subControlPanel2.add(executeButton);
+		controlPanel.add(subControlPanel2);
+		
+		JButton stepButton = new JButton("Step");
+		stepButton.setFont(buttonFont);
+		//stepButton.setAlignmentX(LEFT_ALIGNMENT);
+		stepButton.addActionListener(new StepExecutionListener());
+		subControlPanel3.add(stepButton);
+		controlPanel.add(subControlPanel3);
+
+		
+		JButton modeSwitchButton = new JButton("Pipelined Mode");
+		modeSwitchButton.setFont(buttonFont);
+		//subControlPanel1.add(modeSwitchButton);
+		subControlPanel4.add(modeSwitchButton);	
+		controlPanel.add(subControlPanel4);
+	
+		
+		JButton resetButton = new JButton("Reset");
+		resetButton.addActionListener(new ResetListener());
+		subControlPanel4.add(resetButton);
+		//controlPanel.add(resetButton);
+		subControlPanel5.add(resetButton);	
+		
+		JButton helpButton = new JButton("Help!");
+		helpButton.addActionListener(new HelpButtonListener());		
+		subControlPanel4.add(helpButton);
+		//helpButton.setAlignmentX(RIGHT_ALIGNMENT);
+		//subControlPanel3.add(helpButton);
+		//controlPanel.add(helpButton);
+		subControlPanel5.add(helpButton);	
+		
+		controlPanel.add(subControlPanel5);
+		
+
+
+		
+		Border controlPanelLine = BorderFactory.createLineBorder(Color.BLUE, 3);
+		Font controlPanelFont = new Font("andale mono", Font.ITALIC, 15);
+		controlPanel.setBorder(BorderFactory.createTitledBorder(controlPanelLine, "* Control Panel *",0, 0, controlPanelFont));
+		//Border cyanLine = BorderFactory.createLineBorder(Color.cyan);
+		
+		
 	
 		panel3.add(controlPanel);
-		panel3.setPreferredSize(new Dimension(230, 800));
+		panel3.setPreferredSize(new Dimension(220, 800));
 		
 		this.getContentPane().add(panel1); //Leftmost panel
 		panel1.setBackground(Color.cyan);
 		this.getContentPane().add(panel2);
-		panel2.setBackground(Color.DARK_GRAY);
+		//panel2.setBackground(Color.DARK_GRAY);
+		panel2.setBackground(new Color(119, 123, 123));
 		this.getContentPane().add(panel3);
 		panel3.setBackground(Color.orange);
+		panel3BufferPanel.setBackground(panel3.getBackground());
 		this.getContentPane().add(panel4); //Rightmost panel
 		
 		
@@ -954,9 +973,6 @@ public class CPUframe extends JFrame {
     		
     		assemblyProgramArea.setText(assembler.display());
     		assemblyProgramArea.setCaretPosition(0);
-    		
-//    		executionWorker.cancel(true); //Old worker thread needs terminating
-//    		executionWorker = null; //Must be reset to null to allow for creation of new thread when Execute Program pressed
     		
 		}
 	}
