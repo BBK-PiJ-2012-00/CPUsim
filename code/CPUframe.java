@@ -57,47 +57,7 @@ public class CPUframe extends JFrame {
 	private JPanel panel2;
 	private JPanel panel3;
 	private JPanel panel4;
-	
-//	private JPanel memoryPanel;
-//	private JPanel memoryContentsPanel;	
-	
-//	private JPanel controlPanel;
-//	private JPanel subControlPanel1; //panel to contain open and execute buttons (horizontal layout)
-//	private JPanel subControlPanel2; //Additional panel for any additional buttons
-//	private JPanel subControlPanel3;
-	
-//	private JPanel assemblerPanel;
-//	private JPanel assemblerContentPanel;
-	
-//	private JPanel activityContentPanel;
-//	private JPanel activityPanel;
-//	private JScrollPane activityScroller;
-	
-	
-	private JPanel registerPanel; //A panel to hold all cpu registers
-	private JPanel controlRegistersPanel1; //A panel to hold one row of control registers
-	private JPanel controlRegistersPanel2;
-	private JPanel generalPurposePanel; // A panel to group the general purpsoe registers
-	private JPanel marPanel;
-	private JPanel mbrPanel;
-	private JPanel irPanel;
-	private JPanel pcPanel;
-	private JPanel statusPanel;
-	
-	private JPanel aluPanel;
-	private JPanel aluSubPanel1;
-	private JPanel aluSubPanel2;
-	private JPanel aluAdderPanel;
-	private JPanel aluSubtractorPanel;
-	private JPanel aluDivPanel;
-	private JPanel aluMulPanel;
-	
-	private JPanel systemBusPanel;
-	private JPanel controlLinePanel;
-	private JPanel addressBusPanel;
-	private JPanel dataBusPanel;
-	
-	
+		
 	private JTextArea memoryContentArea;
 	private JTextArea assemblyProgramArea;
 	
@@ -133,15 +93,8 @@ public class CPUframe extends JFrame {
 	
 	private Font buttonFont;
 	
-//	private JButton executeButton;
-//	private JButton resetButton;
 	private JButton fileOpenButton;
-//	private JButton helpButton;
-//	private JButton modeSwitchButton;
-//	private JButton stepButton;
-
-//	private JScrollPane scroller;
-//	private JScrollPane assemblerScroller;
+	
 	
 	public CPUframe() {	
 		CPUbuilder cpuBuilder = new CPUbuilder(false); //Create CPU components
@@ -282,7 +235,7 @@ public class CPUframe extends JFrame {
 		panel2 = new JPanel();
 		panel2.setLayout(new BoxLayout(panel2, BoxLayout.Y_AXIS));
 		
-		registerPanel = new JPanel();
+		JPanel registerPanel = new JPanel();
 		registerPanel.setMaximumSize(new Dimension(400, 400));
 		//registerPanel.setPreferredSize(new Dimension(400, 400));
 		registerPanel.setAlignmentX(CENTER_ALIGNMENT);
@@ -295,7 +248,7 @@ public class CPUframe extends JFrame {
 		JPanel topRegisterPanel = new JPanel();
 		topRegisterPanel.setLayout(new BoxLayout(topRegisterPanel, BoxLayout.X_AXIS));
 		
-		controlRegistersPanel1 = new JPanel();		
+		JPanel controlRegistersPanel1 = new JPanel();		
 		//controlRegistersPanel1.setLayout(new BoxLayout(controlRegistersPanel1, BoxLayout.X_AXIS));
 		controlRegistersPanel1.setLayout(new BoxLayout(controlRegistersPanel1, BoxLayout.Y_AXIS));
 		
@@ -303,17 +256,17 @@ public class CPUframe extends JFrame {
 		pcField.setEditable(false);
 		pcField.setAlignmentX(CENTER_ALIGNMENT);
 		pcField.setAlignmentY(CENTER_ALIGNMENT);
-		pcPanel = new JPanel();
+		JPanel pcPanel = new JPanel();
 		pcPanel.setMaximumSize(new Dimension(125, 60));
 		pcPanel.add(pcField);
 		pcPanel.setBorder(BorderFactory.createTitledBorder(" PC "));
 		
-		UpdateListener registerListener = new UpdateListener(this);
-		controlUnit.getPC().registerListener(registerListener);
+		//UpdateListener registerListener = new UpdateListener(this);
+		controlUnit.getPC().registerListener(new UpdateListener(this));
 		
 		irField = new JTextField(8);
 		irField.setEditable(false);
-		irPanel = new JPanel();
+		JPanel irPanel = new JPanel();
 		irPanel.setMaximumSize(new Dimension(150, 90));
 		irPanel.add(irField);
 		irPanel.setBorder(BorderFactory.createTitledBorder(" IR "));
@@ -322,7 +275,7 @@ public class CPUframe extends JFrame {
 		
 		statusField = new JTextField(6);
 		statusField.setEditable(false);
-		statusPanel = new JPanel();
+		JPanel statusPanel = new JPanel();
 		statusPanel.setMaximumSize(new Dimension(125, 60));
 		//statusPanel.setSize(5, 5);
 		statusPanel.add(statusField);
@@ -337,27 +290,27 @@ public class CPUframe extends JFrame {
 		//registerPanel.add(controlRegistersPanel1);
 		
 		
-		controlRegistersPanel2 = new JPanel();
+		JPanel controlRegistersPanel2 = new JPanel();
 		//controlRegistersPanel2.setLayout(new BoxLayout(controlRegistersPanel2, BoxLayout.X_AXIS));
 		controlRegistersPanel2.setLayout(new BoxLayout(controlRegistersPanel2, BoxLayout.Y_AXIS));
 		
 		marField = new JTextField(8);
 		marField.setEditable(false);		
-		marPanel = new JPanel();
+		JPanel marPanel = new JPanel();
 		marPanel.setMaximumSize(new Dimension(150, 60));
 		marPanel.add(marField);
 		Border cyanLine = BorderFactory.createLineBorder(Color.cyan);
 		marPanel.setBorder(BorderFactory.createTitledBorder(cyanLine, " MAR "));
-		controlUnit.getMAR().registerListener(registerListener);
+		controlUnit.getMAR().registerListener(new UpdateListener(this));
 		
 		mbrField = new JTextField(8);
 		mbrField.setEditable(false);
-		mbrPanel = new JPanel();
+		JPanel mbrPanel = new JPanel();
 		mbrPanel.setMaximumSize(new Dimension(150, 60));
 		mbrPanel.add(mbrField);
 		Border magentaLine = BorderFactory.createLineBorder(Color.magenta);
 		mbrPanel.setBorder(BorderFactory.createTitledBorder(magentaLine, " MBR "));
-		controlUnit.getMBR().registerListener(registerListener);
+		controlUnit.getMBR().registerListener(new UpdateListener(this));
 		
 		controlRegistersPanel2.add(marPanel);
 		controlRegistersPanel2.add(mbrPanel);
@@ -376,7 +329,7 @@ public class CPUframe extends JFrame {
 		 * General purpose registers.
 		 */
 		
-		generalPurposePanel = new JPanel();
+		JPanel generalPurposePanel = new JPanel();
 		generalPurposePanel.setLayout(new BoxLayout(generalPurposePanel, BoxLayout.X_AXIS));
 		generalPurposePanel.setMaximumSize(new Dimension(400, 300));
 		generalPurposePanel.setBorder(BorderFactory.createTitledBorder("General Purpose Registers"));
@@ -540,17 +493,17 @@ public class CPUframe extends JFrame {
 		
 		panel2.add(registerPanel);
 		
-		controlUnit.getRegisters().registerListener(registerListener);
+		controlUnit.getRegisters().registerListener(new UpdateListener(this));
 		
 		/*
 		 * ALU display
 		 */
 		
-		aluPanel = new JPanel(); //Panel to encase the two subpanels
+		JPanel aluPanel = new JPanel(); //Panel to encase the two subpanels
 		aluPanel.setLayout(new BoxLayout(aluPanel, BoxLayout.X_AXIS));
 		aluPanel.setBorder(BorderFactory.createTitledBorder(" ALU "));
 		
-		aluSubPanel1 = new JPanel();
+		JPanel aluSubPanel1 = new JPanel();
 		aluSubPanel1.setLayout(new BoxLayout(aluSubPanel1, BoxLayout.Y_AXIS));
 		
 		JLabel addOperand1Label = new JLabel("Operand 1:");
@@ -579,7 +532,7 @@ public class CPUframe extends JFrame {
 		adderResultPanel.add(addResultLabel);
 		adderResultPanel.add(addResult);		
 		
-		aluAdderPanel = new JPanel();
+		JPanel aluAdderPanel = new JPanel();
 		aluAdderPanel.setLayout(new BoxLayout(aluAdderPanel, BoxLayout.Y_AXIS));
 		aluAdderPanel.add(adderOperand1Panel);
 		aluAdderPanel.add(adderOperand2Panel);
@@ -617,7 +570,7 @@ public class CPUframe extends JFrame {
 		subResultPanel.add(subResultLabel);
 		subResultPanel.add(subResult);		
 		
-		aluSubtractorPanel = new JPanel();
+		JPanel aluSubtractorPanel = new JPanel();
 		aluSubtractorPanel.setLayout(new BoxLayout(aluSubtractorPanel, BoxLayout.Y_AXIS));
 		aluSubtractorPanel.add(subOperand1Panel);
 		aluSubtractorPanel.add(subOperand2Panel);
@@ -701,7 +654,7 @@ public class CPUframe extends JFrame {
 		mulResultPanel.add(mulResultLabel);
 		mulResultPanel.add(mulResult);		
 		
-		aluMulPanel = new JPanel();
+		JPanel aluMulPanel = new JPanel();
 		aluMulPanel.setLayout(new BoxLayout(aluMulPanel, BoxLayout.Y_AXIS));
 		aluMulPanel.add(mulOperand1Panel);
 		aluMulPanel.add(mulOperand2Panel);
@@ -781,7 +734,7 @@ public class CPUframe extends JFrame {
 		panel3.add(systemBusPanel);
 		
 		JPanel panel3BufferPanel = new JPanel();
-		panel3BufferPanel.setPreferredSize(new Dimension(150, 80));
+		panel3BufferPanel.setPreferredSize(new Dimension(150, 90));
 		panel3.add(panel3BufferPanel); //To separate system bus and control panel displays
 		
 		
@@ -814,7 +767,6 @@ public class CPUframe extends JFrame {
 		
 		fileOpenButton = new JButton("Select Assembly File");
 		fileOpenButton.addActionListener(new FileOpenListener());
-		//subControlPanel1.add(fileOpenButton);	
 		subControlPanel1.add(fileOpenButton);
 		controlPanel.add(subControlPanel1);		
 		
@@ -823,14 +775,11 @@ public class CPUframe extends JFrame {
 		
 		JButton executeButton = new JButton("Execute Program");
 		executeButton.addActionListener(new ExecuteListener());
-		//subControlPanel1.add(executeButton);
-		//subControlPanel2.add(executeButton);
 		subControlPanel2.add(executeButton);
 		controlPanel.add(subControlPanel2);
 		
 		JButton stepButton = new JButton("Step");
 		stepButton.setFont(buttonFont);
-		//stepButton.setAlignmentX(LEFT_ALIGNMENT);
 		stepButton.addActionListener(new StepExecutionListener());
 		subControlPanel3.add(stepButton);
 		controlPanel.add(subControlPanel3);
@@ -838,7 +787,6 @@ public class CPUframe extends JFrame {
 		
 		JButton modeSwitchButton = new JButton("Pipelined Mode");
 		modeSwitchButton.setFont(buttonFont);
-		//subControlPanel1.add(modeSwitchButton);
 		subControlPanel4.add(modeSwitchButton);	
 		controlPanel.add(subControlPanel4);
 	
@@ -846,32 +794,26 @@ public class CPUframe extends JFrame {
 		JButton resetButton = new JButton("Reset");
 		resetButton.addActionListener(new ResetListener());
 		subControlPanel4.add(resetButton);
-		//controlPanel.add(resetButton);
 		subControlPanel5.add(resetButton);	
 		
 		JButton helpButton = new JButton("Help!");
 		helpButton.addActionListener(new HelpButtonListener());		
 		subControlPanel4.add(helpButton);
-		//helpButton.setAlignmentX(RIGHT_ALIGNMENT);
-		//subControlPanel3.add(helpButton);
-		//controlPanel.add(helpButton);
 		subControlPanel5.add(helpButton);	
 		
 		controlPanel.add(subControlPanel5);
 		
-
-
-		
+		//Border formatting for button control panel
 		Border controlPanelLine = BorderFactory.createLineBorder(Color.BLUE, 3);
 		Font controlPanelFont = new Font("andale mono", Font.ITALIC, 15);
-		controlPanel.setBorder(BorderFactory.createTitledBorder(controlPanelLine, "* Control Panel *",0, 0, controlPanelFont));
-		//Border cyanLine = BorderFactory.createLineBorder(Color.cyan);
-		
+		controlPanel.setBorder(BorderFactory.createTitledBorder(controlPanelLine, "* Control Panel *",0, 0, controlPanelFont));		
 		
 	
 		panel3.add(controlPanel);
 		panel3.setPreferredSize(new Dimension(220, 800));
 		
+		
+		//Add panels to window and set colours
 		this.getContentPane().add(panel1); //Leftmost panel
 		panel1.setBackground(Color.cyan);
 		this.getContentPane().add(panel2);
@@ -881,27 +823,24 @@ public class CPUframe extends JFrame {
 		panel3.setBackground(Color.orange);
 		panel3BufferPanel.setBackground(panel3.getBackground());
 		this.getContentPane().add(panel4); //Rightmost panel
+		this.getContentPane().setBackground(new Color(119, 123, 123));
 		
 		
 	}
 	
-//	class MeaningOfLifeFinder extends SwingWorker<String, Object> {
-//	       @Override
-//	       public String doInBackground() {
-//	           return findTheMeaningOfLife();
-//	       }
-//
-//	       @Override
-//	       protected void done() {
-//	           try {
-//	               label.setText(get());
-//	           } catch (Exception ignore) {
-//	           }
-//	       }
-//	   }
-//
-//	   (new MeaningOfLifeFinder()).execute();
-//	
+	
+	private void redrawPanel1() {
+		//Redraws panel 1 to acheive GUI display suitable for pipelined mode
+	}
+	
+	private void redrawPanel2() {
+		//Redraws panel2 to achieve GUI display suitable for pipled mode
+	}
+	
+	/*
+	 * Event listening inner classes
+	 */
+
 	class ExecutionWorker extends SwingWorker<Void, Void> {
 
 		@Override
@@ -947,28 +886,20 @@ public class CPUframe extends JFrame {
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
-//			memory.clearMemory();
-//			memoryContentArea.setText(memory.display());
-//			memoryContentArea.setCaretPosition(0);
 			
 			executionWorker.cancel(true); //Old worker thread needs terminating
 			executionWorker = null;
 			
-			//controlUnit.getFetchDecodeStage().resetWaitStatus();
-			//systemBusController.accessControlLine().resetWaitStatus();
-			
+			//Clear fields
 			memory.clearMemory();
             activityArea.setText("");
-            controlUnit.clearRegisters();
-           // controlUnit.resetStages();    
-            
+            controlUnit.clearRegisters();            
            
             assembler = new AssemblerImpl(loader);
             assembler.selectFile(currentAssemblyFile); //Reopen previously selected assembly file
     		assembler.assembleCode();
     		assembler.loadToLoader();
     		assembler.getLoader().loadToMemory();
-    	//	memoryContentArea.setText(memory.display()); //update memory display on opening file
     	//	memoryContentArea.setCaretPosition(0); //Scrolls text area to top
     		
     		assemblyProgramArea.setText(assembler.display());
@@ -978,10 +909,7 @@ public class CPUframe extends JFrame {
 	}
 	
 	
-	/*
-	 * Clear fields upon selecting a file so that the user can run as many programs in succession
-	 * as desired.
-	 */
+	
 	class FileOpenListener implements ActionListener {
 		
 		@Override
