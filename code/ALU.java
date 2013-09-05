@@ -18,8 +18,7 @@ public class ALU {
 		Operand result = new OperandImpl(sum);
 		
 		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(null, "add", op1, op2, result);
-		updateListener.handleUpDateEvent(updateEvent);
-		
+		updateListener.handleUpDateEvent(updateEvent);		
 		return result;
 	}
 	
