@@ -1,15 +1,9 @@
 package code;
 
-/*
- * AddressLine now called AddressBus; typically, an address line in a parallel channel carries one bit,
- * and an address bus width of 32 lines is used to transmit a 32-bit word. Collectively these lines are called
- * an address bus.  AddressBus would more accurately describe the function of this class; the AddressBus class
- * can be interpreted as containing 32 address lines, enabling it to carry 32-bit addresses.  Thus, the address
- * field of this class representing the contents of the address bus is limited to a maximum value of 2^32.
- * 
- * An interface for the address line component of the System Bus. The address line holds an address value
- * as an integer when the address is a location in main memory. The address line holds no value when the 
- * System Bus is making a transfer from main memory to the CPU, as all data is delivered into the Memory Buffer
+/* 
+ * An interface for the address bus component of the system bus. The address line holds an address value
+ * as an integer when the address is a location in main memory. The address line holds a value of -1 when the 
+ * system bus is making a transfer from main memory to the CPU, as all data is delivered into the Memory Buffer
  * Register.
  */
 public interface AddressBus {
@@ -21,13 +15,6 @@ public interface AddressBus {
 	 */
 	public void put(int address);
 	
-//	/*
-//	 * A method used to signify a transfer from memory back to MBR of CPU. 
-//	 * May not be required long term. Sets address to -1, which is not a valid
-//	 * main memory address location. 
-//	 */
-//	public void put();
-	
 	/*
 	 * A method for reading an address from the address line of the bus.
 	 * 
@@ -35,8 +22,21 @@ public interface AddressBus {
 	 */
 	public int read();
 
+	/*
+	 * Returns a String representation of AddressBus contents for GUI display.
+	 * 
+	 * @return String the String representation of the AddressBus contents.
+	 */
 	public String display();
 
+	/*
+	 * A method for registering an event listener object with the address bus,
+	 * for GUI display purposes. Every time the contents of this line is updated,
+	 * an update event is created and handled by the listener to change the GUI
+	 * display accordingly.
+	 * 
+	 * @param UpdateListener listener the listener object to handle update events.
+	 */
 	public void registerListener(UpdateListener listener);		
 
 }
