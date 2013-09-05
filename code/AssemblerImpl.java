@@ -456,7 +456,8 @@ public class AssemblerImpl implements Assembler {
 			}
 			catch (NullPointerException npe) {
 				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Label reference \"" + 
-						instructionParts.get(1) + "\" has not been declared.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+						instructionParts.get(1) + "\" in " + opcode + "\ninstruction has not been declared.", 
+						"Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 				return null; //Prevent further parsing
 			}
 			
