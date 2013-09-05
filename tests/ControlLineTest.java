@@ -9,6 +9,9 @@ import org.junit.Test;
 
 /*
  * Needs testing with multiple threads for pipelining.
+ * 
+ * Note that wait() statements should be commented out of the system bus code
+ * in order for these tests to run (wait() statements were tested using the GUI).
  */
 public class ControlLineTest {
 	private ControlLine cLine;
@@ -37,6 +40,9 @@ public class ControlLineTest {
 		mbr.registerListener(new UpdateListener(new TestFrame()));
 		builder.getControlUnit().getMAR().registerListener(new UpdateListener(new TestFrame()));
 		memory.registerListener(new UpdateListener(new TestFrame()));
+		cLine.getAddressBus().registerListener(new UpdateListener(new TestFrame()));
+		cLine.getDataBus().registerListener(new UpdateListener(new TestFrame()));
+		cLine.registerListener(new UpdateListener(new TestFrame()));
 	}
 
 	@Test
