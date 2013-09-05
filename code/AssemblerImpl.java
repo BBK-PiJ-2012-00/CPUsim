@@ -26,9 +26,10 @@ public class AssemblerImpl implements Assembler {
 	private List<String> instructionArray; //For intermediate stage where programString is split into two, instructions being stored
 	private List<String> operandArray; //in instructionArray, operands being stored in operandArray (as Strings)
 		
-	private Map<String, Integer> lookupTable; //For associating labels with relative addresses	
+	private Map<String, Integer> lookupTable; //For associating labels with memory addresses	
 	
-	private int operandAddressPointer;
+	private int operandAddressPointer;//Used to reference the final instruction line address (usually HALT) so that
+									 //operands can be stored after this point.
 	
 	
 	public AssemblerImpl(Loader loader) {
@@ -57,7 +58,6 @@ public class AssemblerImpl implements Assembler {
 	
 	        while (s.hasNextLine()) {	        	
 	        	line = s.nextLine();
-	        	//displayProgram.add(line);
 	        	if (!leadingCommentsFinished && line.length() != 0) {
 	        		if (line.startsWith("#")) {
 	        			leadingComments.add(line); //Add any comments at beginning of file to separate list for better display        			
@@ -66,7 +66,7 @@ public class AssemblerImpl implements Assembler {
 	        			leadingCommentsFinished = true;
 	        		}
 	        	}
-	        	if (leadingCommentsFinished) { //Don't add leading comments to the array
+	        	if (leadingCommentsFinished) { //Don't add leading comments to programString
 	        		if (line.matches("[\\s]*")) { //Do not add lines consisting of only blank spaces to programString
 	        			displayProgram.add(line); //Ok to add blank lines to the list of code for GUI display
 	        		}
@@ -91,12 +91,7 @@ public class AssemblerImpl implements Assembler {
 	    }
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see code.Assembler#separateOperands()
-	 * 
-	 * Set to miss header line ONLY if headers are present!! (i.e. if < is first non-blank character)
-	 */
+	
 	@Override
 	public void separateOperands() {
 		operandArray = new ArrayList<String>();
@@ -105,7 +100,7 @@ public class AssemblerImpl implements Assembler {
 			if (programString.get(i).contains("DATA")) { //Only operand declarations contain this String sequence
 				operandArray.add(programString.get(i));
 			}
-			else if (programString.get(i).trim().startsWith("#")) {
+			else if (programString.get(i).trim().startsWith("#")) { //Detect comments embedded between lines of code
 				//Do nothing; don't add comment lines to instruction or operand arrays
 			}
 			else {
@@ -127,15 +122,15 @@ public class AssemblerImpl implements Assembler {
 		String operandString = operandParts.get(2); //Operand value as String
 		int operandValue;
 		try {
-			operandValue = Integer.parseInt(operandString);
+			operandValue = Integer.parseInt(operandString); //Attempt to parse String to int
 		}
 		catch (NumberFormatException nfe) {
 			JOptionPane.showMessageDialog(null, "Assembly program syntax error: Invalid operand declaration \"" + operandString +
 					"\".", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
-			return null;
+			return null; //Return null in the event of an error; prevents further parsing of file and flags error to user
 		}
 		
-		Data operand = new OperandImpl(operandValue);
+		Data operand = new OperandImpl(operandValue); //Create the operand
 		
 		return operand;		
 	}
@@ -144,16 +139,15 @@ public class AssemblerImpl implements Assembler {
 	@Override
 	public List<String> splitCodeLine(String line) {
 		Scanner sc;
-		Pattern delimiterPattern = Pattern.compile("[\\,]?[\\s]+"); //splits a String on one or more whitespaces, or a comma
+		Pattern delimiterPattern = Pattern.compile("[\\,]?[\\s]+"); //splits a String on one or more white spaces, or a comma
 		//followed by a whitespace -> this separates each line of assembly code into bits for processing into instructions.
 		
 		List<String> splitLine = new ArrayList<String>(); //Array to hold one line of code, split up into parts
 
 		if (line.contains("#")) { //If the line of code contains a comment, remove the comment part
-			String[] halvedLine = line.split("[\\#]");
+			String[] halvedLine = line.split("[\\#]"); //Split the line on the comment delimiter
 			line = halvedLine[0]; 
 		}
-		//What if a line is a comment? I.e. only a comment on that line and nothing else?
 		
 		sc = new Scanner(line);
 		sc.useDelimiter(delimiterPattern);
@@ -168,7 +162,7 @@ public class AssemblerImpl implements Assembler {
 	
 	@Override
 	public void mapInstructionLabel(List<String> instructionParts, int lineNum) {
-		if (instructionParts.get(0).endsWith(":")) {
+		if (instructionParts.get(0).endsWith(":")) { //Ending with ":" indicates presence of a label, else do nothing
 			String label = instructionParts.get(0).substring(0, instructionParts.get(0).length() - 1); //Trim colon from end
 			lookupTable.put(label, lineNum);
 		}
@@ -180,7 +174,7 @@ public class AssemblerImpl implements Assembler {
 	public boolean assembleCode() {
 		this.readAssemblyFile();
 		if (this.fileReference != null) { //Only assemble if file successfully opened
-			//Operands assembled first so their symbolic references can be mapped to actual addresses
+			//Operands are assembled first so their symbolic references can be mapped to actual addresses
 			this.separateOperands();
 					
 			//Assemble the operands (represented as Strings) to real Operands and put them in programCode
@@ -221,6 +215,7 @@ public class AssemblerImpl implements Assembler {
 		return false; //If file not found		
 	}
 	
+	
 	@Override
 	public Data assembleInstruction(List<String> instructionParts) {
 		Data data = null;
@@ -235,10 +230,7 @@ public class AssemblerImpl implements Assembler {
 			
 			String opcode = instructionParts.get(0);
 			
-			//String destinationString = instructionParts.get(i+2).substring(1); //Trim leading 'r' off
-			String destinationString = instructionParts.get(2).substring(1); //Trim leading 'r' off
-			//register source to leave an integer reference
-			
+			String destinationString = instructionParts.get(2).substring(1); //Trim leading 'r' off			
 			int destination;
 			
 			if (destinationString.equals("CC")) { //A load instruction may reference condition code/status register
@@ -309,8 +301,8 @@ public class AssemblerImpl implements Assembler {
 			
 			String sourceString = instructionParts.get(1).substring(1);//Trim leading 'r' off
 			int source;
+			
 			try {
-				//register source to leave an integer reference
 				source = Integer.parseInt(sourceString);	
 				if (source < 0 || source > 15) { //rCC not included in store instructions, hence 15 is upper bound
 					throw new IllegalStateException("Invalid register reference in STORE instruction");
@@ -333,7 +325,7 @@ public class AssemblerImpl implements Assembler {
 			return data;
 		}
 		
-		//Register to register opcodes all follow this block (all register-register)
+		//Register to register operations all follow this block
 		else if (instructionParts.get(0).equals("MOVE") || instructionParts.get(0).equals("ADD") || 
 				instructionParts.get(0).equals("SUB") || instructionParts.get(0).equals("DIV") ||
 				instructionParts.get(0).equals("MUL")) {
@@ -374,7 +366,7 @@ public class AssemblerImpl implements Assembler {
 			else {
 				try {
 					destination = Integer.parseInt(destinationString);
-					if (destination < 0 || destination > 16) { //rCC references allowed in MOVE instruction (ArithmeticInstr catches error)
+					if (destination < 0 || destination > 16) {
 						throw new IllegalStateException("Illegal register reference");
 					}
 				}
@@ -399,12 +391,12 @@ public class AssemblerImpl implements Assembler {
 				return data;
 			}
 			
-			//Additional error handling for arithmetic instructions, as these cannot reference rCC (r16)
+			
 			if (opcode.equals("ADD")) {
 				try {
 					data = new ArithmeticInstr(Opcode.ADD, source, destination);
 				}
-				catch (IllegalStateException ise) {
+				catch (IllegalStateException ise) { //May be thrown by ArithmeticInstr if rCC referenced (not allowed)
 					JOptionPane.showMessageDialog(null, ise.getMessage(), "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 					return null; //Prevent further parsing
 				}
@@ -496,7 +488,7 @@ public class AssemblerImpl implements Assembler {
 	
 	@Override
 	public void loadToLoader() {
-		loader.clear(); //has the effect of resetting the loader each time, ensuring no remnant data from the last use
+		loader.clear(); //Has the effect of resetting the loader each time, ensuring no remnant data from the last use
 		loader.load(this.programCode);
 	}
 	
@@ -537,52 +529,6 @@ public class AssemblerImpl implements Assembler {
 	}
 
 	
-	/*
-	 * For GUI display
-	 */
-//	@Override
-//	public String display() { //Displays assembly language program with line numbers
-//		String displayString = "     <Label>:  <Instruction/Operand>  <#Comment>\n\n";
-//		
-//		if (leadingComments.size() > 0) { //Display leading comments, if there are any
-//			for (int i = 0; i < leadingComments.size(); i++) {
-//				displayString += leadingComments.get(i) + "\n";
-//			}
-//			displayString += "\n"; //Add extra space for clarity
-//		}
-//		
-//		
-//		int lineReference = 0; //For display of line numbers, including blank lines
-//		for (int i = 0; i < programString.size(); i++) {
-//			if (lineReference < 10) { //Line number formatting
-//				displayString += "0" + lineReference + "|  " + programString.get(i) + "\n"; 
-//				//Add blank line between instruction/operand declarations
-//				if (!programString.get(i).contains("DATA") && programString.get(i + 1).contains("DATA")) {
-//					if (lineReference == 9) { 
-//						lineReference++;
-//						displayString += lineReference + "|\n";
-//					}
-//					else { //Line reference is less than 9, therefore leading 0 is required for neatness
-//						lineReference++;
-//						displayString += "0" + lineReference + "|\n";
-//					}
-//				}
-//				lineReference++;
-//			}
-//			else {
-//				displayString += lineReference + "|  " + programString.get(i) + "\n";
-//				//Add blank line between instruction/operand declarations
-//				if (!programString.get(i).contains("DATA") && programString.get(i+1).contains("DATA")) { 
-//					lineReference++;
-//					displayString += lineReference + "|\n";
-//				}
-//				lineReference++;
-//			}
-//		}		
-//
-//		return displayString;
-//	}
-	
 	
 	/*
 	 * For GUI display
@@ -613,51 +559,5 @@ public class AssemblerImpl implements Assembler {
 		return displayString;
 	}
 
-
-	
-	
-
-/*
- * It will be simpler from an assembly point of view to make data declarations for storing variables
- * to memory first, and then have the program code following.  This allows variables to be mapped
- * to an address first, so that they may then be referred to in program code.
- * 
- * Better than this would be the following: keep structure of assembly text file as it is, but after
- * each line has been added to the initial array list of Strings, go through the array and add any lines
- * containing DATA to another array, and everything else to yet another one.  This effectively separates
- * instructions from operand declarations. Then, the operands can be dealt with first so that their symbolic
- * references can be added to the lookupTable, so that when instructions are created, the operand references
- * can be looked up and resolved to a memory address value.
- */
-	
-/*
- * Assembler reads file of format below. Each line is read into a String, which is stored in an array list.
- * Therefore, the index of each string forms its line number, which also serves as a relative address (i.e. the 
- * code at line 0 is the start address, the code at line 1 is the start address + 1 etc).  If a label is present,
- * it should be stored in a HashMap as a key (so that when it is looked up, the line number value is returned)
- * along with the line number of the label as the value. So for example, in the code
- * below, when line 0 is read from the array list for parsing into an instruction or operand, a label will be detected.
- * Thus, L1 (string) will be stored in the hash map as a key, with the line number 0 being stored as the value.  When
- * L1 is later referred to in, say, a branch instruction. the hash map can be consulted so that the label can be
- * translated to a relative address (0 in this case), and this address can be placed in the instruction field instead
- * of the label.
- */
-//	<Label>  <Instruction>
-//	L1:      LOAD r0, var1  #Presence of a label before an instruction indicates it will likely be a branch target
-//	         LOAD r1, var2
-//	         ADD r2, r1
-//	         STORE r1, var3
-//	         BRZ L1 #Branch to L1, which is the LOAD r0, r1 instruction
-//	         HALT
-//
-//	var1:    DATA 9
-//	var2:    DATA 13
-//	var3:    DATA 0 #The target location of a STORE instr. can be declared and initialised to 0
-	         
-	
-	
-	//Check code once translated; ensure that a HALT instruction is the last instruction (if one is missing
-	//in the translated code, insert one by default).
-	
 
 }
