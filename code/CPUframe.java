@@ -4,8 +4,11 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -15,6 +18,7 @@ import java.util.EventListener;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -97,6 +101,8 @@ public class CPUframe extends JFrame {
 	
 	
 	public CPUframe() {	
+		this.setTitle("CPUsim");
+		
 		CPUbuilder cpuBuilder = new CPUbuilder(false); //Create CPU components
 		
 		this.controlUnit = cpuBuilder.getControlUnit();
@@ -121,7 +127,7 @@ public class CPUframe extends JFrame {
 		//panel2 = new JPanel();
 		panel3 = new JPanel();
 		panel4 = new JPanel();
-		panel4.setBorder(BorderFactory.createEmptyBorder(5, 10, 10, 10));
+		panel4.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		
 		
 		
@@ -170,8 +176,8 @@ public class CPUframe extends JFrame {
 		panel1.setLayout(new BoxLayout(panel1, BoxLayout.Y_AXIS));
 		panel1.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5));
 		//panel1.setBackground(Color.cyan);
-		panel1.setMaximumSize(new Dimension(0, 1000)); //Use Box to keep things rigid
-		
+		//panel1.setMaximumSize(new Dimension(0, 1000)); //Use Box to keep things rigid
+		panel1.setMinimumSize(new Dimension(340, 800));
 
 	
 		/*
@@ -241,7 +247,7 @@ public class CPUframe extends JFrame {
 		registerPanel.setAlignmentX(CENTER_ALIGNMENT);
 		registerPanel.setAlignmentY(TOP_ALIGNMENT);
 		//registerPanel.setMaximumSize(new Dimension(20, 20));
-		registerPanel.setBorder(BorderFactory.createTitledBorder("CPU Registers"));
+		registerPanel.setBorder(BorderFactory.createTitledBorder(" CPU Registers "));
 		registerPanel.setLayout(new BoxLayout(registerPanel, BoxLayout.Y_AXIS));
 		//registerPanel.setLayout(new BoxLayout(registerPanel, BoxLayout.X_AXIS));
 		
@@ -332,7 +338,7 @@ public class CPUframe extends JFrame {
 		JPanel generalPurposePanel = new JPanel();
 		generalPurposePanel.setLayout(new BoxLayout(generalPurposePanel, BoxLayout.X_AXIS));
 		generalPurposePanel.setMaximumSize(new Dimension(400, 300));
-		generalPurposePanel.setBorder(BorderFactory.createTitledBorder("General Purpose Registers"));
+		generalPurposePanel.setBorder(BorderFactory.createTitledBorder(" General Purpose Registers "));
 		
 		JPanel individualPanel1 = new JPanel();
 		individualPanel1.setLayout(new BoxLayout(individualPanel1, BoxLayout.Y_AXIS));
@@ -663,8 +669,6 @@ public class CPUframe extends JFrame {
 		
 		aluSubPanel2.add(aluDivPanel);
 		aluSubPanel2.add(aluMulPanel);
-		//aluSubPanel2.setMaximumSize(new Dimension(100, 125));
-		//aluSubPanel2.setMinimumSize(new Dimension(100, 125));
 		
 		aluPanel.add(aluSubPanel1);
 		aluPanel.add(aluSubPanel2);
@@ -674,10 +678,11 @@ public class CPUframe extends JFrame {
 		JPanel bufferPanel = new JPanel(); //To separate registers from ALU with some empty space
 		bufferPanel.setPreferredSize(new Dimension(400, 35));
 		bufferPanel.setMaximumSize(new Dimension(400, 35));
-		panel2.add(bufferPanel);
 		
-		panel2.add(aluPanel);
-		panel2.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5));
+		panel2.add(bufferPanel);		
+		panel2.add(aluPanel);		
+		
+		panel2.setBorder(BorderFactory.createEmptyBorder(15, 5, 20, 5));
 		
 		ALU.registerListener(new UpdateListener(this));
 		
@@ -725,7 +730,7 @@ public class CPUframe extends JFrame {
 		
 		systemBusController.accessControlLine().registerListener(new UpdateListener(this));
 		
-		systemBusPanel.setBorder(BorderFactory.createTitledBorder("System Bus"));
+		systemBusPanel.setBorder(BorderFactory.createTitledBorder(" System Bus "));
 		
 		
 		panel3.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 10));
@@ -779,14 +784,14 @@ public class CPUframe extends JFrame {
 		controlPanel.add(subControlPanel2);
 		
 		JButton stepButton = new JButton("Step");
-		stepButton.setFont(buttonFont);
+		//stepButton.setFont(buttonFont);
 		stepButton.addActionListener(new StepExecutionListener());
 		subControlPanel3.add(stepButton);
 		controlPanel.add(subControlPanel3);
 
 		
 		JButton modeSwitchButton = new JButton("Pipelined Mode");
-		modeSwitchButton.setFont(buttonFont);
+		//modeSwitchButton.setFont(buttonFont);
 		subControlPanel4.add(modeSwitchButton);	
 		controlPanel.add(subControlPanel4);
 	
@@ -805,25 +810,34 @@ public class CPUframe extends JFrame {
 		
 		//Border formatting for button control panel
 		Border controlPanelLine = BorderFactory.createLineBorder(Color.BLUE, 3);
-		Font controlPanelFont = new Font("andale mono", Font.ITALIC, 15);
+		Font controlPanelFont = new Font("default", Font.ITALIC, 15);
 		controlPanel.setBorder(BorderFactory.createTitledBorder(controlPanelLine, "* Control Panel *",0, 0, controlPanelFont));		
 		
 	
 		panel3.add(controlPanel);
 		panel3.setPreferredSize(new Dimension(220, 800));
+		panel3.setMaximumSize(new Dimension(220, 800));
+		
+		
+		JPanel imagePanel = new JPanel();
+		imagePanel.setPreferredSize(new Dimension (191, 50));
+		ImageIcon logo = new ImageIcon("src/cpuLogoSmall.jpg");
+		JLabel logoLabel = new JLabel("", logo, JLabel.CENTER);
+		imagePanel.add(logoLabel);
+		panel3.add(imagePanel);
 		
 		
 		//Add panels to window and set colours
 		this.getContentPane().add(panel1); //Leftmost panel
-		panel1.setBackground(Color.cyan);
+		//panel1.setBackground(Color.cyan);
 		this.getContentPane().add(panel2);
 		//panel2.setBackground(Color.DARK_GRAY);
-		panel2.setBackground(new Color(119, 123, 123));
+		//panel2.setBackground(new Color(119, 123, 123));
 		this.getContentPane().add(panel3);
-		panel3.setBackground(Color.orange);
+		//panel3.setBackground(Color.orange);
 		panel3BufferPanel.setBackground(panel3.getBackground());
 		this.getContentPane().add(panel4); //Rightmost panel
-		this.getContentPane().setBackground(new Color(119, 123, 123));
+		//this.getContentPane().setBackground(new Color(119, 123, 123));
 		
 		
 	}
