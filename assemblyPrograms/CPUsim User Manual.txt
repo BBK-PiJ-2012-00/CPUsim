@@ -23,7 +23,15 @@ Activity Monitor
 This area displays a running commentary on the activities carried out by the CPU and updates with every step of the chosen program's execution.
 
 CPU  
+The CPU consists of the following control registers:
 
+PC - Program Counter, which holds the address of the next instruction to be fetched from memory via the system bus. This is incremented by 1 at the end of the fetch/decode stage, or is set as a result of a branch instruction.
+
+IR - Instruction Register, which holds the instruction just fetched from memory while it is decoded and executed. Pipelined execution makes use of a register file.
+
+CC - Condition Code register, referred to in instructions as rCC. This is a register for storing condition codes used with conditional branch instructions.
+
+MAR - Memory Address Register
 
 
 3) ASSEMBLY LANGUAGE, INSTRUCTIONS AND OPERANDS  

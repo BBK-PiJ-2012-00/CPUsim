@@ -1,0 +1,21 @@
+
+# A simple arithmetic equation: (((8 + 2) * 5) / 2) - 10
+
+  LOAD var8, r0 #Load var8 into r0
+  LOAD var2, r1
+  ADD r0, r1 #Add contents of r1 to r0, store in r0
+  LOAD var5, r3
+  MUL r0, r3 #Multiply contents of r0 & r3, store in r3
+  DIV r0, r1 #2 is already in r1, so no need to load
+  LOAD var10, r4
+  SUB r0, r4
+  STORE r0, varResult #Store contents of r0 to memory
+  HALT
+
+
+var8:  DATA 8
+var2:  DATA 2
+var5:  DATA 5
+var10: DATA 10
+
+varResult: DATA 0 #A location to store result

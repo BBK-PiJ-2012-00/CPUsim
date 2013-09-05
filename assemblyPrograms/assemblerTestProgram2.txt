@@ -16,7 +16,7 @@ Fudge:        ADD r2, r3
              BRNE Foo, r2
              MUL r2, r3
 Foo:      HALT
-
+		
 var1:      DATA 5
 var2:      DATA 10
 var3:      DATA 0   #Variables initialised to 0 used to reference STORE locations
