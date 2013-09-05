@@ -303,6 +303,10 @@ public class AssemblerTest {
 		assertFalse(assembler.assembleCode());
 	}
 	
+	/*
+	 * BRE and BRNE instructions share the same error handling code as LOAD instructions, so this test also caters
+	 * to errors in these instructions.
+	 */
 	@Test
 	public void testBadRegisterReferenceLOAD() { //Tests invalid register reference in LOAD instruction is caught with warning
 		assembler.selectFile(new File("src/testAssemblyPrograms/badRegisterRefLOAD.txt"));
@@ -315,12 +319,33 @@ public class AssemblerTest {
 		assertFalse(assembler.assembleCode());
 	}
 	
+	
+	/*
+	 * MOVE and arithmetic instructions share error handling code, so this test also caters to arithmetic
+	 * instruction errors.
+	 */
 	@Test
 	public void testBadRegisterReferenceMOVE() { //Tests invalid register reference in MOVE instruction is caught with warning
 		assembler.selectFile(new File("src/testAssemblyPrograms/badRegisterRefMOVE.txt"));
 		assertFalse(assembler.assembleCode());
 	}
-	//ERROR!!! Second register being bad not caught!!!
+	
+	/*
+	 * Arithmetic instructions are not allowed to reference the condition code register, unlike move instructions,
+	 * so it is necessary to test this separately.
+	 */
+	@Test
+	public void testBadRegisterReferenceArithmetic() { //Tests invalid rCC reference in arithmetic instruction is caught with warning
+		assembler.selectFile(new File("src/testAssemblyPrograms/badRegisterRefArithmetic.txt"));
+		assertFalse(assembler.assembleCode());
+	}
+	
+	@Test
+	public void testBadBranchDeclaration() { //Tests invalid BR/BRZ instruction is caught with warning
+		assembler.selectFile(new File("src/testAssemblyPrograms/badBranch.txt"));
+		assertFalse(assembler.assembleCode());
+	}
+
 	
 	
 	
