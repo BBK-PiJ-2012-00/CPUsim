@@ -16,7 +16,7 @@ import java.util.concurrent.SynchronousQueue;
 public class ControlUnitImpl implements ControlUnit {
 	private boolean pipeliningMode;
 	private boolean active; //True while there are still instructions to fetch and execute; HALT instruction being decoded
-							//should set this to false, stopping execution. 
+							//sets this to false, stopping execution. 
 	
 	private ProgramCounter pc;	
 	private InstructionRegister ir;	//An instruction register file / cache (containing at least 2 registers) for pipelining mode?
@@ -56,6 +56,8 @@ public class ControlUnitImpl implements ControlUnit {
 		if (pipeliningMode) { //Queues only required if pipelining enabled
 			fetchToExecuteQueue = new SynchronousQueue<Integer>();
 			executeToWriteQueue = new SynchronousQueue<Integer>(); //Integer to reflect that result of arithmetic is passed
+			
+			fetchDecodeStage = new PipelinedFetchDecodeStage(this.systemBus, mar, this.mbr, ir, pc, fetchToExecuteQueue);
 		}
 		
 	}
@@ -78,10 +80,7 @@ public class ControlUnitImpl implements ControlUnit {
 	private void launch() { //The method that kick starts execution of a program, and manages it
 		pc.setPC(0); //Initialise PC to 0 for GUI display
 		if (!pipeliningMode) { 
-			while (active) {	
-				
-				//fetchDecodeStage.instructionFetch();
-				//int opcode = fetchDecodeStage.instructionDecode();
+			while (active) {				
 				
 				fetchDecodeStage.run();
 				int opcode = fetchDecodeStage.getOpcodeValue();
@@ -91,16 +90,29 @@ public class ControlUnitImpl implements ControlUnit {
 				}
 				else {
 					executeStage.setOpcodeValue(opcode);
-					executeStage.run();
+					executeStage.run();//Note that writeBackStage is called from executeStage if necessary
 					this.active = executeStage.isActive();
-				}
-			
-				//this.active = executeStage.instructionExecute(opcode); //Returns false if HALT encountered
-				
-				
-				
-				//executeStage has a reference to, and calls if necessary, writeBackStage (only for arithmetic operations).
+				}				
 			}
+		}
+		
+		else if (pipeliningMode) {
+			
+			fetchDecodeStage.run();
+			int opcode = fetchDecodeStage.getOpcodeValue();
+			if (opcode == -1) { //fetchDecodeStage.getOpcodeValue() returns -1 if interrupted, meaning SwingWorker.cancel()
+				//has been called from CPUframe. Execution should not continue as a result.
+				this.active = false;
+			}
+			else {
+				//Get fetchDecodeStage to add opcode to the queue
+				//execute stage should be activated above so that it is attempting a take
+				//while (!fetchDecodeStage.forward()); //Keep attempting forward until executeStage takes from queue
+				boolean forwardSuccessful = fetchDecodeStage.forward();
+				executeStage.setOpcodeValue(opcode);
+				executeStage.run();//Note that writeBackStage is called from executeStage if necessary
+				this.active = executeStage.isActive();
+			}				
 		}
 	}
 	
@@ -124,14 +136,7 @@ public class ControlUnitImpl implements ControlUnit {
 		}
 	}
 	
-	/*
-	 * If the main thread running through this method controls worker threads in the run method, prompting it
-	 * to pause at every stage, step by step execution could be implemented.  Calling next simply wakes the 
-	 * worker thread in launch, which puts itself to sleep at selected intervals.
-	 */
-	public void next() {
-		
-	}
+	
 	
 	
 	
@@ -143,10 +148,8 @@ public class ControlUnitImpl implements ControlUnit {
 
 		
 	
-	//Stages represented by methods --> these methods should be embedded within objects of type Stage
-	//This allows for pipelining to be more easily implemented later.
 	
-	public InstructionRegister getIR() { //For testing
+	public InstructionRegister getIR() { 
 		return this.ir;
 	}
 	
@@ -196,69 +199,6 @@ public class ControlUnitImpl implements ControlUnit {
 	
 	
 	
-//	public class FetchDecodeStage implements InstructionCycleStage {	
-//		private boolean running;
-//		private int opcodeValue;
-//		
-//		public FetchDecodeStage() {
-//			this.running = true;
-//		}
-//		
-//		public void run() {
-//			running = true;
-//			
-//			while (running) { //Fetching/decoding must be in a loop, as this continues until HALT instruction
-//			
-//				instructionFetch();	
-//				opcodeValue = instructionDecode();
-//				
-//				try {
-//					fetchToExecuteQueue.put(opcodeValue); //Program will wait until executeStage attempts take()
-//				} catch (InterruptedException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//				
-//				if (opcodeValue == 13) { //A HALT instruction; another fetch after this should not be attempted
-//					running = false;
-//				}
-//			}
-//		}	
-//		
-//	}
-//		
-//		
-//	public class ExecuteStage implements InstructionCycleStage {
-//		private int opcodeValue;
-//		private boolean running;//For pipelining mode; prompts the thread to keep attempting to retrieve an opcode from the queue
-//		//while execution of a program continues
-//		
-//		public ExecuteStage() {
-//			this.running = true;
-//		}
-//		
-//		public void run() {
-//			
-//			while (running) {
-//				
-//				try {
-//					opcodeValue = fetchToExecuteQueue.take();
-//				} catch (InterruptedException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//				
-//				instructionExecute(opcodeValue);
-//				if (active == false) { //This would be the case after execution of HALT instruction
-//					running = false; //Don't attempt to execute any further instructions
-//				}
-//				//Need to coordinate this stage with writeBack stage for arithmetic instructions
-//			}
-//			
-//		}			
-//			
-//	}
-//		
 	
 	
 	
