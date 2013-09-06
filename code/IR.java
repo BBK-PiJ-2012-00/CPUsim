@@ -37,4 +37,16 @@ public class IR implements InstructionRegister {
 		return displayString;
 	}
 
+	@Override
+	public Instruction read(int index) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void clear(int index) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

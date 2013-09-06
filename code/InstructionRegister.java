@@ -24,5 +24,9 @@ public interface InstructionRegister {
 	
 	public void clear();
 	
-	public String display();
+	public String display(); //Not strictly necessary; can just use read()
+
+	public Instruction read(int index);
+
+	public void clear(int index);
 }

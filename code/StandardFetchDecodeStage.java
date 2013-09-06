@@ -7,9 +7,6 @@ public class StandardFetchDecodeStage extends FetchDecodeStage {
 		super(systemBus, mar, mbr, ir, pc);
 	}
 
-	@Override
-	public void forward() {
-		//Probably not required for standard mode of operation
-	}
+	
 
 }

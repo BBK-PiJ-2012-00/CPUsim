@@ -13,9 +13,10 @@ public class StandardExecuteStage extends ExecuteStage {
 //	}
 
 	@Override
-	public void forward(Operand result) {
+	public boolean forward(Operand result) {
 		this.getWriteBackStage().receive(result);
 		this.getWriteBackStage().run();
+		return true;
 	}
 
 }

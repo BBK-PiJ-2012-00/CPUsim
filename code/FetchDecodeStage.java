@@ -124,14 +124,15 @@ public abstract class FetchDecodeStage implements Runnable {
 		opcodeValue = this.instructionDecode();
 	}
 	
-	//Returns true once opcode forwarded to next stage
-	public abstract boolean forward(); //For forwarding execution to the next stage (for pipelining)
-	
 	public int getOpcodeValue() {
 		return this.opcodeValue;
 	}
 	
-	private void fireUpdate(String update) {
+	public void setOpcodeValue(int opcodeValue) {
+		this.opcodeValue = opcodeValue;
+	}
+	
+	protected void fireUpdate(String update) {
 		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, update);
 		updateListener.handleUpDateEvent(updateEvent);		
 	}
@@ -155,8 +156,28 @@ public abstract class FetchDecodeStage implements Runnable {
 	 * stepping through execution after the restart, the "Step" button won't work as it uses the status
 	 * of isWaiting to determine whether to resume execution or not.
 	 */
-	public void resetWaitStatus() {
-		isWaiting = false;
+	public void setWaitStatus(boolean status) {
+		isWaiting = status;
+	}
+	
+	public BusController getSystemBus() {
+		return this.systemBus;
+	}
+	
+	public MemoryAddressRegister getMAR() {
+		return this.mar;
+	}
+	
+	public MemoryBufferRegister getMBR() {
+		return this.mbr;
+	}
+	
+	public InstructionRegister getIR() {
+		return this.ir;
+	}
+	
+	public ProgramCounter getPC() {
+		return this.pc;
 	}
 	
 }
