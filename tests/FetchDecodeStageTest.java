@@ -2,11 +2,17 @@ package tests;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.SynchronousQueue;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import code.ArithmeticInstr;
+import code.Assembler;
+import code.AssemblerImpl;
 import code.BranchInstr;
 import code.BusController;
 import code.CPUbuilder;
@@ -15,6 +21,7 @@ import code.ControlUnitImpl;
 import code.FetchDecodeStage;
 import code.HaltInstr;
 import code.IR;
+import code.IRfile;
 import code.Instruction;
 import code.InstructionRegister;
 import code.MAR;
@@ -26,6 +33,7 @@ import code.MemoryModule;
 import code.Opcode;
 import code.OperandImpl;
 import code.PC;
+import code.PipelinedFetchDecodeStage;
 import code.ProgramCounter;
 import code.StandardFetchDecodeStage;
 import code.TransferInstr;
@@ -41,6 +49,7 @@ import code.UpdateListener;
 
 public class FetchDecodeStageTest {
 	private FetchDecodeStage fetchDecodeStage;
+	private FetchDecodeStage pipelinedFDstage;
 	private InstructionRegister ir;
 	private ProgramCounter pc;
 	
@@ -76,6 +85,10 @@ public class FetchDecodeStageTest {
 		mar.registerListener(new UpdateListener(new TestFrame()));
 		MemoryBufferRegister mbr = builder.getControlUnit().getMBR();
 		mbr.registerListener(new UpdateListener(new TestFrame()));
+		builder.getBusController().accessControlLine().getAddressBus().registerListener(new UpdateListener(new TestFrame()));
+		builder.getBusController().accessControlLine().getDataBus().registerListener(new UpdateListener(new TestFrame()));
+		builder.getBusController().accessControlLine().registerListener(new UpdateListener(new TestFrame()));
+		
 		
 		
 		pc = builder.getControlUnit().getPC();
@@ -86,6 +99,10 @@ public class FetchDecodeStageTest {
 		
 		fetchDecodeStage = new StandardFetchDecodeStage(builder.getBusController(), mar, mbr, ir, pc);
 		fetchDecodeStage.registerListener(new UpdateListener(new TestFrame()));
+		
+		pipelinedFDstage = new PipelinedFetchDecodeStage(builder.getBusController(), mar, mbr, new IRfile(), pc,
+				new SynchronousQueue<Integer>());
+		pipelinedFDstage.registerListener(new UpdateListener(new TestFrame()));
 		
 		memory = builder.getMemoryModule();
 		memory.registerListener(new UpdateListener(new TestFrame()));
@@ -107,7 +124,13 @@ public class FetchDecodeStageTest {
 		
 		testInstrHALT = new HaltInstr(Opcode.HALT); //Halt instruction 
 		
-		memory.notifyWrite(50, new OperandImpl(1000)); //Load operand (integer) 1000 to memory address 50		
+		Assembler assembler = new AssemblerImpl(builder.getLoader());
+		assembler.selectFile(new File("src/assemblyPrograms/simpleEquation.txt"));
+		assembler.assembleCode();
+		assembler.loadToLoader();
+		assembler.getLoader().loadToMemory();
+		
+		//memory.notifyWrite(50, new OperandImpl(1000)); //Load operand (integer) 1000 to memory address 50		
 	}
 
 	/*
@@ -118,77 +141,97 @@ public class FetchDecodeStageTest {
 	 * so that this will be fetched.
 	 * 
 	 */
-	@Test
-	public void testInstructionFetch() { //Tests instruction fetch method
-		memory.writeInstruction(testInstrSTORE, 0);
-		fetchDecodeStage.instructionFetch();
-		
-		Instruction expected = testInstrSTORE;
-		Instruction output = ir.read();
-		assertEquals(expected, output);		
-	}
+//	@Test
+//	public void testInstructionFetch() { //Tests instruction fetch method
+//		memory.notifyWrite(0, testInstrSTORE);
+//		fetchDecodeStage.instructionFetch();
+//		
+//		Instruction expected = testInstrSTORE;
+//		Instruction output = ir.read();
+//		assertEquals(expected, output);		
+//	}
+//	
+//	@Test
+//	public void testInstructionFetch2() { //Test instruction with PC set to another value
+//		memory.notifyWrite(19, testInstrSTORE);
+//		pc.setPC(19); //Need to manually set PC for testing; this will be set automatically when program loaded
+//		//via loader into memory; this will send a signal to CPU to set PC to start address.
+//		fetchDecodeStage.instructionFetch();
+//		
+//		Instruction expected = testInstrSTORE;
+//		Instruction output = ir.read();
+//		assertEquals(expected, output);		
+//	}
+//	
+//	//A test to see what happens if the fetched item is in fact an Operand and not an Instruction would be useful;
+//	//implement some exception handling first.
+//	
+//	
+//	@Test
+//	public void testInstructionDecode() { //Test that PC is incremented by the end of the method
+//		memory.notifyWrite(0, testInstrSTORE);
+//		fetchDecodeStage.instructionFetch(); //Need to fetch an instruction before decoding
+//		fetchDecodeStage.instructionDecode();
+//		
+//		int expected = 1; //PC starts at 0 by default (unless set otherwise)
+//		int output = pc.getValue();
+//		assertEquals(expected, output);
+//	}
+//	
+//	/*
+//	 * Not necessary to test every opcode, as opcode integer values have been tested in InstructionTest.
+//	 */
+//	@Test
+//	public void testInstructionDecode_opcodeValueBR() { //Test correct opcode value for instruction is returned
+//		memory.notifyWrite(0, testInstrBR);
+//		fetchDecodeStage.instructionFetch(); //Load an instruction into IR
+//		
+//		int output = fetchDecodeStage.instructionDecode();		
+//		int expected = 8; //BR should decode to integer value of 8
+//		assertEquals(expected, output);
+//	}
+//	
+//	@Test
+//	public void testInstructionDecode_opcodeValueHALT() { //Test correct opcode value for instruction is returned
+//		memory.notifyWrite(0, testInstrHALT);
+//		fetchDecodeStage.instructionFetch(); //Load an instruction into IR
+//		
+//		int output = fetchDecodeStage.instructionDecode();		
+//		int expected = 13; //HALT should decode to integer value of 13
+//		assertEquals(expected, output);
+//	}
+//	
+//	@Test
+//	public void testInstructionDecode_opcodeValueADD() { //Test correct opcode value for instruction is returned
+//		memory.notifyWrite(0, testInstrADD);
+//		fetchDecodeStage.instructionFetch(); //Load an instruction into IR
+//		
+//		int output = fetchDecodeStage.instructionDecode();		
+//		int expected = 4; //HALT should decode to integer value of 4
+//		assertEquals(expected, output);
+//	}
 	
 	@Test
-	public void testInstructionFetch2() { //Test instruction with PC set to another value
-		memory.writeInstruction(testInstrSTORE, 19);
-		pc.setPC(19); //Need to manually set PC for testing; this will be set automatically when program loaded
-		//via loader into memory; this will send a signal to CPU to set PC to start address.
-		fetchDecodeStage.instructionFetch();
+	public void testInterrupt() {
+		Thread testThread = new Thread(pipelinedFDstage);
+		testThread.start();
+		try {
+			Thread.sleep(1);
+		} catch (InterruptedException e) {
+			System.out.println("This one");
+			e.printStackTrace();
+		}
+//		while(testThread.isAlive()) {
+//			System.out.println("Still alive.");
+//		}
+		testThread.interrupt();
+		while(testThread.isAlive());
+		System.out.println("Done!");
 		
-		Instruction expected = testInstrSTORE;
-		Instruction output = ir.read();
-		assertEquals(expected, output);		
 	}
 	
-	//A test to see what happens if the fetched item is in fact an Operand and not an Instruction would be useful;
-	//implement some exception handling first.
-	
-	
-	@Test
-	public void testInstructionDecode() { //Test that PC is incremented by the end of the method
-		memory.writeInstruction(testInstrSTORE, 0);
-		fetchDecodeStage.instructionFetch(); //Need to fetch an instruction before decoding
-		fetchDecodeStage.instructionDecode();
-		
-		int expected = 1; //PC starts at 0 by default (unless set otherwise)
-		int output = pc.getValue();
-		assertEquals(expected, output);
-	}
-	
-	/*
-	 * Not necessary to test every opcode, as opcode integer values have been tested in InstructionTest.
-	 */
-	@Test
-	public void testInstructionDecode_opcodeValueBR() { //Test correct opcode value for instruction is returned
-		memory.writeInstruction(testInstrBR, 0);
-		fetchDecodeStage.instructionFetch(); //Load an instruction into IR
-		
-		int output = fetchDecodeStage.instructionDecode();		
-		int expected = 8; //BR should decode to integer value of 8
-		assertEquals(expected, output);
-	}
-	
-	@Test
-	public void testInstructionDecode_opcodeValueHALT() { //Test correct opcode value for instruction is returned
-		memory.writeInstruction(testInstrHALT, 0);
-		fetchDecodeStage.instructionFetch(); //Load an instruction into IR
-		
-		int output = fetchDecodeStage.instructionDecode();		
-		int expected = 13; //HALT should decode to integer value of 13
-		assertEquals(expected, output);
-	}
-	
-	@Test
-	public void testInstructionDecode_opcodeValueADD() { //Test correct opcode value for instruction is returned
-		memory.writeInstruction(testInstrADD, 0);
-		fetchDecodeStage.instructionFetch(); //Load an instruction into IR
-		
-		int output = fetchDecodeStage.instructionDecode();		
-		int expected = 4; //HALT should decode to integer value of 4
-		assertEquals(expected, output);
-	}
-	
-	//Tests for pipelined version to follow once implemented
+
+	//Check that pipelined thread is dead after interrupt!!
 
 
 }
