@@ -5,25 +5,37 @@ import java.util.concurrent.BlockingQueue;
 public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	private BlockingQueue<Integer> fetchToExecuteQueue;
 	private boolean active;
-	
-	private ExecuteStage executeStage; //This class manages execution of execute stage
-	private Thread executeThread;
+	private boolean pipelineFlush;
+
 
 	public PipelinedFetchDecodeStage(BusController systemBus,
 			MemoryAddressRegister mar, MemoryBufferRegister mbr,
-			InstructionRegister ir, ProgramCounter pc, BlockingQueue<Integer> fetchToExecuteQueue, ExecuteStage exStage) {
+			InstructionRegister ir, ProgramCounter pc, BlockingQueue<Integer> fetchToExecuteQueue) {
 		
 		super(systemBus, mar, mbr, ir, pc);
-		this.fetchToExecuteQueue = fetchToExecuteQueue;
-		this.executeStage = exStage;
-		this.executeThread = new Thread(executeStage);
+		this.fetchToExecuteQueue = fetchToExecuteQueue;	
 
 	}
 	
+	/*
+	 * Interrupted status must be polled continuously to check for a pipeline flush originating 
+	 * from execute stage.
+	 */
 	public void instructionFetch() {
 		this.fireUpdate("\n** INSTRUCTION FETCH/DECODE STAGE ** \n");
 		getIR().clear(); //Clear previous instruction from display
+		
+		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
+			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
+			return;
+		}
+		
 		getMAR().write(getPC().getValue()); //Write address value in PC to MAR.
+		
+		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
+			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
+			return;
+		}
 		
 		fireUpdate("Memory address from PC placed into MAR \n");
 		
@@ -38,6 +50,10 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 		}
 		setWaitStatus(false);
 		
+		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
+			fireUpdate("Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
+			return;
+		}
 		
 		//Transfer address from MAR to system bus, prompting read
 		boolean successfulTransfer = getSystemBus().transferToMemory(getMAR().read(), null); 
@@ -48,7 +64,10 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 			return;
 		}
 		
-		System.out.println("Reentered f/d stage from bus: successful transfer = " + successfulTransfer);
+		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
+			fireUpdate("Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
+			return;
+		}
 		
 		this.fireUpdate("Load contents of memory address " + getMAR().read() + " into MBR \n");
 		
@@ -61,12 +80,21 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 			setWaitStatus(false);
 			return; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 		}
-		setWaitStatus(false);	
+		setWaitStatus(false);
 		
+		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
+			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
+			return;
+		}		
 		
 		//A Data item should now be in MBR
 		getIR().loadIR((Instruction) getMBR().read()); //Cast required as mbr holds type data, IR type Instruction; May need to handle exception
 		this.fireUpdate("Load contents of MBR into IR \n");
+		
+		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
+			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
+			return;
+		}
 		
 		setWaitStatus(true);
 		try {
@@ -85,12 +113,26 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	}
 	//Fetch ends with instruction being loaded into IR.
 	
-	
+	/*
+	 * Similarly to the fetch method above, the interrupted status of the thread must be continuously
+	 * polled to check for an interrupt caused by a pipeline flush originating in execute stage.
+	 */
 	public int instructionDecode() { //Returns int value of opcode
 		Instruction instr = getIR().read();
 		int opcodeValue = instr.getOpcode().getValue(); //Gets instruction opcode as int value
+		
+		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
+			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
+			return -1; //Do not continue execution if interrupted (pipeline flush)
+		}
+		
 		getPC().incrementPC(); //Increment PC; done here so that with pipelining, the next instruction can be fetched at this point
 		this.fireUpdate("PC incremented by 1 (ready for next instruction fetch) \n");
+		
+		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
+			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
+			return -1;
+		}
 		
 		setWaitStatus(true);
 		try {
@@ -109,12 +151,15 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	
 	@Override
 	public synchronized void run() { //Synchronized to enable step execution
-		if (!executeThread.isAlive()) {
-			executeThread.start(); //Only start thread if it's not already alive
-		}
+//		if (!executeThread.isAlive()) {
+//			executeThread.start(); //Only start thread if it's not already alive
+//		}
 		active = true;
 		while (active) { //Continue fetching instructions		
 			this.instructionFetch();
+			if (!active) { //This will happen if an interrupt takes places within instructionFetch()
+				return;
+			}
 			this.setOpcodeValue(this.instructionDecode());
 			if (this.getOpcodeValue() == -1) { //Signals interrupted wait(); execution should be cancelled
 				active = false;
@@ -147,8 +192,15 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 		return this.active;
 	}
 	
-	public void flush() { //For pipeline flushing
-		
+	/*
+	 * There must be a way to differentiate between interrupts generated by pipelining flushing
+	 * and those generated by the user clicking reset; in the former case, execution must continue,
+	 * with the fetch/decode stage simply resetting itself, in the latter case execution should terminate
+	 * altogether.
+	 * 
+	 */
+	public void setPipelineFlush(boolean isFlush) { //For pipeline flushing
+		this.pipelineFlush = isFlush;
 	}
 
 }
