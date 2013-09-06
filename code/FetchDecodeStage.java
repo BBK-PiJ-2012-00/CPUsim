@@ -13,7 +13,7 @@ public abstract class FetchDecodeStage implements Runnable {
 	
 	private InstructionRegister ir;
 	private ProgramCounter pc;
-	//private RegisterFile genRegisters;
+	
 	
 	private int opcodeValue; //This is fetched by control unit to pass to next stage.
 	
@@ -51,7 +51,6 @@ public abstract class FetchDecodeStage implements Runnable {
 		}
 		isWaiting = false;
 		
-		System.out.println("I'm carrying on!");
 		
 		//Transfer address from MAR to system bus, prompting read
 		boolean successfulTransfer = systemBus.transferToMemory(mar.read(), null); 
@@ -61,7 +60,7 @@ public abstract class FetchDecodeStage implements Runnable {
 			return;
 		}
 		
-		System.out.println("Reentered f/d stage from bus");
+		System.out.println("Reentered f/d stage from bus: successful transfer = " + successfulTransfer);
 		
 		this.fireUpdate("Load contents of memory address " + mar.read() + " into MBR \n");
 		
@@ -125,7 +124,8 @@ public abstract class FetchDecodeStage implements Runnable {
 		opcodeValue = this.instructionDecode();
 	}
 	
-	public abstract void forward(); //For forwarding execution to the next stage (for pipelining)
+	//Returns true once opcode forwarded to next stage
+	public abstract boolean forward(); //For forwarding execution to the next stage (for pipelining)
 	
 	public int getOpcodeValue() {
 		return this.opcodeValue;

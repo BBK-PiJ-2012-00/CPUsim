@@ -37,7 +37,6 @@ package code;
  * 			check that's sufficient.
  */
 public class SystemBusController implements BusController {
-	private static BusController systemBus = null; //System Bus is a singleton.
 	
 	private ControlLine controlLine;
 	
@@ -60,7 +59,10 @@ public class SystemBusController implements BusController {
 
 	@Override
 	public boolean transferToMemory(int memoryAddress, Data data) {
-		return controlLine.writeToBus(memoryAddress, data);
+		boolean returned = controlLine.writeToBus(memoryAddress, data);
+		//return controlLine.writeToBus(memoryAddress, data);
+		System.out.println("returned = " + returned);
+		return returned;
 	}
 
 	/*

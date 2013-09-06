@@ -305,7 +305,7 @@ public class CPUframe extends JFrame {
 		JPanel marPanel = new JPanel();
 		marPanel.setMaximumSize(new Dimension(150, 60));
 		marPanel.add(marField);
-		Border cyanLine = BorderFactory.createLineBorder(Color.cyan);
+		Border cyanLine = BorderFactory.createLineBorder(Color.blue);
 		marPanel.setBorder(BorderFactory.createTitledBorder(cyanLine, " MAR "));
 		controlUnit.getMAR().registerListener(new UpdateListener(this));
 		
@@ -712,6 +712,9 @@ public class CPUframe extends JFrame {
 		dataBusPanel.setPreferredSize(new Dimension(175, 60));
 		//dataBusPanel.setBackground(Color.magenta);
 		//Border magentaLine = BorderFactory.createLineBorder(Color.magenta);
+		//Border navyLine = BorderFactory.createLineBorder(new Color(3, 12, 103));
+		//Border blueLine = BorderFactory.createLineBorder(Color.green);
+		//dataBusPanel.setBorder(BorderFactory.createTitledBorder(magentaLine, "Data Bus"));
 		dataBusPanel.setBorder(BorderFactory.createTitledBorder(magentaLine, "Data Bus"));
 		dataBusField = new JTextField(8);
 		dataBusField.setEditable(false);
@@ -809,7 +812,8 @@ public class CPUframe extends JFrame {
 		controlPanel.add(subControlPanel5);
 		
 		//Border formatting for button control panel
-		Border controlPanelLine = BorderFactory.createLineBorder(Color.BLUE, 3);
+	   Border controlPanelLine = BorderFactory.createLineBorder(Color.BLUE, 3);
+		//Border controlPanelLine = BorderFactory.createLineBorder(new Color(21, 129, 239), 3);
 		Font controlPanelFont = new Font("default", Font.ITALIC, 15);
 		controlPanel.setBorder(BorderFactory.createTitledBorder(controlPanelLine, "* Control Panel *",0, 0, controlPanelFont));		
 		
@@ -820,8 +824,8 @@ public class CPUframe extends JFrame {
 		
 		
 		JPanel imagePanel = new JPanel();
-		imagePanel.setPreferredSize(new Dimension (191, 50));
-		ImageIcon logo = new ImageIcon("src/cpuLogoSmall.jpg");
+		//imagePanel.setMaximumSize(new Dimension (150, 50));
+		ImageIcon logo = new ImageIcon("src/cpuSimLogoMagentaSmall.jpg");
 		JLabel logoLabel = new JLabel("", logo, JLabel.CENTER);
 		imagePanel.add(logoLabel);
 		panel3.add(imagePanel);
@@ -901,24 +905,28 @@ public class CPUframe extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
-			executionWorker.cancel(true); //Old worker thread needs terminating
-			executionWorker = null;
-			
-			//Clear fields
-			memory.clearMemory();
-            activityArea.setText("");
-            controlUnit.clearRegisters();            
-           
-            assembler = new AssemblerImpl(loader);
-            assembler.selectFile(currentAssemblyFile); //Reopen previously selected assembly file
-    		assembler.assembleCode();
-    		assembler.loadToLoader();
-    		assembler.getLoader().loadToMemory();
-    	//	memoryContentArea.setCaretPosition(0); //Scrolls text area to top
-    		
-    		assemblyProgramArea.setText(assembler.display());
-    		assemblyProgramArea.setCaretPosition(0);
-    		
+			try {
+				executionWorker.cancel(true); //Old worker thread needs terminating
+				executionWorker = null;
+				
+				//Clear fields
+				memory.clearMemory();
+	            activityArea.setText("");
+	            controlUnit.clearRegisters();            
+	           
+	            assembler = new AssemblerImpl(loader);
+	            assembler.selectFile(currentAssemblyFile); //Reopen previously selected assembly file
+	    		assembler.assembleCode();
+	    		assembler.loadToLoader();
+	    		assembler.getLoader().loadToMemory();
+	    		memoryContentArea.setCaretPosition(0); //Scrolls text area to top
+	    		
+	    		assemblyProgramArea.setText(assembler.display());
+	    		assemblyProgramArea.setCaretPosition(0);
+			}
+			catch (NullPointerException nfe) { //If reset is pressed not during execution
+				JOptionPane.showMessageDialog(null, "Please select an assembly file first!", "!", JOptionPane.WARNING_MESSAGE);
+			}
 		}
 	}
 	
