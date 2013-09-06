@@ -6,13 +6,12 @@ package code;
  */
 
 public class MemoryModule implements MainMemory {
-	
-	//Array full of null values to start with - should it be initialised to hold 0s (to avoid null pointer exception)?
+
 	private final Data[] MEMORY; //Array representing main memory itself/
 	private int pointer; //Points to next available location for storage	
 	private BusController systemBusController; //Reference to system bus
 	
-	private UpdateListener updateListener; //Will perhaps have different listener
+	private UpdateListener updateListener;
 	
 
 	
@@ -21,21 +20,27 @@ public class MemoryModule implements MainMemory {
 		pointer = 0;
 	}
 	
+	@Override
 	public void registerBusController(BusController systemBusController) {
 		this.systemBusController = systemBusController;
 	}
 	
 	
+	@Override
 	public int getPointer() {
 		return this.pointer;
 	}
 	
+	
+	@Override
 	public void resetPointer() {
 		this.pointer = 0;
 	}
 	
+	
+	@Override
 	public void clearMemory() { //To reset memory contents when loading a new program
-		for (int i = 0; i < 100; i++) { //Resets each non-null address to null, effectively clearing memor contents
+		for (int i = 0; i < 100; i++) { //Resets each non-null address to null, effectively clearing memory contents
 			if (MEMORY[i] != null) {
 				MEMORY[i] = null;
 			}
@@ -45,25 +50,13 @@ public class MemoryModule implements MainMemory {
 		}
 	}
 	
-	public Data accessAddress(int index) { //Primarily for testing purposes, not for use by program.
+	
+	@Override
+	public Data accessAddress(int index) { //Primarily for testing purposes
 		return MEMORY[index];
 	}
 	
-//	//Should take Data type as parameter, not Instruction (what about Operands are not type Instruction!)
-//	//May even be obsolete, as notify() below could be used
-//	//May take an array as a parameter, depdening on Loader implementation
-//	public void writeInstruction(Instruction instr, int index) { //For use by Loader to write instructions into memory
-//		MEMORY[index] = instr; 
-//		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, display());
-//		updateListener.handleUpDateEvent(updateEvent);
-//		//As this is only used by loader, it should take the address of the first instruction loaded into memory
-//		//and transfer this address via the address bus to the MAR, and on to the PC to begin execution.
-//		//A method can be called to do this; transferFirstInstruction().
-//		//When a user selects a program to load, this should prompt the sim to the point where the PC is loaded
-//		//but is waiting to begin execution.
-//		//So it simply causes MAR to set the PC, and then the sim waits for user to press 'start'.
-//	}
-	
+
 	
 	/*
 	 * Absolute addressing may be clearer pedagogically; will there ever be a need to start a program from a 
@@ -72,11 +65,12 @@ public class MemoryModule implements MainMemory {
 	 * always start from address 0 (array can be made of variables, then of instructions, and then the two can
 	 * be put together into one large array to be passed to this method). 
 	 */
+	@Override
 	public void loadMemory(Data[] programCode) {
 		for (Data line : programCode) {
 			MEMORY[pointer] = line; //Load pointer location with line of program code
 			//System.out.println(MEMORY[pointer].toString());
-			pointer++; //Increment pointer
+			pointer++;
 		}
 		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, display());
 		updateListener.handleUpDateEvent(updateEvent);
@@ -87,6 +81,7 @@ public class MemoryModule implements MainMemory {
 	}
 	
 	
+	@Override
 	public boolean notifyWrite(int address, Data data) { //Method to prompt memory to receive data from system bus (write)
 		//No checking of address being empty or not; up to programmer
 		if (address < 100 && address >= 0) {
@@ -95,10 +90,11 @@ public class MemoryModule implements MainMemory {
 			updateListener.handleUpDateEvent(updateEvent);
 			return true;
 		}
-		//Throw an exception or simply return false?
 		return false;
 	}
 	
+	
+	@Override
 	public boolean notifyRead(int address) { //Absence of data indicates requested memory read as opposed to write (as in reality)
 		Data dataRead;
 		if (address < 100 && address >=0) {
@@ -108,23 +104,17 @@ public class MemoryModule implements MainMemory {
 			else {
 				dataRead = MEMORY[address];
 			}
-			//systemBusController = SystemBusController.getInstance(); //Putting this here breaks awkward creation chain, and is of no consequence 
-			//as there is only ever one system bus instance with global access point.
 			
-			//As this is all performed by the same thread, there should be no issue
-			systemBusController.transferToCPU(dataRead);//Transfers read data to system bus, subsequently to CPU
-			return true;
+			return systemBusController.transferToCPU(dataRead);//Transfers read data to system bus, subsequently to CPU
 		}
-		//Throw exception if address invalid? This would disrupt program flow (possibly)
-		System.out.println("Returning false from memory's notifyRead()");
 		return false;
 	}
 	
 	
-	//Fix so that numbers 1-10 display with extra space to align | character
+	@Override
 	public String display() { //Display memory on command line interface
 		String displayString = "";
-		//System.out.println("  -- MAIN MEMORY --  ");
+		
 		for (int i = 0; i < MEMORY.length; i++) {
 			if (MEMORY[i] == null) {
 				if (i < 10) { //For formatting of single digits
@@ -132,7 +122,6 @@ public class MemoryModule implements MainMemory {
 					displayString += "\n" + iString + "| ------------";
 				}
 				else {
-					//System.out.println(i + "| " + "--------");
 					displayString += "\n  " + i + "| ------------";
 				}
 			}
@@ -142,15 +131,15 @@ public class MemoryModule implements MainMemory {
 					displayString += "\n" + iString + "| " + MEMORY[i].toString();
 				}
 				else {
-					//System.out.println(i + "| " + MEMORY[i].toString());
 					displayString+= "\n  " + i + "| " + MEMORY[i].toString();
 				}
 			}
 		}
-		//displayString += "</html>";
 		return displayString;
 	}
 	
+	
+	@Override
 	public void registerListener(UpdateListener listener) {
 		this.updateListener = listener;
 	}
