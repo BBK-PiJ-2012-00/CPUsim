@@ -365,11 +365,14 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					
 			case 8: //A BR instruction (unconditional branch to memory location in instruction field 1).
 					getPC().setPC(getIR().read(1).getField1());
-					fireUpdate("PC set to " + getIR().read(1).getField1() + " as result of " + getIR().read(1).getOpcode() + " operation\n");
+					fireUpdate("PC set to " + getIR().read(1).getField1() + " as result of " + getIR().read(1).getOpcode() + 
+							" operation\n");
 					//Pipeline needs flushing!! This involves ditching the instruction being fetched; clear IR file 0.
 					//Fetch stage also needs to go back to beginning of cycle, with new value in pc.
 					//Need a reference to fetch decode stage
 					//Have a method pipelineFlush() on f/d stage, which restarts its cycle
+					
+					pipelineFlush();
 					
 					
 					setWaitStatus(true);
@@ -542,12 +545,21 @@ public class PipelinedExecuteStage extends ExecuteStage {
 	} 
 	
 	
+	/*
+	 * This can manage difference between a reset and pipeline flush interrupt to f/d stage? Perhaps not;
+	 * if reset is clicked -- THIS object will get the interrupt, either while it's waiting to take from the queue,
+	 * put something in the queue, or executing. The fetch and writeBack threads will continue unless directed
+	 * otherwise.  So, when THIS thread is interrupted, interrupt the others.  Otherwise, this thread will just
+	 * restart the other threads in the event of a pipeline flush.
+	 */
 	public synchronized void run() {
 		active = true;
 		while (active) {
+			if (!fetchDecodeThread.isAlive()) { //Thread will need restarting after a pipeline flush
+				fetchDecodeThread.start();
+			}
 			try {
 				int opcodeValue = this.fetchToExecuteQueue.take();
-				((IRfile) getIR()).shuntContents(0, 1); //Shift contents to register 1 of IRfile
 				active = this.instructionExecute(opcodeValue);
 			}
 			catch (InterruptedException ex) {
@@ -557,6 +569,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 			}
 			
 		}
+		return;
 	}
 
 	@Override
@@ -570,6 +583,14 @@ public class PipelinedExecuteStage extends ExecuteStage {
 		}
 		return true;
 
+	}
+	
+	
+	public void pipelineFlush() {
+		((PipelinedFetchDecodeStage) fetchDecodeStage).setPipelineFlush(true); //Allows for differentiation between reset and flush
+		fetchDecodeThread.interrupt(); //Poll Thread.isInterrupted() at crucial points
+		getIR().clear(); //Necessary to clear all IR registers?
+		
 	}
 
 }
