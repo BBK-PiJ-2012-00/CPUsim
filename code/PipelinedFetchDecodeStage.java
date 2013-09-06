@@ -41,7 +41,7 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 		
 		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
 			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
-			//pipelineFlush = true;
+			pipelineFlush = true;
 			return;
 		}
 		
@@ -60,7 +60,7 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 		
 		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
 			fireUpdate("Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
-			//pipelineFlush = true;
+			pipelineFlush = true;
 			return;
 		}
 		
@@ -75,7 +75,7 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 		
 		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
 			fireUpdate("Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
-			//pipelineFlush = true;
+			pipelineFlush = true;
 			return;
 		}
 		
@@ -94,7 +94,7 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 		
 		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
 			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
-			//pipelineFlush = true;
+			pipelineFlush = true;
 			return;
 		}		
 		
@@ -105,7 +105,7 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 		
 		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
 			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
-			//pipelineFlush = true;
+			pipelineFlush = true;
 			return;
 		}
 		
@@ -136,7 +136,7 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 		
 		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
 			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
-			//pipelineFlush = true;
+			pipelineFlush = true;
 			return -1; //Do not continue execution if interrupted (pipeline flush)
 		}
 		
@@ -172,6 +172,7 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 		while (active) { //Continue fetching instructions		
 			this.instructionFetch();
 			if (!active || pipelineFlush) { //This will happen if an interrupt takes places within instructionFetch()
+				System.out.println("About to call return before getting to decode() from within run()");
 				return;
 			}
 			this.setOpcodeValue(this.instructionDecode());
@@ -226,7 +227,7 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	public void fireUpdate(final String update) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-			    ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, update);
+			    ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(PipelinedFetchDecodeStage.this, update);
 				getUpdateListener().handleUpDateEvent(updateEvent);	
 			}
 		});

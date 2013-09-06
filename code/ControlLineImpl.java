@@ -34,20 +34,20 @@ public class ControlLineImpl implements ControlLine {
 				fireActivityUpdate("Operand " + data.toString() + " placed on data bus from \nmemory.\n");
 			}
 			
-			isWaiting = true;
-			try {
-				System.out.println("I'm waaaaaaiting!");
-				wait();
-			} catch (InterruptedException e) {
-				System.out.println("I'm being interrupted.");
-				e.printStackTrace();
-				clear();
-				isWaiting = false;
-				System.out.println("About to return false.");
-				return false;
-			}
-			System.out.println("Just left catch.");
-			isWaiting = false;
+//			isWaiting = true;
+//			try {
+//				System.out.println("I'm waaaaaaiting!");
+//				wait();
+//			} catch (InterruptedException e) {
+//				System.out.println("I'm being interrupted.");
+//				e.printStackTrace();
+//				clear();
+//				isWaiting = false;
+//				System.out.println("About to return false.");
+//				return false;
+//			}
+//			System.out.println("Just left catch.");
+//			isWaiting = false;
 			
 			fireOperationUpdate(""); //Clear control line display
 			
@@ -62,16 +62,16 @@ public class ControlLineImpl implements ControlLine {
 			fireActivityUpdate("Address " + address + " placed on address line by MAR, prompting\nthe first stage" +
 					"of a memory read.\n");
 			
-			isWaiting = true;
-			try {
-				wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				clear();
-				isWaiting = false;
-				return false;
-			}
-			isWaiting = false;
+//			isWaiting = true;
+//			try {
+//				wait();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//				clear();
+//				isWaiting = false;
+//				return false;
+//			}
+//			isWaiting = false;
 			
 			return this.deliverToMemory(true);
 		}
@@ -90,16 +90,16 @@ public class ControlLineImpl implements ControlLine {
 					data.toString() + " placed on data bus by MBR.\n");
 		}
 		
-		isWaiting = true;
-		try {
-			wait();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			clear();
-			isWaiting = false;
-			return false;
-		}
-		isWaiting = false;
+//		isWaiting = true;
+//		try {
+//			wait();
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//			clear();
+//			isWaiting = false;
+//			return false;
+//		}
+//		isWaiting = false;
 		
 		return this.deliverToMemory(false);	//False -> not a read operation (write operation)	
 	}

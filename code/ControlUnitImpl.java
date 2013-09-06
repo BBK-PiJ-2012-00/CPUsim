@@ -110,14 +110,20 @@ public class ControlUnitImpl implements ControlUnit {
 			 * execution and interrupts and flushing will be much simpler.
 			 */
 			
-			Thread fetchThread = new Thread(fetchDecodeStage);
-			fetchThread.start();
+//			Thread fetchThread = new Thread(fetchDecodeStage);
+//			fetchThread.start();
+//			
+//			Thread executeThread = new Thread(executeStage);
+//			executeThread.start();
+//			
+//			Thread writeBackThread = new Thread(writeBackStage);
+//			writeBackThread.start();
 			
-			Thread executeThread = new Thread(executeStage);
-			executeThread.start();
-			
-			Thread writeBackThread = new Thread(writeBackStage);
-			writeBackThread.start();
+			while (active) {
+				
+				executeStage.run(); //This manages the fetch and write back stages
+				
+			}
 			
 			
 			

@@ -373,6 +373,9 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					//Have a method pipelineFlush() on f/d stage, which restarts its cycle
 					
 					pipelineFlush();
+					//Re-activate f/d thread here?
+					while (fetchDecodeThread.isAlive()); //Wait for f/d thread to terminate
+					fetchDecodeThread.start();
 					
 					
 					setWaitStatus(true);
@@ -555,7 +558,8 @@ public class PipelinedExecuteStage extends ExecuteStage {
 	public synchronized void run() {
 		active = true;
 		while (active) {
-			if (!fetchDecodeThread.isAlive()) { //Thread will need restarting after a pipeline flush
+			if (!fetchDecodeThread.isAlive()) { //Thread will need restarting after a pipeline flush / avoids attempting to start
+				//a thread which is still live.
 				fetchDecodeThread.start();
 			}
 			try {

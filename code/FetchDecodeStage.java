@@ -180,4 +180,8 @@ public abstract class FetchDecodeStage implements Runnable {
 		return this.pc;
 	}
 	
+	public UpdateListener getUpdateListener() {
+		return this.updateListener;
+	}
+	
 }
