@@ -11,7 +11,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 	private Thread fetchDecodeThread;
 	
 	
-	public PipelinedExecuteStage(BusController systemBus, InstructionRegister ir, ProgramCounter pc,	RegisterFile genRegisters,
+	public PipelinedExecuteStage(BusController systemBus, InstructionRegister ir, ProgramCounter pc, RegisterFile genRegisters,
 			Register statusRegister, WriteBackStage writeBackStage, MemoryBufferRegister mbr, MemoryAddressRegister mar,
 			BlockingQueue<Integer> fetchToExecuteQueue, BlockingQueue<Operand> executeToWriteQueue, FetchDecodeStage fdStage) {
 		super(systemBus, ir, pc, genRegisters, statusRegister, writeBackStage, mbr, mar);
@@ -25,6 +25,8 @@ public class PipelinedExecuteStage extends ExecuteStage {
 	
 	public synchronized boolean instructionExecute(int opcode) {
 		this.fireUpdate("\n** INSTRUCTION EXECUTION STAGE ** \n");
+		System.out.println(getIR().read(0) + " " + getIR().read(1) + " " + getIR().read(2));
+		
 		switch (opcode) {
 		
 			case 1: //A LOAD instruction
@@ -32,28 +34,28 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					getMAR().write(getIR().read(1).getField1()); //Load mar with source address of instruction in IR
 					//Request a read from memory via system bus, with address contained in mar
 					
-					setWaitStatus(true);
-					try {
-						wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						setWaitStatus(false);
-						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-					}
-					setWaitStatus(false);
+//					setWaitStatus(true);
+//					try {
+//						wait();
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//						setWaitStatus(false);
+//						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//					}
+//					setWaitStatus(false);
 					
 					getSystemBus().transferToMemory(getMAR().read(), null);
 					this.fireUpdate("Operand " + getMBR().read().toString() + " loaded from address " + getIR().read(1).getField1() + " into MBR\n");
 					
-					setWaitStatus(true);
-					try {
-						wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						setWaitStatus(false);
-						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-					}
-					setWaitStatus(false);
+//					setWaitStatus(true);
+//					try {
+//						wait();
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//						setWaitStatus(false);
+//						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//					}
+//					setWaitStatus(false);
 					
 					getMAR().write(-1); //Reset MAR
 					
@@ -63,15 +65,15 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						
 						this.fireUpdate("Loaded operand " + getMBR().read() + " into condition code register\n");
 						
-						setWaitStatus(true);
-						try {
-							wait();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-							setWaitStatus(false);
-							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-						}
-						setWaitStatus(false);
+//						setWaitStatus(true);
+//						try {
+//							wait();
+//						} catch (InterruptedException e) {
+//							e.printStackTrace();
+//							setWaitStatus(false);
+//							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//						}
+//						setWaitStatus(false);
 					}
 					
 					
@@ -81,16 +83,16 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					//gives the operand to be moved from mbr to genRegisters at index given in getField2().
 					this.fireUpdate("Operand " + getMBR().read() + " loaded into r" + getIR().read(1).getField2() + "\n");
 					
-					setWaitStatus(true);
-					try {
-						wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						setWaitStatus(false);
-						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-					}
-					setWaitStatus(false);
-					
+//					setWaitStatus(true);
+//					try {
+//						wait();
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//						setWaitStatus(false);
+//						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//					}
+//					setWaitStatus(false);
+//					
 					
 					getMBR().write(null); //Reset MBR
 					break;
@@ -101,30 +103,30 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						" placed into MAR \n");
 					getMAR().write(getIR().read(1).getField2()); //Load mar with destination (memory address)
 					
-					setWaitStatus(true);
-					try {
-						wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						setWaitStatus(false);
-						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-					}
-					setWaitStatus(false);
+//					setWaitStatus(true);
+//					try {
+//						wait();
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//						setWaitStatus(false);
+//						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//					}
+//					setWaitStatus(false);
 					
 					getMBR().write(getGenRegisters().read(getIR().read(1).getField1())); //Write to mbr the data held in getGenRegisters() at index
 					//given by field1(source) of instruction held in IR.
 					this.fireUpdate("Operand " + getGenRegisters().read(getIR().read(1).getField1()) + " loaded from r" + getIR().read(1).getField1() + 
 							" into MBR\n");
 					
-					setWaitStatus(true);
-					try {
-						wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						setWaitStatus(false);
-						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-					}
-					setWaitStatus(false);
+//					setWaitStatus(true);
+//					try {
+//						wait();
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//						setWaitStatus(false);
+//						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//					}
+//					setWaitStatus(false);
 					
 					
 					getSystemBus().transferToMemory(getMAR().read(), getMBR().read()); //Transfer contents of mbr to address specified in mar
@@ -132,15 +134,15 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					this.fireUpdate("Operand " + getGenRegisters().read(getIR().read(1).getField1()) + " stored in memory address " +
 							getIR().read(1).getField2() + "\n");
 					
-					setWaitStatus(true);
-					try {
-						wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						setWaitStatus(false);
-						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-					}
-					setWaitStatus(false);
+//					setWaitStatus(true);
+//					try {
+//						wait();
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//						setWaitStatus(false);
+//						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//					}
+//					setWaitStatus(false);
 					
 					break;
 					
@@ -154,16 +156,16 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						
 						this.fireUpdate("Loaded operand " + getGenRegisters().read(getIR().read(1).getField1()) + 
 								" into condition code register\n");
-						
-						setWaitStatus(true);
-						try {
-							wait();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-							setWaitStatus(false);
-							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-						}
-						setWaitStatus(false);
+//						
+//						setWaitStatus(true);
+//						try {
+//							wait();
+//						} catch (InterruptedException e) {
+//							e.printStackTrace();
+//							setWaitStatus(false);
+//							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//						}
+//						setWaitStatus(false);
 					}
 					
 					else { //Register-register move
@@ -175,29 +177,29 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						this.fireUpdate("Operand " + getGenRegisters().read(getIR().read(1).getField1()) + 
 								" moved into r" + getGenRegisters().read(getIR().read(1).getField2()) + "\n");
 						
-						setWaitStatus(true);
-						try {
-							wait();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-							setWaitStatus(false);
-							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-						}
-						setWaitStatus(false);
+//						setWaitStatus(true);
+//						try {
+//							wait();
+//						} catch (InterruptedException e) {
+//							e.printStackTrace();
+//							setWaitStatus(false);
+//							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//						}
+//						setWaitStatus(false);
 					}
 					
 					
 					getGenRegisters().write(getIR().read(1).getField1(), null); //Complete the move by resetting register source
 					
-					setWaitStatus(true);
-					try {
-						wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						setWaitStatus(false);
-						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-					}
-					setWaitStatus(false);
+//					setWaitStatus(true);
+//					try {
+//						wait();
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//						setWaitStatus(false);
+//						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//					}
+//					setWaitStatus(false);
 					
 					break;
 					
@@ -210,15 +212,15 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					fireUpdate("Operands " + op1 + " and " + op2 + " loaded from general purpose \nregisters into ALU " +
 							"for ADD operation: " + op1 + " + " + op2 + "\n");
 					
-					setWaitStatus(true);
-					try {
-						wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						setWaitStatus(false);
-						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-					}
-					setWaitStatus(false);
+//					setWaitStatus(true);
+//					try {
+//						wait();
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//						setWaitStatus(false);
+//						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//					}
+//					setWaitStatus(false);
 					
 					//writeBackStage.receive(result); //Call write back stage to store result of addition
 					//writeBackStage.run();
@@ -230,15 +232,15 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
 					fireUpdate("Result operand " + result + " written to r" + getIR().read(1).getField1() + " from ALU\n");
 					
-					setWaitStatus(true);
-					try {
-						wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						setWaitStatus(false);
-						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-					}
-					setWaitStatus(false);
+//					setWaitStatus(true);
+//					try {
+//						wait();
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//						setWaitStatus(false);
+//						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//					}
+//					setWaitStatus(false);
 					
 					ALU.clearFields();
 					
@@ -252,15 +254,15 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					fireUpdate("Operands " + op1 + " and " + op2 + " loaded from general purpose \nregisters into ALU " +
 							"for SUB operation: " + op1 + " - " + op2 + "\n");
 					
-					setWaitStatus(true);
-					try {
-						wait(); //Makes more sense to place wait here than to complicate writeBack stage.
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						setWaitStatus(false);
-						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-					}
-					setWaitStatus(false);
+//					setWaitStatus(true);
+//					try {
+//						wait(); //Makes more sense to place wait here than to complicate writeBack stage.
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//						setWaitStatus(false);
+//						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//					}
+//					setWaitStatus(false);
 					
 					//writeBackStage.receive(result);
 					//writeBackStage.run();
@@ -268,16 +270,16 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					
 					fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
 					fireUpdate("Result operand " + result + " written to r" + getIR().read(1).getField1() + " from ALU\n");
-					
-					setWaitStatus(true);
-					try {
-						wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						setWaitStatus(false);
-						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-					}
-					setWaitStatus(false);
+//					
+//					setWaitStatus(true);
+//					try {
+//						wait();
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//						setWaitStatus(false);
+//						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//					}
+//					setWaitStatus(false);
 					
 					ALU.clearFields();
 					
@@ -291,15 +293,15 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					fireUpdate("Operands " + op1 + " and " + op2 + " loaded from general purpose \nregisters into ALU " +
 							"for DIV operation: " + op1 + " / " + op2 + "\n");
 					
-					setWaitStatus(true);
-					try {
-						wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						setWaitStatus(false);
-						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-					}
-					setWaitStatus(false);
+//					setWaitStatus(true);
+//					try {
+//						wait();
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//						setWaitStatus(false);
+//						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//					}
+//					setWaitStatus(false);
 					
 					//writeBackStage.receive(result);
 					//writeBackStage.run();
@@ -308,15 +310,15 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
 					fireUpdate("Result operand " + result + " written to r" + getIR().read(1).getField1() + " from ALU\n");
 					
-					setWaitStatus(true);
-					try {
-						wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						setWaitStatus(false);
-						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-					}
-					setWaitStatus(false);
+//					setWaitStatus(true);
+//					try {
+//						wait();
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//						setWaitStatus(false);
+//						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//					}
+//					setWaitStatus(false);
 					
 					ALU.clearFields();
 					
@@ -330,15 +332,15 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					fireUpdate("Operands " + op1 + " and " + op2 + " loaded from general purpose \nregisters into ALU " +
 							"for MUL operation: " + op1 + " * " + op2 + "\n");
 					
-					setWaitStatus(true);
-					try {
-						wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						setWaitStatus(false);
-						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-					}
-					setWaitStatus(false);
+//					setWaitStatus(true);
+//					try {
+//						wait();
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//						setWaitStatus(false);
+//						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//					}
+//					setWaitStatus(false);
 					
 					//writeBackStage.receive(result);
 					//writeBackStage.run();
@@ -347,15 +349,15 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
 					fireUpdate("Result operand " + result + " written to r" + getIR().read(1).getField1() + " from ALU\n");
 					
-					setWaitStatus(true);
-					try {
-						wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						setWaitStatus(false);
-						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-					}
-					setWaitStatus(false);
+//					setWaitStatus(true);
+//					try {
+//						wait();
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//						setWaitStatus(false);
+//						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//					}
+//					setWaitStatus(false);
 					
 					ALU.clearFields();
 					
@@ -375,18 +377,19 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					pipelineFlush();
 					//Re-activate f/d thread here?
 					while (fetchDecodeThread.isAlive()); //Wait for f/d thread to terminate
-					fetchDecodeThread.start();
+					fetchDecodeThread = new Thread(fetchDecodeStage);
+					fetchDecodeThread.start(); //Restart f/d thread, which will fetch from new PC address value
 					
 					
-					setWaitStatus(true);
-					try {
-						wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						setWaitStatus(false);
-						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-					}
-					setWaitStatus(false);
+//					setWaitStatus(true);
+//					try {
+//						wait();
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//						setWaitStatus(false);
+//						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//					}
+//					setWaitStatus(false);
 					
 					
 					
@@ -398,29 +401,29 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						getPC().setPC(getIR().read(1).getField1()); //If statusRegister holds 0, set PC to new address held in instruction
 						fireUpdate("PC set to " + getIR().read(1).getField1() + " as result of " + getIR().read(1).getOpcode() + " operation\n");
 						
-						setWaitStatus(true);
-						try {
-							wait();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-							setWaitStatus(false);
-							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-						}
-						setWaitStatus(false);
+//						setWaitStatus(true);
+//						try {
+//							wait();
+//						} catch (InterruptedException e) {
+//							e.printStackTrace();
+//							setWaitStatus(false);
+//							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//						}
+//						setWaitStatus(false);
 					}
 					
 					else { //If condition code register doesn't hold 0, provide activity monitor comment to say branch not taken
 						fireUpdate("Branch (BRZ) not taken as condition code\nvalue does not equal 0\n");
 						
-						setWaitStatus(true);
-						try {
-							wait();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-							setWaitStatus(false);
-							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-						}
-						setWaitStatus(false);				
+//						setWaitStatus(true);
+//						try {
+//							wait();
+//						} catch (InterruptedException e) {
+//							e.printStackTrace();
+//							setWaitStatus(false);
+//							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//						}
+//						setWaitStatus(false);				
 						
 					}
 					break;
@@ -431,30 +434,30 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						 getPC().incrementPC();
 						 fireUpdate("PC set to " + getIR().read(1).getField1() + " as result of " + getIR().read(1).getOpcode() + " operation\n");
 						 
-			 			setWaitStatus(true);
-						try {
-							wait();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-							setWaitStatus(false);
-							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-					  	}
-					    setWaitStatus(false);	
+//			 			setWaitStatus(true);
+//						try {
+//							wait();
+//						} catch (InterruptedException e) {
+//							e.printStackTrace();
+//							setWaitStatus(false);
+//							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//					  	}
+//					    setWaitStatus(false);	
 					    
 					 }
 					 
 					 else { //If condition code register does not hold value of 0, provide activity monitor comment to say skip not taken
 						 fireUpdate("Skip (SKZ) instruction not executed as condition\ncode value does not equal 0\n");
 						 
-						setWaitStatus(true);
-						try {
-							wait();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-							setWaitStatus(false);
-							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-						}
-						setWaitStatus(false);			
+//						setWaitStatus(true);
+//						try {
+//							wait();
+//						} catch (InterruptedException e) {
+//							e.printStackTrace();
+//							setWaitStatus(false);
+//							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//						}
+//						setWaitStatus(false);			
 								
 					 }
 					 break;
@@ -466,30 +469,30 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						 getPC().setPC(getIR().read(1).getField1()); //Set PC to equal address in field1 of instruction in ir
 						 fireUpdate("PC set to " + getIR().read(1).getField1() + " as result of " + getIR().read(1).getOpcode() + " operation\n");
 						 
-						setWaitStatus(true);
-						try {
-							wait();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-							setWaitStatus(false);
-							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-						}
-						setWaitStatus(false);			
+//						setWaitStatus(true);
+//						try {
+//							wait();
+//						} catch (InterruptedException e) {
+//							e.printStackTrace();
+//							setWaitStatus(false);
+//							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//						}
+//						setWaitStatus(false);			
 					 }
 					 
 					 else {  //If not equal, do nothing other than provide activity monitor comment to say branch not taken
 						 fireUpdate("Branch (BRE) not taken as condition code\nvalue does not equal " + 
 								 getGenRegisters().read(getIR().read(1).getField2()) + " (contents of r" + getIR().read(1).getField2() + ")\n");
 						 
-						setWaitStatus(true);
-						try {
-							wait();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-							setWaitStatus(false);
-							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-						}
-						setWaitStatus(false);			
+//						setWaitStatus(true);
+//						try {
+//							wait();
+//						} catch (InterruptedException e) {
+//							e.printStackTrace();
+//							setWaitStatus(false);
+//							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//						}
+//						setWaitStatus(false);			
 						 
 					 }
 					 break; 
@@ -501,15 +504,15 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						 fireUpdate("PC set to " + getIR().read(1).getField1() + " as result of " + getIR().read(1).getOpcode() + " operation\n");
 						 
 						
-						 setWaitStatus(true);
-						 try {
-							 wait();
-						 } catch (InterruptedException e) {
-							 e.printStackTrace();
-							 setWaitStatus(false);
-							 return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-						 }
-						 setWaitStatus(false);			
+//						 setWaitStatus(true);
+//						 try {
+//							 wait();
+//						 } catch (InterruptedException e) {
+//							 e.printStackTrace();
+//							 setWaitStatus(false);
+//							 return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//						 }
+//						 setWaitStatus(false);			
 						 
 					 }
 					 
@@ -517,16 +520,16 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						 fireUpdate("Branch (BRNE) not taken as condition code\nvalue equals " + 
 								 getGenRegisters().read(getIR().read(1).getField2()) + " (contents of r" + getIR().read(1).getField2() + ")\n");
 						 
-						 setWaitStatus(true);
-						 try {							 
-							wait();
-						 } catch (InterruptedException e) {
-							 e.printStackTrace();
-							 setWaitStatus(false);
-							 return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-						 }
-						 setWaitStatus(false);			
-						 
+//						 setWaitStatus(true);
+//						 try {							 
+//							wait();
+//						 } catch (InterruptedException e) {
+//							 e.printStackTrace();
+//							 setWaitStatus(false);
+//							 return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//						 }
+//						 setWaitStatus(false);			
+//						 
 					 }
 					 break; 
 					 
@@ -536,7 +539,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					 //pc.setPC(0);
 					 //statusRegister.write(null);
 					// ir.loadIR(null);	
-					 
+					 System.out.println("HALT encountered.");
 					 fireUpdate("HALT instruction decoded; end of program");
 					 return false; //Signals end of instruction cycle		
 		}
@@ -557,13 +560,12 @@ public class PipelinedExecuteStage extends ExecuteStage {
 	 */
 	public synchronized void run() {
 		active = true;
-		while (active) {
-			if (!fetchDecodeThread.isAlive()) { //Thread will need restarting after a pipeline flush / avoids attempting to start
-				//a thread which is still live.
-				fetchDecodeThread.start();
-			}
+		fetchDecodeThread.start();
+		while (active) {			
 			try {
 				int opcodeValue = this.fetchToExecuteQueue.take();
+				System.out.println("Just taken from queue, opcode value is:" + opcodeValue);
+				System.out.println("IR at 1" + getIR().read(1));
 				active = this.instructionExecute(opcodeValue);
 			}
 			catch (InterruptedException ex) {
