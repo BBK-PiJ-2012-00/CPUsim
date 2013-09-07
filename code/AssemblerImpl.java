@@ -466,6 +466,12 @@ public class AssemblerImpl implements Assembler {
 			
 			String opcode = instructionParts.get(0);
 			
+			if (instructionParts.size() > 1) {
+				JOptionPane.showMessageDialog(null, "Assembly program syntax error: " + opcode + " insructions \n" +
+						" should not have any reference/target fields.");
+				return null;
+			}
+			
 			if (opcode.equals("SKZ")) {
 				data = new BranchInstr(Opcode.SKZ);
 			}
