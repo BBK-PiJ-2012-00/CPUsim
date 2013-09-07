@@ -3,6 +3,7 @@ package tests;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 
@@ -168,10 +169,7 @@ public class ExecuteStageTest {
 		
 		//Load an assembly file into memory to use for testing
 		assembler = new AssemblerImpl(builder.getLoader());
-		assembler.selectFile(new File("src/testAssemblyPrograms/testBRflush.txt"));
-		assembler.assembleCode();
-		assembler.loadToLoader();
-		assembler.getLoader().loadToMemory();
+		
 	}
 
 
@@ -520,6 +518,11 @@ public class ExecuteStageTest {
 	 */
 	@Test
 	public void testFlushBR() { //Tests f/d stage is flushed when BR instruction encountered.	
+		assembler.selectFile(new File("src/testAssemblyPrograms/testBRflush.txt"));
+		assembler.assembleCode();
+		assembler.loadToLoader();
+		assembler.getLoader().loadToMemory();
+		
 		pipelinedExecuteStage.run(); 		
 		Data genRegistersR1 = pipelinedExecuteStage.getGenRegisters().read(1); //Retrieve contents of r1
 		Operand r1Contents = (Operand) genRegistersR1; //Cast to operand
@@ -534,11 +537,81 @@ public class ExecuteStageTest {
 	 */
 	@Test
 	public void testFlushBR2() { //Checks that branch target is executed
+		assembler.selectFile(new File("src/testAssemblyPrograms/testBRflush.txt"));
+		assembler.assembleCode();
+		assembler.loadToLoader();
+		assembler.getLoader().loadToMemory();
+		
 		pipelinedExecuteStage.run(); 		
 		Data genRegistersR5 = pipelinedExecuteStage.getGenRegisters().read(5); //Retrieve contents of r5
 		Operand r5Contents = (Operand) genRegistersR5; //Cast to operand
 		assertEquals(12, r5Contents.unwrapInteger()); //Check r5 contains #12
 	}
+	
+	
+	@Test
+	public void testFlushBRZ() {
+		assembler.selectFile(new File("src/testAssemblyPrograms/testBRZflush.txt"));
+		assembler.assembleCode();
+		assembler.loadToLoader();
+		assembler.getLoader().loadToMemory();
+		
+		pipelinedExecuteStage.run(); 		
+		Data genRegistersR1 = pipelinedExecuteStage.getGenRegisters().read(1); //Retrieve contents of r1
+		Operand r1Contents = (Operand) genRegistersR1; //Cast to operand
+		assertNull(r1Contents); //r1 contents should be null, as the BR instruction should ensure the operand value 33
+								//is never loaded into r1 via LOAD instruction 	
+		
+	}
+	
+	
+	@Test
+	public void testFlushBRZ2() { //Checks branch target is executed
+		assembler.selectFile(new File("src/testAssemblyPrograms/testBRZflush.txt"));
+		assembler.assembleCode();
+		assembler.loadToLoader();
+		assembler.getLoader().loadToMemory();
+		
+		pipelinedExecuteStage.run(); 		
+		Data genRegistersR5 = pipelinedExecuteStage.getGenRegisters().read(5); //Retrieve contents of r5
+		Operand r5Contents = (Operand) genRegistersR5; //Cast to operand
+		assertEquals(112, r5Contents.unwrapInteger()); //Check r5 contains #12
+	}
+	
+
+	@Test
+	public void testFlushSKZ() {
+		assembler.selectFile(new File("src/testAssemblyPrograms/testSKZflush.txt"));
+		assembler.assembleCode();
+		assembler.loadToLoader();
+		assembler.getLoader().loadToMemory();
+		
+		pipelinedExecuteStage.run(); 		
+		Data genRegistersR4 = pipelinedExecuteStage.getGenRegisters().read(4); //Retrieve contents of r1
+		Operand r4Contents = (Operand) genRegistersR4; //Cast to operand
+		assertNull(r4Contents); //r1 contents should be null, as the BR instruction should ensure the operand value 33
+								//is never loaded into r1 via LOAD instruction 	
+		
+	}
+	
+	
+	@Test
+	public void testFlushSKZ2() { //Checks instruction after skipped instruction is executed
+		assembler.selectFile(new File("src/testAssemblyPrograms/testSKZflush.txt"));
+		assembler.assembleCode();
+		assembler.loadToLoader();
+		assembler.getLoader().loadToMemory();
+		
+		System.out.println("ASSEMBLER CONTS.: " + Arrays.toString(assembler.getProgramCode()));
+		
+		
+		pipelinedExecuteStage.run(); 		
+		Data genRegistersR7 = pipelinedExecuteStage.getGenRegisters().read(7); //Retrieve contents of r5
+		Operand r7Contents = (Operand) genRegistersR7; //Cast to operand
+		assertEquals(117, r7Contents.unwrapInteger()); //Check r5 contains #12
+		
+	}
+
 
 }
 
