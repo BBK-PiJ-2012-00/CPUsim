@@ -60,20 +60,8 @@ public class FetchDecodeStageTest {
 	//execution.
 	
 	private Instruction testInstrSTORE;
-	private Instruction testInstrLOAD;
-	private Instruction testInstrMOVE;
-	
 	private Instruction testInstrADD;
-	private Instruction testInstrSUB;
-	private Instruction testInstrDIV;
-	private Instruction testInstrMUL;
-	
 	private Instruction testInstrBR;
-	private Instruction testInstrBRZ;
-	private Instruction testInstrSKZ;
-	private Instruction testInstrBRE;
-	private Instruction testInstrBRNE;
-	
 	private Instruction testInstrHALT;
 	
 	
@@ -114,20 +102,8 @@ public class FetchDecodeStageTest {
 		memory.registerListener(new UpdateListener(new TestFrame()));
 		
 		testInstrSTORE = new TransferInstr(Opcode.STORE, 0, 99); //source r0, destination address 99
-		testInstrLOAD = new TransferInstr(Opcode.LOAD, 50, 0); //Load contents of address 50 to register 0
-		testInstrMOVE = new TransferInstr(Opcode.MOVE, 0, 15); //Move contents of r0 to r15
-		
 		testInstrADD = new ArithmeticInstr(Opcode.ADD, 2, 4); //Add contents of r2 and r4, storing in r2
-		testInstrSUB = new ArithmeticInstr(Opcode.SUB, 9, 10); //Sub contents of r10 from r9, storing in r9
-		testInstrDIV = new ArithmeticInstr(Opcode.DIV, 3, 12); //Divide contents of r3 by contents of r12, storing in r3
-		testInstrMUL = new ArithmeticInstr(Opcode.MUL, 5, 8); //Multiply contents of r5 by contents of r8, storing in r5
-		
 		testInstrBR = new BranchInstr(Opcode.BR, 10); //Branch to memory address 10
-		testInstrBRZ = new BranchInstr(Opcode.BRZ, 37); //Branch to memory address 37
-		testInstrSKZ = new BranchInstr(Opcode.SKZ); //Skip if zero
-		testInstrBRE = new BranchInstr(Opcode.BRE, 92, 1); //Branch to address 92 if contents of r1 equals contents of status reg
-		testInstrBRNE = new BranchInstr(Opcode.BRNE, 77, 6);//Branch to addr. 77 if contents of r6 doesn't equal contents of s. reg.
-		
 		testInstrHALT = new HaltInstr(Opcode.HALT); //Halt instruction 
 		
 		assembler = new AssemblerImpl(builder.getLoader());
