@@ -48,6 +48,7 @@ public class IRfile implements InstructionRegister {
 
 	@Override
 	public void clear() {
+		System.out.println("IRfile clear() called.");
 		for (int i = 0; i < irRegisters.length; i++) {
 			irRegisters[i] = null;
 		}

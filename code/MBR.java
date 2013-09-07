@@ -15,14 +15,29 @@ public class MBR implements MemoryBufferRegister {
 	private Data registerContents;
 	private UpdateListener updateListener;
 	
+	private boolean lockAcquired;
+	
+	public synchronized void acquireLock() {
+		lockAcquired = true;
+	}
+	
+	public synchronized void releaseLock() {
+		lockAcquired = false;
+	}
+	
+	public boolean lockIsAcquired() {
+		return lockAcquired;
+	}
+	
 	
 	
 	@Override
-	public boolean write(Data data) { //Successful write returns true
+	public synchronized boolean write(Data data) { //Successful write returns true
 		//Size is restricted in Instruction/Operand classes
 		registerContents = data;
 		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, display());
 		updateListener.handleUpDateEvent(updateEvent);
+		
 		if (registerContents == null) {
 			return false;
 		}
@@ -30,7 +45,7 @@ public class MBR implements MemoryBufferRegister {
 	}
 	
 	@Override
-	public Data read() { 
+	public synchronized Data read() { 
 		return registerContents;
 	}
 	

@@ -43,6 +43,8 @@ public class PipelinedExecuteStage extends ExecuteStage {
 //					}
 //					setWaitStatus(false);
 					
+					System.out.println("Instruction is: " + getIR().read(1).toString());
+					System.out.println("Value on MAR at ln46:" + getMAR().read());
 					getSystemBus().transferToMemory(getMAR().read(), null);
 					this.fireUpdate("Operand " + getMBR().read().toString() + " loaded from address " + getIR().read(1).getField1() + " into MBR\n");
 					
@@ -394,7 +396,10 @@ public class PipelinedExecuteStage extends ExecuteStage {
 			case 9: //A BRZ instruction (branch if value in status register is zero).
 					if (getCC().read().unwrapInteger() == 0) {
 						getPC().setPC(getIR().read(1).getField1()); //If statusRegister holds 0, set PC to new address held in instruction
-						fireUpdate("PC set to " + getIR().read(1).getField1() + " as result of " + getIR().read(1).getOpcode() + " operation\n");
+						fireUpdate("PC set to " + getIR().read(1).getField1() + " as result of " + getIR().read(1).getOpcode() 
+								+ " operation\n");
+						
+						pipelineFlush();
 						
 //						setWaitStatus(true);
 //						try {
@@ -428,6 +433,8 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					 if (getCC().read().unwrapInteger() == 0) {
 						 getPC().incrementPC();
 						 fireUpdate("PC set to " + getIR().read(1).getField1() + " as result of " + getIR().read(1).getOpcode() + " operation\n");
+						
+						 pipelineFlush();
 						 
 //			 			setWaitStatus(true);
 //						try {
@@ -464,6 +471,8 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						 getPC().setPC(getIR().read(1).getField1()); //Set PC to equal address in field1 of instruction in ir
 						 fireUpdate("PC set to " + getIR().read(1).getField1() + " as result of " + getIR().read(1).getOpcode() + " operation\n");
 						 
+						 pipelineFlush();
+						 
 //						setWaitStatus(true);
 //						try {
 //							wait();
@@ -478,6 +487,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					 else {  //If not equal, do nothing other than provide activity monitor comment to say branch not taken
 						 fireUpdate("Branch (BRE) not taken as condition code\nvalue does not equal " + 
 								 getGenRegisters().read(getIR().read(1).getField2()) + " (contents of r" + getIR().read(1).getField2() + ")\n");
+						 
 						 
 //						setWaitStatus(true);
 //						try {
@@ -498,7 +508,8 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						 getPC().setPC(getIR().read(1).getField1()); //Set PC to equal address in field1 of instruction in ir	
 						 fireUpdate("PC set to " + getIR().read(1).getField1() + " as result of " + getIR().read(1).getOpcode() + " operation\n");
 						 
-						
+						pipelineFlush();
+						 
 //						 setWaitStatus(true);
 //						 try {
 //							 wait();
@@ -555,6 +566,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 	 */
 	public synchronized void run() {
 		active = true;
+		fetchDecodeThread = new Thread(fetchDecodeStage);
 		fetchDecodeThread.start();
 		while (active) {			
 			try {

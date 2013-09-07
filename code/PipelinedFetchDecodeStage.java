@@ -26,7 +26,7 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	public void instructionFetch() {
 		System.out.println("Entering instructionFetch()");
 		this.fireUpdate("\n** INSTRUCTION FETCH/DECODE STAGE ** \n");
-		getIR().clear(); //Clear previous instruction from display
+		//getIR().clear(); //Clear previous instruction from display
 		
 		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
 			System.out.println("Entering interrupted block 1");
@@ -34,8 +34,6 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 			pipelineFlush = true;
 			return;
 		}
-		
-		System.out.println("Left interrupted block 1: pipelineFlush = " + pipelineFlush);
 		
 		getMAR().write(getPC().getValue()); //Write address value in PC to MAR.
 		
@@ -72,6 +70,7 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 			active = false;
 			return;
 		}
+		//Flushing during system bus operation? 
 		
 		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
 			fireUpdate("Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
@@ -80,6 +79,7 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 		}
 		
 		this.fireUpdate("Load contents of memory address " + getMAR().read() + " into MBR \n");
+		
 		
 		
 //		setWaitStatus(true);
@@ -96,8 +96,11 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
 			pipelineFlush = true;
 			return;
-		}		
+		}
 		
+		
+		
+		System.out.println("Ln102, attempting to cast: " + getMBR().read());
 		//A Data item should now be in MBR
 		getIR().loadIR((Instruction) getMBR().read()); //Cast required as mbr holds type data, IR type Instruction; May need to handle exception
 		System.out.println("Instruction: " + getMBR().read());
@@ -132,6 +135,7 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	 */
 	public int instructionDecode() { //Returns int value of opcode
 		Instruction instr = getIR().read();
+		System.out.println("Instruction fetched and about to be decoded is: " + instr.toString());
 		int opcodeValue = instr.getOpcode().getValue(); //Gets instruction opcode as int value
 		
 		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
@@ -168,10 +172,13 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 //		if (!executeThread.isAlive()) {
 //			executeThread.start(); //Only start thread if it's not already alive
 //		}
+		System.out.println("Starting run() in FDstage");
 		active = true;
+		pipelineFlush = false;
 		while (active) { //Continue fetching instructions		
 			this.instructionFetch();
 			if (!active || pipelineFlush) { //This will happen if an interrupt takes places within instructionFetch()
+				System.out.println("PipelineFlush: " + pipelineFlush);
 				System.out.println("About to call return before getting to decode() from within run()");
 				return;
 			}
@@ -181,7 +188,7 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 				return; //Additional boolean may need to be set so controlUnit knows what's going on
 			}
 			boolean forwardSuccessful = this.forward();
-			if (!forwardSuccessful) { //Interrupt meaning reset clicked; cancel execution
+			if (!forwardSuccessful) { //Interrupt meaning reset clicked or HALT decoded; cancel execution of THIS stage.
 				active = false;
 				return;
 			}
@@ -192,8 +199,18 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	public boolean forward() {
 		Integer opcode = this.getOpcodeValue(); //Get opcode value from superclass to pass to queue
 		try {
-			((IRfile) getIR()).shuntContents(0, 1); //Move contents of IR regsiter 0 to IR register 1 for use by execute stage
+			System.out.println("About to put");
+			if (pipelineFlush) {
+				//Don't offer to queue; will possibly result in execution of instruction that should be skipped
+				return false;
+			}
 			fetchToExecuteQueue.put(opcode); //Waits here until put is successful (executeStage thread must be attempting take()).
+			System.out.println("Put successful");
+			((IRfile) getIR()).shuntContents(0, 1); //Move contents of IR register 0 to IR register 1 for use by execute stage
+			if (opcode == 13) { //Don't attempt to fetch another instruction after HALT fetched. Execute stage won't send signal in time.
+				System.out.println("HALT, so no more fetching");
+				return false;
+			}
 			return true;
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -202,6 +219,8 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 			return false;
 		}
 	}
+	//If this stage is waiting on a put(), and branch is taken, the put should be interrupted, and this stage is 
+	//deactivated.
 	
 	public boolean isActive() {
 		return this.active;
@@ -214,8 +233,10 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	 * altogether.
 	 * 
 	 */
+	@Override
 	public void setPipelineFlush(boolean isFlush) { //For pipeline flushing
 		this.pipelineFlush = isFlush;
+		System.out.println("PIPELINE FLUSH TRIGGERED");
 	}
 	
 	public boolean flushed() {
@@ -223,6 +244,7 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	}
 	
 	//GUI events should not be handled from this thread but from EDT or SwingWorker
+	//This adds the update event to the EDT thread. Need to test this works on the GUI
 	@Override
 	public void fireUpdate(final String update) {
 		SwingUtilities.invokeLater(new Runnable() {

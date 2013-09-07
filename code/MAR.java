@@ -9,6 +9,21 @@ public class MAR implements MemoryAddressRegister {
 	
 	private int registerContents;
 	
+	private boolean lockAcquired;
+	
+	public synchronized void acquireLock() {
+		lockAcquired = true;
+	}
+	
+	public synchronized void releaseLock() {
+		lockAcquired = false;
+	}
+	
+	public synchronized boolean lockIsAcquired() {
+		return lockAcquired;
+	}
+	
+	
 	
 	public void registerListener(UpdateListener listener) {
 		this.updateListener = listener;
@@ -27,6 +42,7 @@ public class MAR implements MemoryAddressRegister {
 		registerContents = address;
 		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, display());
 		updateListener.handleUpDateEvent(updateEvent);
+		
 	}
 	
 	@Override

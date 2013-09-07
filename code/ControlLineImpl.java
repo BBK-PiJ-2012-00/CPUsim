@@ -36,17 +36,14 @@ public class ControlLineImpl implements ControlLine {
 			
 //			isWaiting = true;
 //			try {
-//				System.out.println("I'm waaaaaaiting!");
 //				wait();
 //			} catch (InterruptedException e) {
 //				System.out.println("I'm being interrupted.");
 //				e.printStackTrace();
 //				clear();
 //				isWaiting = false;
-//				System.out.println("About to return false.");
 //				return false;
 //			}
-//			System.out.println("Just left catch.");
 //			isWaiting = false;
 			
 			fireOperationUpdate(""); //Clear control line display
