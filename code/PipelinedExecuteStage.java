@@ -25,7 +25,6 @@ public class PipelinedExecuteStage extends ExecuteStage {
 	
 	public synchronized boolean instructionExecute(int opcode) {
 		this.fireUpdate("\n** INSTRUCTION EXECUTION STAGE ** \n");
-		System.out.println(getIR().read(0) + " " + getIR().read(1) + " " + getIR().read(2));
 		
 		switch (opcode) {
 		
@@ -375,10 +374,6 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					//Have a method pipelineFlush() on f/d stage, which restarts its cycle
 					
 					pipelineFlush();
-					//Re-activate f/d thread here?
-					while (fetchDecodeThread.isAlive()); //Wait for f/d thread to terminate
-					fetchDecodeThread = new Thread(fetchDecodeStage);
-					fetchDecodeThread.start(); //Restart f/d thread, which will fetch from new PC address value
 					
 					
 //					setWaitStatus(true);
@@ -596,6 +591,9 @@ public class PipelinedExecuteStage extends ExecuteStage {
 		((PipelinedFetchDecodeStage) fetchDecodeStage).setPipelineFlush(true); //Allows for differentiation between reset and flush
 		fetchDecodeThread.interrupt(); //Poll Thread.isInterrupted() at crucial points
 		getIR().clear(); //Necessary to clear all IR registers?
+		while (fetchDecodeThread.isAlive()); //Wait for f/d thread to terminate
+		fetchDecodeThread = new Thread(fetchDecodeStage); //Must create new thread, as old one cannot be restarted
+		fetchDecodeThread.start(); //Restart f/d thread, which will fetch from new PC address value
 		
 	}
 
