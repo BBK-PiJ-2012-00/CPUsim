@@ -147,75 +147,71 @@ public class FetchDecodeStageTest {
 	 * so that this will be fetched.
 	 * 
 	 */
-//	@Test
-//	public void testInstructionFetch() { //Tests instruction fetch method
-//		memory.notifyWrite(0, testInstrSTORE);
-//		fetchDecodeStage.instructionFetch();
-//		
-//		Instruction expected = testInstrSTORE;
-//		Instruction output = ir.read();
-//		assertEquals(expected, output);		
-//	}
-//	
-//	@Test
-//	public void testInstructionFetch2() { //Test instruction with PC set to another value
-//		memory.notifyWrite(19, testInstrSTORE);
-//		pc.setPC(19); //Need to manually set PC for testing; this will be set automatically when program loaded
-//		//via loader into memory; this will send a signal to CPU to set PC to start address.
-//		fetchDecodeStage.instructionFetch();
-//		
-//		Instruction expected = testInstrSTORE;
-//		Instruction output = ir.read();
-//		assertEquals(expected, output);		
-//	}
-//	
-//	//A test to see what happens if the fetched item is in fact an Operand and not an Instruction would be useful;
-//	//implement some exception handling first.
-//	
-//	
-//	@Test
-//	public void testInstructionDecode() { //Test that PC is incremented by the end of the method
-//		memory.notifyWrite(0, testInstrSTORE);
-//		fetchDecodeStage.instructionFetch(); //Need to fetch an instruction before decoding
-//		fetchDecodeStage.instructionDecode();
-//		
-//		int expected = 1; //PC starts at 0 by default (unless set otherwise)
-//		int output = pc.getValue();
-//		assertEquals(expected, output);
-//	}
-//	
-//	/*
-//	 * Not necessary to test every opcode, as opcode integer values have been tested in InstructionTest.
-//	 */
-//	@Test
-//	public void testInstructionDecode_opcodeValueBR() { //Test correct opcode value for instruction is returned
-//		memory.notifyWrite(0, testInstrBR);
-//		fetchDecodeStage.instructionFetch(); //Load an instruction into IR
-//		
-//		int output = fetchDecodeStage.instructionDecode();		
-//		int expected = 8; //BR should decode to integer value of 8
-//		assertEquals(expected, output);
-//	}
-//	
-//	@Test
-//	public void testInstructionDecode_opcodeValueHALT() { //Test correct opcode value for instruction is returned
-//		memory.notifyWrite(0, testInstrHALT);
-//		fetchDecodeStage.instructionFetch(); //Load an instruction into IR
-//		
-//		int output = fetchDecodeStage.instructionDecode();		
-//		int expected = 13; //HALT should decode to integer value of 13
-//		assertEquals(expected, output);
-//	}
-//	
-//	@Test
-//	public void testInstructionDecode_opcodeValueADD() { //Test correct opcode value for instruction is returned
-//		memory.notifyWrite(0, testInstrADD);
-//		fetchDecodeStage.instructionFetch(); //Load an instruction into IR
-//		
-//		int output = fetchDecodeStage.instructionDecode();		
-//		int expected = 4; //HALT should decode to integer value of 4
-//		assertEquals(expected, output);
-//	}
+	@Test
+	public void testInstructionFetch() { //Tests instruction fetch method
+		memory.notifyWrite(0, testInstrSTORE);
+		fetchDecodeStage.instructionFetch();
+		
+		Instruction expected = testInstrSTORE;
+		Instruction output = ir.read();
+		assertEquals(expected, output);		
+	}
+	
+	@Test
+	public void testInstructionFetch2() { //Test instruction with PC set to another value
+		memory.notifyWrite(19, testInstrSTORE);
+		pc.setPC(19); //Need to manually set PC for testing
+		fetchDecodeStage.instructionFetch();
+		
+		Instruction expected = testInstrSTORE;
+		Instruction output = ir.read();
+		assertEquals(expected, output);		
+	}
+	
+
+	@Test
+	public void testInstructionDecode() { //Test that PC is incremented by the end of the method
+		memory.notifyWrite(0, testInstrSTORE);
+		fetchDecodeStage.instructionFetch(); //Need to fetch an instruction before decoding
+		fetchDecodeStage.instructionDecode();
+		
+		int expected = 1; //PC starts at 0 by default (unless set otherwise)
+		int output = pc.getValue();
+		assertEquals(expected, output);
+	}
+	
+	/*
+	 * Not necessary to test every opcode, as opcode integer values have been tested in InstructionTest.
+	 */
+	@Test
+	public void testInstructionDecode_opcodeValueBR() { //Test correct opcode value for instruction is returned
+		memory.notifyWrite(0, testInstrBR);
+		fetchDecodeStage.instructionFetch(); //Load an instruction into IR
+		
+		int output = fetchDecodeStage.instructionDecode();		
+		int expected = 8; //BR should decode to integer value of 8
+		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void testInstructionDecode_opcodeValueHALT() { //Test correct opcode value for instruction is returned
+		memory.notifyWrite(0, testInstrHALT);
+		fetchDecodeStage.instructionFetch(); //Load an instruction into IR
+		
+		int output = fetchDecodeStage.instructionDecode();		
+		int expected = 13; //HALT should decode to integer value of 13
+		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void testInstructionDecode_opcodeValueADD() { //Test correct opcode value for instruction is returned
+		memory.notifyWrite(0, testInstrADD);
+		fetchDecodeStage.instructionFetch(); //Load an instruction into IR
+		
+		int output = fetchDecodeStage.instructionDecode();		
+		int expected = 4; //HALT should decode to integer value of 4
+		assertEquals(expected, output);
+	}
 	
 	
 	/*
@@ -266,31 +262,26 @@ public class FetchDecodeStageTest {
 	 * are not relevant to the fetch/decode stage). The opcode of each instruction in the assembly file is compared to
 	 * the opcode placed into the queue by the fetch/decode stage.
 	 */
-//	@Test
-//	public void testQueueUsage() {
-//		Thread testThread = new Thread(pipelinedFDstage); //A thread running through pipelined FDstage.
-//		testThread.start(); //Start the thread, which runs until interrupted (execute stage is responsible for terminating
-//		int opcodeValue = 0; 
-//		for (int i = 0; i < 10; i ++) { //There are 10 instruction declarations in simpleEquation.txt program used in assembler
-//			try {
-//				opcodeValue = testFetchToExecuteQueue.take(); //Have THIS thread Take from the queue
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//			Instruction actualInstruction = (Instruction) assembler.getProgramCode()[i];
-//			assertEquals(actualInstruction.getOpcode().getValue(), opcodeValue); //Compare the opcode of the instruction from the assembly
-//					//file to the one put into the queue by the fetch/decode stage.
-//		}
-//		testThread.interrupt(); //Stops the thread
-//		while(testThread.isAlive()); //Ensures the thread dies as it should after an interrupt
-//		System.out.println("Done!"); //This statement will not be reached if the interrupt does not terminate the thread
-//		//Note that the thread is not strictly terminated but is forced to run to completion without fetching or decoding any more
-//		//instructions.
-//	}
-	
-
-	//Check that pipelined thread is dead after interrupt!!
-	//Check that opcode is passed via queue
-
+	@Test
+	public void testQueueUsage() {
+		Thread testThread = new Thread(pipelinedFDstage); //A thread running through pipelined FDstage.
+		testThread.start(); //Start the thread, which runs until interrupted (execute stage is responsible for terminating
+		int opcodeValue = 0; 
+		for (int i = 0; i < 10; i ++) { //There are 10 instruction declarations in simpleEquation.txt program used in assembler
+			try {
+				opcodeValue = testFetchToExecuteQueue.take(); //Have THIS thread Take from the queue
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			Instruction actualInstruction = (Instruction) assembler.getProgramCode()[i];
+			assertEquals(actualInstruction.getOpcode().getValue(), opcodeValue); //Compare the opcode of the instruction from the assembly
+					//file to the one put into the queue by the fetch/decode stage.
+		}
+		testThread.interrupt(); //Stops the thread
+		while(testThread.isAlive()); //Ensures the thread dies as it should after an interrupt
+		System.out.println("Done!"); //This statement will not be reached if the interrupt does not terminate the thread
+		//Note that the thread is not strictly terminated but is forced to run to completion without fetching or decoding any more
+		//instructions.
+	}
 
 }
