@@ -3,6 +3,7 @@ package tests;
 
 import static org.junit.Assert.*;
 
+import code.IRfile;
 import code.InstructionRegister;
 import code.IR;
 import code.Instruction;
@@ -44,5 +45,24 @@ public class IRtest {
 		ir.clear();
 		assertNull(ir.read()); //IR contents should be null after clear() operation
 	}
+	
+	@Test
+	public void testIRfileShunt() {
+		ir = new IRfile();
+		ir.loadIR(testInstr);
+		((IRfile) ir).shuntContents(0, 1); //Shunt contents of index 0 to index 1
+		assertEquals(testInstr, ir.read(1));
+		
+	}
+	
+	@Test
+	public void testIRfileShuntReset() { //Test shunt source set to null
+		ir = new IRfile();
+		ir.loadIR(testInstr);
+		((IRfile) ir).shuntContents(0, 1); //Shunt contents of index 0 to index 1
+		assertNull(ir.read(0));
+		
+	}
+
 
 }
