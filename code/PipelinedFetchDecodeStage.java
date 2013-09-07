@@ -10,11 +10,11 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	private boolean pipelineFlush;
 
 
-	public PipelinedFetchDecodeStage(BusController systemBus,
-			MemoryAddressRegister mar, MemoryBufferRegister mbr,
-			InstructionRegister ir, ProgramCounter pc, BlockingQueue<Integer> fetchToExecuteQueue) {
+	public PipelinedFetchDecodeStage(BusController systemBus, InstructionRegister ir, ProgramCounter pc,
+			RegisterFile genRegisters, Register statusRegister, MemoryBufferRegister mbr, MemoryAddressRegister mar, 
+			BlockingQueue<Integer> fetchToExecuteQueue) {
 		
-		super(systemBus, mar, mbr, ir, pc);
+		super(systemBus, ir, pc, genRegisters, statusRegister, mbr, mar);
 		this.fetchToExecuteQueue = fetchToExecuteQueue;	
 
 	}
@@ -24,108 +24,112 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	 * from execute stage.
 	 */
 	public void instructionFetch() {
-		System.out.println("Entering instructionFetch()");
-		this.fireUpdate("\n** INSTRUCTION FETCH/DECODE STAGE ** \n");
-		//getIR().clear(); //Clear previous instruction from display
 		
-		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
-			System.out.println("Entering interrupted block 1");
-			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
-			pipelineFlush = true;
-			return;
-		}
+		accessMemory(true, false, false); //Fetch requires access to MAR, MBR and memory; use synchronized block to do this
+										//See Stage super class for details.
 		
-		getMAR().write(getPC().getValue()); //Write address value in PC to MAR.
-		
-		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
-			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
-			pipelineFlush = true;
-			return;
-		}
-		
-		fireUpdate("Memory address from PC placed into MAR \n");
-		
-//		setWaitStatus(true);
-//		try {
-//			wait();
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//			setWaitStatus(false);
+//		System.out.println("Entering instructionFetch()");
+//		this.fireUpdate("\n** INSTRUCTION FETCH/DECODE STAGE ** \n");
+//		//getIR().clear(); //Clear previous instruction from display
+//		
+//		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
+//			System.out.println("Entering interrupted block 1");
+//			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
+//			pipelineFlush = true;
+//			return;
+//		}
+//		
+//		getMAR().write(getPC().getValue()); //Write address value in PC to MAR.
+//		
+//		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
+//			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
+//			pipelineFlush = true;
+//			return;
+//		}
+//		
+//		fireUpdate("Memory address from PC placed into MAR \n");
+//		
+////		setWaitStatus(true);
+////		try {
+////			wait();
+////		} catch (InterruptedException e) {
+////			e.printStackTrace();
+////			setWaitStatus(false);
+////			active = false;
+////			return; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+////		}
+////		setWaitStatus(false);
+//		
+//		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
+//			fireUpdate("Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
+//			pipelineFlush = true;
+//			return;
+//		}
+//		
+//		//Transfer address from MAR to system bus, prompting read
+//		boolean successfulTransfer = getSystemBus().transferToMemory(getMAR().read(), null); 
+//		if (!successfulTransfer) { 
+//			//If SwingWorker is cancelled and thread of execution is interrupted, successfulTransfer will be false and the
+//			//method should not execute any further
 //			active = false;
-//			return; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//			return;
 //		}
-//		setWaitStatus(false);
-		
-		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
-			fireUpdate("Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
-			pipelineFlush = true;
-			return;
-		}
-		
-		//Transfer address from MAR to system bus, prompting read
-		boolean successfulTransfer = getSystemBus().transferToMemory(getMAR().read(), null); 
-		if (!successfulTransfer) { 
-			//If SwingWorker is cancelled and thread of execution is interrupted, successfulTransfer will be false and the
-			//method should not execute any further
-			active = false;
-			return;
-		}
-		//Flushing during system bus operation? 
-		
-		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
-			fireUpdate("Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
-			pipelineFlush = true;
-			return;
-		}
-		
-		this.fireUpdate("Load contents of memory address " + getMAR().read() + " into MBR \n");
-		
-		
-		
-//		setWaitStatus(true);
-//		try {
-//			wait();
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//			setWaitStatus(false);
-//			return; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//		//Flushing during system bus operation? 
+//		
+//		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
+//			fireUpdate("Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
+//			pipelineFlush = true;
+//			return;
 //		}
-//		setWaitStatus(false);
-		
-		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
-			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
-			pipelineFlush = true;
-			return;
-		}
-		
-		
-		
-		System.out.println("Ln102, attempting to cast: " + getMBR().read());
-		//A Data item should now be in MBR
-		getIR().loadIR((Instruction) getMBR().read()); //Cast required as mbr holds type data, IR type Instruction; May need to handle exception
-		System.out.println("Instruction: " + getMBR().read());
-		this.fireUpdate("Load contents of MBR into IR \n");
-		
-		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
-			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
-			pipelineFlush = true;
-			return;
-		}
-		
-//		setWaitStatus(true);
-//		try {
-//			wait();
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//			setWaitStatus(false);
-//			return; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//		
+//		this.fireUpdate("Load contents of memory address " + getMAR().read() + " into MBR \n");
+//		
+//		
+//		
+////		setWaitStatus(true);
+////		try {
+////			wait();
+////		} catch (InterruptedException e) {
+////			e.printStackTrace();
+////			setWaitStatus(false);
+////			return; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+////		}
+////		setWaitStatus(false);
+//		
+//		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
+//			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
+//			pipelineFlush = true;
+//			return;
 //		}
-//		setWaitStatus(false);
-		
-		getMAR().write(-1);//Reset MAR. Repositioned here for user clarity; mem. addr. remains in MAR until instr. in IR.		
-		getMBR().write(null); //Clear MBR to reflect that instruction has moved to IR (should it be reset earlier, to better reflect
-		//movement?)
-		
+//		
+//		
+//		
+//		System.out.println("Ln102, attempting to cast: " + getMBR().read());
+//		//A Data item should now be in MBR
+//		getIR().loadIR((Instruction) getMBR().read()); //Cast required as mbr holds type data, IR type Instruction; May need to handle exception
+//		System.out.println("Instruction: " + getMBR().read());
+//		this.fireUpdate("Load contents of MBR into IR \n");
+//		
+//		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
+//			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
+//			pipelineFlush = true;
+//			return;
+//		}
+//		
+////		setWaitStatus(true);
+////		try {
+////			wait();
+////		} catch (InterruptedException e) {
+////			e.printStackTrace();
+////			setWaitStatus(false);
+////			return; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+////		}
+////		setWaitStatus(false);
+//		
+//		getMAR().write(-1);//Reset MAR. Repositioned here for user clarity; mem. addr. remains in MAR until instr. in IR.		
+//		getMBR().write(null); //Clear MBR to reflect that instruction has moved to IR (should it be reset earlier, to better reflect
+//		//movement?)
+//		
 	}
 	//Fetch ends with instruction being loaded into IR.
 	
