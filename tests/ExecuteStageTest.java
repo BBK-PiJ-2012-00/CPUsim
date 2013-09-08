@@ -625,7 +625,7 @@ public class ExecuteStageTest {
 		pipelinedExecuteStage.run(); 		
 		Data genRegistersR1 = pipelinedExecuteStage.getGenRegisters().read(1); //Retrieve contents of r1
 		Operand r1Contents = (Operand) genRegistersR1; //Cast to operand
-		assertNull(r1Contents); //r1 contents should be null, as the BRE instruction should ensure the operand value 44
+		assertNull(r1Contents); //r1 contents should be null, as the BRE instruction should ensure the operand value #44
 								//is never loaded into r1 via LOAD instruction 	
 		
 	}
@@ -644,6 +644,37 @@ public class ExecuteStageTest {
 		assertEquals(112, r5Contents.unwrapInteger()); //Check r5 contains #112
 		
 	}
+	
+	@Test
+	public void testFlushBRNE() {
+		assembler.selectFile(new File("src/testAssemblyPrograms/testBRNEflush.txt"));
+		assembler.assembleCode();
+		assembler.loadToLoader();
+		assembler.getLoader().loadToMemory();
+		
+		pipelinedExecuteStage.run(); 		
+		Data genRegistersR15 = pipelinedExecuteStage.getGenRegisters().read(15); //Retrieve contents of r15
+		Operand r15Contents = (Operand) genRegistersR15; //Cast to operand
+		assertNull(r15Contents); //r15 contents should be null, as the BRNE instruction should ensure the operand value #99
+								//is never loaded into r15 via LOAD instruction 	
+		
+	}
+	
+	
+	@Test
+	public void testFlushBRNE2() { //Checks branch target is executed
+		assembler.selectFile(new File("src/testAssemblyPrograms/testBRNEflush.txt"));
+		assembler.assembleCode();
+		assembler.loadToLoader();
+		assembler.getLoader().loadToMemory();		
+		
+		pipelinedExecuteStage.run(); 		
+		Data genRegistersR11 = pipelinedExecuteStage.getGenRegisters().read(11); //Retrieve contents of r11
+		Operand r11Contents = (Operand) genRegistersR11; //Cast to operand
+		assertEquals(88, r11Contents.unwrapInteger()); //Check r11 contains #88
+		
+	}
+
 
 
 }
