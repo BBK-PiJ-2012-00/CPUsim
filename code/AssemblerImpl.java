@@ -229,9 +229,17 @@ public class AssemblerImpl implements Assembler {
 				instructionParts.get(0).equals("BRNE")) { 
 			
 			String opcode = instructionParts.get(0);
-			
-			String destinationString = instructionParts.get(2).substring(1); //Trim leading 'r' off			
+			String destinationString;
 			int destination;
+			
+			try {
+				destinationString = instructionParts.get(2).substring(1); //Trim leading 'r' off			
+			}
+			catch (IndexOutOfBoundsException iob) { //Occurs if less than 2 arguments specified
+				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Ensure that\n" + instructionParts.get(0) +
+						" instructions have two arguments/fields.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+				return null; //Prevent further parsing
+			}
 			
 			if (destinationString.equals("CC")) { //A load instruction may reference condition code/status register
 				destination = 16;
@@ -258,6 +266,7 @@ public class AssemblerImpl implements Assembler {
 							"Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 					return null; //Prevent further parsing
 				}
+				
 			}				
 			
 			int source;
@@ -331,10 +340,20 @@ public class AssemblerImpl implements Assembler {
 				instructionParts.get(0).equals("MUL")) {
 			
 			String opcode = instructionParts.get(0);
-							
+			String sourceString;				
 			//Register source, register destination
-			String sourceString = instructionParts.get(1).substring(1);
+			
+			//Ensure instruction has right number of fields
+			try {
+				sourceString = instructionParts.get(1).substring(1);
+			}
+			catch (IndexOutOfBoundsException iob) {
+				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Ensure that\n" + instructionParts.get(0) +
+						" instructions have two arguments/fields.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+				return null; //Prevent further parsing
+			}
 			int source;
+			
 			try {
 				source = Integer.parseInt(sourceString);
 				if (source < 0 || source > 16) { //rCC references allowed in MOVE instruction (ArithmeticInstr catches error)
@@ -355,10 +374,25 @@ public class AssemblerImpl implements Assembler {
 						JOptionPane.WARNING_MESSAGE);
 				return null; //Prevent further parsing
 			}
+			catch (IndexOutOfBoundsException iob) {
+				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Ensure that\n" + instructionParts.get(0) +
+						" instructions have two arguments/fields.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+				return null; //Prevent further parsing
+			}
 			
 			int destination;
+			String destinationString;
 			
-			String destinationString = instructionParts.get(2).substring(1); //Trim leading 'r' off
+			//Ensure there is a destination field
+			try {			
+				destinationString = instructionParts.get(2).substring(1); //Trim leading 'r' off
+			}
+			catch (IndexOutOfBoundsException iob) {
+				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Ensure that\n" + instructionParts.get(0) +
+						" instructions have two arguments/fields.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+				return null; //Prevent further parsing
+			}
+			
 			if (destinationString.equals("CC")) { //A load instruction may reference condition code/status register
 				destination = 16;
 			}
@@ -440,6 +474,13 @@ public class AssemblerImpl implements Assembler {
 		//These opcodes have the same instruction format; just a symbolic memory address
 		else if (instructionParts.get(0).equals("BR") || instructionParts.get(0).equals("BRZ")) {
 			String opcode = instructionParts.get(0);
+			
+			if (instructionParts.size() > 2) {
+				JOptionPane.showMessageDialog(null, "Assembly program syntax error: " + opcode + " insructions \n" +
+						" should have one target field.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+				return null; //Prevent assembly
+			}
+			
 			System.out.println(lookupTable);
 			int destination;
 			
@@ -468,8 +509,8 @@ public class AssemblerImpl implements Assembler {
 			
 			if (instructionParts.size() > 1) {
 				JOptionPane.showMessageDialog(null, "Assembly program syntax error: " + opcode + " insructions \n" +
-						" should not have any reference/target fields.");
-				return null;
+						" should not have any reference/target fields.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+				return null; //Prevent assembly
 			}
 			
 			if (opcode.equals("SKZ")) {
