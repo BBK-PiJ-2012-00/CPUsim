@@ -193,319 +193,319 @@ public class ExecuteStageTest {
 	 * So it must be checked that register 0 contains the operand (1000) contained at address 50, for the successful
 	 * execution of a LOAD instruction.
 	 */
-//	@Test
-//	public void testInstructionExecuteLOAD() { //Test execution of LOAD instruction
-//		//Load a LOAD instruction into memory address, and prompt a fetch which will call decode, and then execute
-//		memory.notifyWrite(0, testInstrLOAD); //load test instruction into address 0
-//		fetchDecodeStage.instructionFetch(); //This should result in r0 containing 1000
-//		int opcode = fetchDecodeStage.instructionDecode(); //Returns opcode value, to be passed to execute stage
-//		executeStage.instructionExecute(opcode);
-//		
-//		Operand output = (Operand) genRegisters.read(0);
-//		Operand expected = new OperandImpl(1000);
-//		assertEquals(expected, output);	
-//	}
-//	
-//	
-//	@Test
-//	public void testInstructionExecuteSTORE() { //Test execution of STORE instruction
-//		Operand operand = new OperandImpl(5000);
-//		//Firstly, load an operand (5000) into r0
-//		genRegisters.write(0, operand);
-//		//Now load a store instruction into memory address 0, ready for fetch
-//		memory.notifyWrite(0, testInstrSTORE);
-//		fetchDecodeStage.instructionFetch();
-//		int opcode = fetchDecodeStage.instructionDecode();
-//		executeStage.instructionExecute(opcode);
-//		//Should result in operand 5000 being stored at address 99
-//		
-//		Data expected = operand;
-//		Data output = memory.accessAddress(99);
-//		assertEquals(expected, output);		
-//	}
-//	
-//	
-//	@Test
-//	public void testInstructionExecuteMOVE() { //Test execution of MOVE instruction
-//		Operand operand = new OperandImpl(5000);
-//		//Load operand to r0
-//		genRegisters.write(0, operand);
-//		//Load MOVE instruction to memory address 0
-//		memory.notifyWrite(0, testInstrMOVE);
-//		//Fetch and execute the instruction; operand should end up in r15 (see testInstrMOVE in setup)
-//		fetchDecodeStage.instructionFetch();
-//		int opcode = fetchDecodeStage.instructionDecode();
-//		executeStage.instructionExecute(opcode);
-//		
-//		Operand expected = operand;
-//		Operand output = (Operand) genRegisters.read(15);
-//		assertEquals(expected, output);
-//	}
-//	
-//	
-//	@Test
-//	public void testInstructionExecuteMOVE2() { //Tests moving from register to condition code register
-//		Operand operand = new OperandImpl(5000);
-//		//Load operand to r0
-//		genRegisters.write(0, operand);
-//		//Load MOVE instruction to memory address 0
-//		memory.notifyWrite(0, testInstrMOVErCC);
-//		//Fetch and execute the instruction; operand should end up in rCC (see testInstrMOVErCC in setup)
-//		fetchDecodeStage.instructionFetch();
-//		int opcode = fetchDecodeStage.instructionDecode();
-//		executeStage.instructionExecute(opcode);
-//		
-//		assertEquals(operand, statusRegister.read());//r0 should be null after move of operand to r15
-//	}
-//	
-//	
-//	
-//	@Test
-//	public void testInstructionExecuteADD() { //Test execution of ADD instruction
-//		//testInstrADD -> Add contents of r2 and r4, storing in r2
-//		//Load operands into r2 and r4, for use by testInstrADD detailed in setUp.
-//		genRegisters.write(2, new OperandImpl(5));
-//		genRegisters.write(4, new OperandImpl(7));
-//		//Put the ADD instruction into memory for fetching
-//		memory.notifyWrite(0, testInstrADD);
-//		fetchDecodeStage.instructionFetch();
-//		int opcode = fetchDecodeStage.instructionDecode();
-//		
-//		executeStage.instructionExecute(opcode);
-//		
-//		Operand expected = new OperandImpl(12); //12 should be present in r2 (5 + 7)
-//		Operand output = (Operand) genRegisters.read(2);
-//		assertEquals(expected, output);
-//	}
-//	
-//	
-//	@Test
-//	public void testInstructionExecuteSUB() { //Test execution of SUB instruction
-//		//Load operands into r9 and r10, for use by testInstrSUB
-//		genRegisters.write(9, new OperandImpl(50));
-//		genRegisters.write(10, new OperandImpl(25));
-//		//Put the SUB instruction into memory for fetching
-//		memory.notifyWrite(0, testInstrSUB);
-//		fetchDecodeStage.instructionFetch();
-//		int opcode = fetchDecodeStage.instructionDecode();
-//		
-//		executeStage.instructionExecute(opcode);
-//		
-//		Operand expected = new OperandImpl(25); //25 should be present in r9 (50 - 25)
-//		Operand output = (Operand) genRegisters.read(9);
-//		assertEquals(expected, output);
-//	}
-//	
-//	
-//	@Test
-//	public void testInstructionExecuteDIV() { //Test execution of DIV instruction
-//		//testInstrDIV -> Divide contents of r3 by contents of r12, storing in r3
-//		//Load operands into r3 and r12, for use by testInstrDIV
-//		genRegisters.write(3, new OperandImpl(40));
-//		genRegisters.write(12, new OperandImpl(10));
-//		//Put the DIV instruction into memory for fetching
-//		memory.notifyWrite(0, testInstrDIV);
-//		fetchDecodeStage.instructionFetch();
-//		int opcode = fetchDecodeStage.instructionDecode();
-//		
-//		executeStage.instructionExecute(opcode);
-//		
-//		Operand expected = new OperandImpl(4); //4 should be present in r3 (40 / 10)
-//		Operand output = (Operand) genRegisters.read(3);
-//		assertEquals(expected, output);
-//	}
-//	
-//	
-//	@Test
-//	public void testInstructionExecuteMUL() { //Test execution of MUL instruction
-//		//testInstrMUL -> Multiply contents of r5 by contents of r8, storing in r5
-//		//Load operands into r5 and r8, for use by testInstrMUL
-//		genRegisters.write(5, new OperandImpl(7));
-//		genRegisters.write(8, new OperandImpl(11));
-//		//Put the MUL instruction into memory for fetching
-//		memory.notifyWrite(0, testInstrMUL);
-//		fetchDecodeStage.instructionFetch();
-//		int opcode = fetchDecodeStage.instructionDecode();
-//		
-//		executeStage.instructionExecute(opcode);
-//		
-//		Operand expected = new OperandImpl(77); //77 should be present in r5 (7 * 11)
-//		Operand output = (Operand) genRegisters.read(5);
-//		assertEquals(expected, output);
-//	}
-//	
-//	
-//	@Test
-//	public void testInstructionExecuteBR() { //Test BR instruction execution
-//		//testInstrBR -> Branch to memory address 10
-//		//Load testInstrBR to memory address 0 for fetching
-//		memory.notifyWrite(0, testInstrBR);
-//		fetchDecodeStage.instructionFetch();
-//		int opcode = fetchDecodeStage.instructionDecode();
-//		
-//		executeStage.instructionExecute(opcode);
-//		
-//		int expected = 10; //Expect PC to now point to memory address 10
-//		int output = pc.getValue();
-//		assertEquals(expected, output);
-//	}
-//	
-//	
-//	@Test
-//	public void testInstructionExecuteBRZ_branchTaken() { //Test BRZ execution
-//		//testInstrBRZ -> Branch to memory address 37
-//		memory.notifyWrite(0, testInstrBRZ); //Load memory address 0 with branch instruction
-//		statusRegister.write(new OperandImpl(0)); //Set status register to hold 0
-//
-//		fetchDecodeStage.instructionFetch();
-//		int opcode = fetchDecodeStage.instructionDecode();
-//		
-//		executeStage.instructionExecute(opcode);
-//		
-//		int expected = 37; //PC should hold 37, as the branch should be taken
-//		int output = pc.getValue();
-//		assertEquals(expected, output);
-//	}
-//	
-//	
-//	@Test
-//	public void testInstructionExecuteBRZ_branchNotTaken() { //Test BRZ execution
-//		//testInstrBRZ -> Branch to memory address 37
-//		memory.notifyWrite(0, testInstrBRZ); //Load memory address 0 with branch instruction
-//		statusRegister.write(new OperandImpl(3)); //Set status register to hold 3
-//		fetchDecodeStage.instructionFetch();
-//		int opcode = fetchDecodeStage.instructionDecode();
-//		
-//		executeStage.instructionExecute(opcode);
-//		
-//		int expected = 1; //PC 1, as branch should not be taken
-//		int output = pc.getValue();
-//		assertEquals(expected, output);
-//	}
-//	
-//	
-//	@Test
-//	public void testInstructionExecuteSKZ() { //Test SKZ execution
-//		memory.notifyWrite(0, testInstrSKZ); //Load memory address 0 with branch instruction
-//		statusRegister.write(new OperandImpl(0)); //Set status register to hold 0
-//		fetchDecodeStage.instructionFetch(); //Fetch and execute SKZ instruction
-//		int opcode = fetchDecodeStage.instructionDecode();
-//		
-//		executeStage.instructionExecute(opcode);
-//		
-//		int expected = 2; //PC should = 2, as branch should be taken (meaning PC is incremented)
-//		int output = pc.getValue();
-//		assertEquals(expected, output);
-//	}
-//	
-//	@Test
-//	public void testInstructionExecuteSKZ_branchNotTaken() { //Test SKZ execution
-//		memory.notifyWrite(0, testInstrSKZ); //Load memory address 0 with branch instruction
-//		statusRegister.write(new OperandImpl(1)); //Set status register to hold 1
-//		fetchDecodeStage.instructionFetch(); //Fetch and execute SKZ instruction
-//		int opcode = fetchDecodeStage.instructionDecode();
-//		
-//		executeStage.instructionExecute(opcode);
-//		
-//		int expected = 1; //PC should = 1, as branch should not be taken
-//		int output = pc.getValue();
-//		assertEquals(expected, output);
-//	}
-//	
-//	
-//	@Test
-//	public void testInstructionExecuteBRE_branchTaken() { //Test BRE execution
-//		//testInstrBRE -> Branch to address 92 if contents of r1 equals contents of status reg
-//		memory.notifyWrite(0, testInstrBRE); //Load memory address 0 with branch instruction
-//		statusRegister.write(new OperandImpl(23)); //Set status register to hold 23
-//		genRegisters.write(1, new OperandImpl(23)); //Set r1 to hold 23
-//		fetchDecodeStage.instructionFetch(); //Fetch and execute BRE instruction
-//		int opcode = fetchDecodeStage.instructionDecode();
-//		
-//		executeStage.instructionExecute(opcode);
-//		
-//		int expected = 92; //PC should = 92, as branch should be taken
-//		int output = pc.getValue();
-//		assertEquals(expected, output);		
-//	}
-//	
-//	
-//	@Test
-//	public void testInstructionExecuteBRE_branchNotTaken() { //Test BRE execution
-//		//testInstrBRE -> Branch to address 92 if contents of r1 equals contents of status reg
-//		memory.notifyWrite(0, testInstrBRE); //Load memory address 0 with branch instruction
-//		statusRegister.write(new OperandImpl(23)); //Set status register to hold 23
-//		genRegisters.write(1, new OperandImpl(20)); //Set r1 to hold 20
-//		fetchDecodeStage.instructionFetch(); //Fetch and execute BRE instruction
-//		int opcode = fetchDecodeStage.instructionDecode();
-//		
-//		executeStage.instructionExecute(opcode);
-//		
-//		int expected = 1; //PC should = 1, as branch should not be taken
-//		int output = pc.getValue();
-//		assertEquals(expected, output);		
-//	}	
-//	
-//	
-//	
-//	@Test
-//	public void testInstructionExecuteBRNE_branchTaken() { //Test BRNE execution
-//		//testInstrBRNE -> Branch to addr. 77 if contents of r6 doesn't equal contents of s. reg.
-//		memory.notifyWrite(0, testInstrBRNE); //Load test Instr to address 0
-//		statusRegister.write(new OperandImpl(14)); //Set status register to hold 14
-//		genRegisters.write(6, new OperandImpl(11)); //Set r6 to hold 11
-//		fetchDecodeStage.instructionFetch(); //Fetch and execute BRNE instruction
-//		int opcode = fetchDecodeStage.instructionDecode();
-//		
-//		executeStage.instructionExecute(opcode);
-//		
-//		int expected = 77; //PC should hold 77 (branch should be taken)
-//		int output = pc.getValue();
-//		assertEquals(expected, output);
-//	}
-//	
-//	
-//	@Test
-//	public void testInstructionExecuteBRNE_branchNotTaken() { //Test BRNE execution
-//		//testInstrBRNE -> Branch to addr. 77 if contents of r6 doesn't equal contents of s. reg.
-//		memory.notifyWrite(0, testInstrBRNE); //Load test Instr to address 0
-//		statusRegister.write(new OperandImpl(14)); //Set status register to hold 14
-//		genRegisters.write(6, new OperandImpl(14)); //Set r6 to hold 14
-//		fetchDecodeStage.instructionFetch(); //Fetch and execute BRNE instruction
-//		int opcode = fetchDecodeStage.instructionDecode();
-//		
-//		executeStage.instructionExecute(opcode);
-//		
-//		int expected = 1; //PC should hold 1 (branch should not be taken)
-//		int output = pc.getValue();
-//		assertEquals(expected, output);
-//	}
-//	
-//	
-//	@Test
-//	public void testInstructionHALT_returnsFalse() { //Check HALT instruction returns false
-//		memory.notifyWrite(0, testInstrHALT);
-//		fetchDecodeStage.instructionFetch(); //Fetch and execute HALT instruction
-//		int opcode = fetchDecodeStage.instructionDecode();
-//		
-//		boolean result = executeStage.instructionExecute(opcode);
-//		
-//		assertFalse(result);
-//	}
-//	
-//	//Test loading condition code register
-//	@Test
-//	public void testInstructionLOAD_statusRegister() {
-//		memory.notifyWrite(0, new TransferInstr(Opcode.LOAD, 50, 16)); //16 refers to status register
-//		fetchDecodeStage.instructionFetch();
-//		int opcode = fetchDecodeStage.instructionDecode();
-//		executeStage.instructionExecute(opcode);
-//		
-//		Operand expected = new OperandImpl(1000); //Value of operand stored in memory address 50
-//		Operand output = statusRegister.read();
-//		
-//		assertEquals(expected, output);
-//	}
+	@Test
+	public void testInstructionExecuteLOAD() { //Test execution of LOAD instruction
+		//Load a LOAD instruction into memory address, and prompt a fetch which will call decode, and then execute
+		memory.notifyWrite(0, testInstrLOAD); //load test instruction into address 0
+		fetchDecodeStage.instructionFetch(); //This should result in r0 containing 1000
+		int opcode = fetchDecodeStage.instructionDecode(); //Returns opcode value, to be passed to execute stage
+		executeStage.instructionExecute(opcode);
+		
+		Operand output = (Operand) genRegisters.read(0);
+		Operand expected = new OperandImpl(1000);
+		assertEquals(expected, output);	
+	}
+	
+	
+	@Test
+	public void testInstructionExecuteSTORE() { //Test execution of STORE instruction
+		Operand operand = new OperandImpl(5000);
+		//Firstly, load an operand (5000) into r0
+		genRegisters.write(0, operand);
+		//Now load a store instruction into memory address 0, ready for fetch
+		memory.notifyWrite(0, testInstrSTORE);
+		fetchDecodeStage.instructionFetch();
+		int opcode = fetchDecodeStage.instructionDecode();
+		executeStage.instructionExecute(opcode);
+		//Should result in operand 5000 being stored at address 99
+		
+		Data expected = operand;
+		Data output = memory.accessAddress(99);
+		assertEquals(expected, output);		
+	}
+	
+	
+	@Test
+	public void testInstructionExecuteMOVE() { //Test execution of MOVE instruction
+		Operand operand = new OperandImpl(5000);
+		//Load operand to r0
+		genRegisters.write(0, operand);
+		//Load MOVE instruction to memory address 0
+		memory.notifyWrite(0, testInstrMOVE);
+		//Fetch and execute the instruction; operand should end up in r15 (see testInstrMOVE in setup)
+		fetchDecodeStage.instructionFetch();
+		int opcode = fetchDecodeStage.instructionDecode();
+		executeStage.instructionExecute(opcode);
+		
+		Operand expected = operand;
+		Operand output = (Operand) genRegisters.read(15);
+		assertEquals(expected, output);
+	}
+	
+	
+	@Test
+	public void testInstructionExecuteMOVE2() { //Tests moving from register to condition code register
+		Operand operand = new OperandImpl(5000);
+		//Load operand to r0
+		genRegisters.write(0, operand);
+		//Load MOVE instruction to memory address 0
+		memory.notifyWrite(0, testInstrMOVErCC);
+		//Fetch and execute the instruction; operand should end up in rCC (see testInstrMOVErCC in setup)
+		fetchDecodeStage.instructionFetch();
+		int opcode = fetchDecodeStage.instructionDecode();
+		executeStage.instructionExecute(opcode);
+		
+		assertEquals(operand, statusRegister.read());//r0 should be null after move of operand to r15
+	}
+	
+	
+	
+	@Test
+	public void testInstructionExecuteADD() { //Test execution of ADD instruction
+		//testInstrADD -> Add contents of r2 and r4, storing in r2
+		//Load operands into r2 and r4, for use by testInstrADD detailed in setUp.
+		genRegisters.write(2, new OperandImpl(5));
+		genRegisters.write(4, new OperandImpl(7));
+		//Put the ADD instruction into memory for fetching
+		memory.notifyWrite(0, testInstrADD);
+		fetchDecodeStage.instructionFetch();
+		int opcode = fetchDecodeStage.instructionDecode();
+		
+		executeStage.instructionExecute(opcode);
+		
+		Operand expected = new OperandImpl(12); //12 should be present in r2 (5 + 7)
+		Operand output = (Operand) genRegisters.read(2);
+		assertEquals(expected, output);
+	}
+	
+	
+	@Test
+	public void testInstructionExecuteSUB() { //Test execution of SUB instruction
+		//Load operands into r9 and r10, for use by testInstrSUB
+		genRegisters.write(9, new OperandImpl(50));
+		genRegisters.write(10, new OperandImpl(25));
+		//Put the SUB instruction into memory for fetching
+		memory.notifyWrite(0, testInstrSUB);
+		fetchDecodeStage.instructionFetch();
+		int opcode = fetchDecodeStage.instructionDecode();
+		
+		executeStage.instructionExecute(opcode);
+		
+		Operand expected = new OperandImpl(25); //25 should be present in r9 (50 - 25)
+		Operand output = (Operand) genRegisters.read(9);
+		assertEquals(expected, output);
+	}
+	
+	
+	@Test
+	public void testInstructionExecuteDIV() { //Test execution of DIV instruction
+		//testInstrDIV -> Divide contents of r3 by contents of r12, storing in r3
+		//Load operands into r3 and r12, for use by testInstrDIV
+		genRegisters.write(3, new OperandImpl(40));
+		genRegisters.write(12, new OperandImpl(10));
+		//Put the DIV instruction into memory for fetching
+		memory.notifyWrite(0, testInstrDIV);
+		fetchDecodeStage.instructionFetch();
+		int opcode = fetchDecodeStage.instructionDecode();
+		
+		executeStage.instructionExecute(opcode);
+		
+		Operand expected = new OperandImpl(4); //4 should be present in r3 (40 / 10)
+		Operand output = (Operand) genRegisters.read(3);
+		assertEquals(expected, output);
+	}
+	
+	
+	@Test
+	public void testInstructionExecuteMUL() { //Test execution of MUL instruction
+		//testInstrMUL -> Multiply contents of r5 by contents of r8, storing in r5
+		//Load operands into r5 and r8, for use by testInstrMUL
+		genRegisters.write(5, new OperandImpl(7));
+		genRegisters.write(8, new OperandImpl(11));
+		//Put the MUL instruction into memory for fetching
+		memory.notifyWrite(0, testInstrMUL);
+		fetchDecodeStage.instructionFetch();
+		int opcode = fetchDecodeStage.instructionDecode();
+		
+		executeStage.instructionExecute(opcode);
+		
+		Operand expected = new OperandImpl(77); //77 should be present in r5 (7 * 11)
+		Operand output = (Operand) genRegisters.read(5);
+		assertEquals(expected, output);
+	}
+	
+	
+	@Test
+	public void testInstructionExecuteBR() { //Test BR instruction execution
+		//testInstrBR -> Branch to memory address 10
+		//Load testInstrBR to memory address 0 for fetching
+		memory.notifyWrite(0, testInstrBR);
+		fetchDecodeStage.instructionFetch();
+		int opcode = fetchDecodeStage.instructionDecode();
+		
+		executeStage.instructionExecute(opcode);
+		
+		int expected = 10; //Expect PC to now point to memory address 10
+		int output = pc.getValue();
+		assertEquals(expected, output);
+	}
+	
+	
+	@Test
+	public void testInstructionExecuteBRZ_branchTaken() { //Test BRZ execution
+		//testInstrBRZ -> Branch to memory address 37
+		memory.notifyWrite(0, testInstrBRZ); //Load memory address 0 with branch instruction
+		statusRegister.write(new OperandImpl(0)); //Set status register to hold 0
+
+		fetchDecodeStage.instructionFetch();
+		int opcode = fetchDecodeStage.instructionDecode();
+		
+		executeStage.instructionExecute(opcode);
+		
+		int expected = 37; //PC should hold 37, as the branch should be taken
+		int output = pc.getValue();
+		assertEquals(expected, output);
+	}
+	
+	
+	@Test
+	public void testInstructionExecuteBRZ_branchNotTaken() { //Test BRZ execution
+		//testInstrBRZ -> Branch to memory address 37
+		memory.notifyWrite(0, testInstrBRZ); //Load memory address 0 with branch instruction
+		statusRegister.write(new OperandImpl(3)); //Set status register to hold 3
+		fetchDecodeStage.instructionFetch();
+		int opcode = fetchDecodeStage.instructionDecode();
+		
+		executeStage.instructionExecute(opcode);
+		
+		int expected = 1; //PC 1, as branch should not be taken
+		int output = pc.getValue();
+		assertEquals(expected, output);
+	}
+	
+	
+	@Test
+	public void testInstructionExecuteSKZ() { //Test SKZ execution
+		memory.notifyWrite(0, testInstrSKZ); //Load memory address 0 with branch instruction
+		statusRegister.write(new OperandImpl(0)); //Set status register to hold 0
+		fetchDecodeStage.instructionFetch(); //Fetch and execute SKZ instruction
+		int opcode = fetchDecodeStage.instructionDecode();
+		
+		executeStage.instructionExecute(opcode);
+		
+		int expected = 2; //PC should = 2, as branch should be taken (meaning PC is incremented)
+		int output = pc.getValue();
+		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void testInstructionExecuteSKZ_branchNotTaken() { //Test SKZ execution
+		memory.notifyWrite(0, testInstrSKZ); //Load memory address 0 with branch instruction
+		statusRegister.write(new OperandImpl(1)); //Set status register to hold 1
+		fetchDecodeStage.instructionFetch(); //Fetch and execute SKZ instruction
+		int opcode = fetchDecodeStage.instructionDecode();
+		
+		executeStage.instructionExecute(opcode);
+		
+		int expected = 1; //PC should = 1, as branch should not be taken
+		int output = pc.getValue();
+		assertEquals(expected, output);
+	}
+	
+	
+	@Test
+	public void testInstructionExecuteBRE_branchTaken() { //Test BRE execution
+		//testInstrBRE -> Branch to address 92 if contents of r1 equals contents of status reg
+		memory.notifyWrite(0, testInstrBRE); //Load memory address 0 with branch instruction
+		statusRegister.write(new OperandImpl(23)); //Set status register to hold 23
+		genRegisters.write(1, new OperandImpl(23)); //Set r1 to hold 23
+		fetchDecodeStage.instructionFetch(); //Fetch and execute BRE instruction
+		int opcode = fetchDecodeStage.instructionDecode();
+		
+		executeStage.instructionExecute(opcode);
+		
+		int expected = 92; //PC should = 92, as branch should be taken
+		int output = pc.getValue();
+		assertEquals(expected, output);		
+	}
+	
+	
+	@Test
+	public void testInstructionExecuteBRE_branchNotTaken() { //Test BRE execution
+		//testInstrBRE -> Branch to address 92 if contents of r1 equals contents of status reg
+		memory.notifyWrite(0, testInstrBRE); //Load memory address 0 with branch instruction
+		statusRegister.write(new OperandImpl(23)); //Set status register to hold 23
+		genRegisters.write(1, new OperandImpl(20)); //Set r1 to hold 20
+		fetchDecodeStage.instructionFetch(); //Fetch and execute BRE instruction
+		int opcode = fetchDecodeStage.instructionDecode();
+		
+		executeStage.instructionExecute(opcode);
+		
+		int expected = 1; //PC should = 1, as branch should not be taken
+		int output = pc.getValue();
+		assertEquals(expected, output);		
+	}	
+	
+	
+	
+	@Test
+	public void testInstructionExecuteBRNE_branchTaken() { //Test BRNE execution
+		//testInstrBRNE -> Branch to addr. 77 if contents of r6 doesn't equal contents of s. reg.
+		memory.notifyWrite(0, testInstrBRNE); //Load test Instr to address 0
+		statusRegister.write(new OperandImpl(14)); //Set status register to hold 14
+		genRegisters.write(6, new OperandImpl(11)); //Set r6 to hold 11
+		fetchDecodeStage.instructionFetch(); //Fetch and execute BRNE instruction
+		int opcode = fetchDecodeStage.instructionDecode();
+		
+		executeStage.instructionExecute(opcode);
+		
+		int expected = 77; //PC should hold 77 (branch should be taken)
+		int output = pc.getValue();
+		assertEquals(expected, output);
+	}
+	
+	
+	@Test
+	public void testInstructionExecuteBRNE_branchNotTaken() { //Test BRNE execution
+		//testInstrBRNE -> Branch to addr. 77 if contents of r6 doesn't equal contents of s. reg.
+		memory.notifyWrite(0, testInstrBRNE); //Load test Instr to address 0
+		statusRegister.write(new OperandImpl(14)); //Set status register to hold 14
+		genRegisters.write(6, new OperandImpl(14)); //Set r6 to hold 14
+		fetchDecodeStage.instructionFetch(); //Fetch and execute BRNE instruction
+		int opcode = fetchDecodeStage.instructionDecode();
+		
+		executeStage.instructionExecute(opcode);
+		
+		int expected = 1; //PC should hold 1 (branch should not be taken)
+		int output = pc.getValue();
+		assertEquals(expected, output);
+	}
+	
+	
+	@Test
+	public void testInstructionHALT_returnsFalse() { //Check HALT instruction returns false
+		memory.notifyWrite(0, testInstrHALT);
+		fetchDecodeStage.instructionFetch(); //Fetch and execute HALT instruction
+		int opcode = fetchDecodeStage.instructionDecode();
+		
+		boolean result = executeStage.instructionExecute(opcode);
+		
+		assertFalse(result);
+	}
+	
+	//Test loading condition code register
+	@Test
+	public void testInstructionLOAD_statusRegister() {
+		memory.notifyWrite(0, new TransferInstr(Opcode.LOAD, 50, 16)); //16 refers to status register
+		fetchDecodeStage.instructionFetch();
+		int opcode = fetchDecodeStage.instructionDecode();
+		executeStage.instructionExecute(opcode);
+		
+		Operand expected = new OperandImpl(1000); //Value of operand stored in memory address 50
+		Operand output = statusRegister.read();
+		
+		assertEquals(expected, output);
+	}
 	
 	
 	/*
