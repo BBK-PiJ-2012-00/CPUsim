@@ -39,18 +39,23 @@ import code.WriteBackStage;
 
 /*
  * Most Stage functionality is tested in tests more specific to each stage; this class is to test
- * that the accessMemory() method is synchronized. This is tested by using an assembly file that
- * would cause errors (from null pointers to class cast exceptions (caused by the fetch stage
- * treating operands loaded into the MBR by a STORE or LOAD instruction as instructions), to the wrong 
- * operands ending up in the wrong registers) if instructions were allowed to be fetched at the same
- * time as LOAD or STORE operations were taking place.  This is not a system bus issue but rather
+ * that the accessMemory() prevents read/write conflicts with the MAR and MBR registers when the simulator
+ * is launched in pipelined mode.  The accessMemory() method is used in pipelined
+ * execution to encapsulate operations that require memory access, preventing multiple threads from accessing
+ * memory at the same time and thus protecting the integrity of the MAR and MBR registers.
+ * 
+ * This is tested by using an assembly file that would cause errors if instructions were allowed to be fetched at the same
+ * time as LOAD or STORE operations were taking place (errors ranging from null pointers to class cast exceptions 
+ * caused by the fetch stage treating operands loaded into the MBR by a STORE or LOAD instruction as instructions), to the wrong 
+ * operands ending up in the wrong registers).  This is not a system bus issue but rather
  * stems from, for example, an address being placed into the MAR in order to instigate an instruction
  * fetch, but before the address in the MAR can be passed to the system bus, the execution of a LOAD instruction
  * by the other thread in the execute stage causes an operand address to be written to the MAR.  As a result,
  * an operand is fetched back into the MBR from memory and the fetch stage attempts to treat this as instruction,
- * causing an error.  This is just one of many scenarios.
+ * causing an error.
  * 
- *  The assembly file used with this test consists of LOAD and STORE instructions to try and cause this situation.
+ *  The assembly file used with this test consists of multiple successive LOAD and STORE instructions that would cause
+ *  conflicts if their execution is not controlled by the accessMemory() method.
  */
 public class StageTest {
 	private FetchDecodeStage fdStage;
