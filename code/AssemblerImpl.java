@@ -232,6 +232,7 @@ public class AssemblerImpl implements Assembler {
 			String destinationString;
 			int destination;
 			
+			//Ensure the instruction has two fields
 			try {
 				destinationString = instructionParts.get(2).substring(1); //Trim leading 'r' off			
 			}
@@ -299,6 +300,7 @@ public class AssemblerImpl implements Assembler {
 		
 		else if (instructionParts.get(0).equals("STORE")) { //This means a register source and memory destination are specified
 			int destination;
+			
 			try {
 				destination = lookupTable.get(instructionParts.get(2)); //Look up symbolic destination
 			}
@@ -307,8 +309,22 @@ public class AssemblerImpl implements Assembler {
 						instructionParts.get(2) + "\" has not been declared.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 				return null; //Prevent further parsing
 			}
+			catch (IndexOutOfBoundsException iob) { //Occurs if less than 2 arguments specified
+				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Ensure that\n" + instructionParts.get(0) +
+						" instructions have two arguments/fields.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+				return null; //Prevent further parsing
+			}
 			
-			String sourceString = instructionParts.get(1).substring(1);//Trim leading 'r' off
+			String sourceString;
+			try {
+				sourceString = instructionParts.get(1).substring(1);//Trim leading 'r' off
+			}
+			catch (IndexOutOfBoundsException iob) { //Occurs if less than 2 arguments specified
+				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Ensure that\n" + instructionParts.get(0) +
+						" instructions have two arguments/fields.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+				return null; //Prevent further parsing
+			}
+			
 			int source;
 			
 			try {
@@ -491,6 +507,11 @@ public class AssemblerImpl implements Assembler {
 				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Label reference \"" + 
 						instructionParts.get(1) + "\" in " + opcode + "\ninstruction has not been declared.", 
 						"Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+				return null; //Prevent further parsing
+			}
+			catch (IndexOutOfBoundsException iob) { //Occurs if less than 2 arguments specified
+				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Ensure that\n" + instructionParts.get(0) +
+						" instructions have two arguments/fields.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 				return null; //Prevent further parsing
 			}
 			
