@@ -511,7 +511,7 @@ public class AssemblerImpl implements Assembler {
 			}
 			catch (IndexOutOfBoundsException iob) { //Occurs if less than 2 arguments specified
 				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Ensure that\n" + instructionParts.get(0) +
-						" instructions have two arguments/fields.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+						" instructions have a target field.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 				return null; //Prevent further parsing
 			}
 			
