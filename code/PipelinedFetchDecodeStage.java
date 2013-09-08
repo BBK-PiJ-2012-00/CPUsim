@@ -5,14 +5,16 @@ import java.util.concurrent.BlockingQueue;
 import javax.swing.SwingUtilities;
 
 public class PipelinedFetchDecodeStage extends FetchDecodeStage {
-	private BlockingQueue<Integer> fetchToExecuteQueue;
+	private BlockingQueue<Instruction> fetchToExecuteQueue;
 	//private boolean active;
 	//private boolean pipelineFlush;
+	
+	private boolean IRshunted;
 
 
 	public PipelinedFetchDecodeStage(BusController systemBus, InstructionRegister ir, ProgramCounter pc,
 			RegisterFile genRegisters, Register statusRegister, MemoryBufferRegister mbr, MemoryAddressRegister mar, 
-			BlockingQueue<Integer> fetchToExecuteQueue) {
+			BlockingQueue<Instruction> fetchToExecuteQueue) {
 		
 		super(systemBus, ir, pc, genRegisters, statusRegister, mbr, mar);
 		this.fetchToExecuteQueue = fetchToExecuteQueue;	
@@ -26,110 +28,8 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	public void instructionFetch() {
 		
 		accessMemory(true, false, false); //Fetch requires access to MAR, MBR and memory; use synchronized block to do this
-										//See Stage super class for details.
+										//See Stage super class for details of fetch.
 		
-//		System.out.println("Entering instructionFetch()");
-//		this.fireUpdate("\n** INSTRUCTION FETCH/DECODE STAGE ** \n");
-//		//getIR().clear(); //Clear previous instruction from display
-//		
-//		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
-//			System.out.println("Entering interrupted block 1");
-//			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
-//			pipelineFlush = true;
-//			return;
-//		}
-//		
-//		getMAR().write(getPC().getValue()); //Write address value in PC to MAR.
-//		
-//		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
-//			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
-//			pipelineFlush = true;
-//			return;
-//		}
-//		
-//		fireUpdate("Memory address from PC placed into MAR \n");
-//		
-////		setWaitStatus(true);
-////		try {
-////			wait();
-////		} catch (InterruptedException e) {
-////			e.printStackTrace();
-////			setWaitStatus(false);
-////			active = false;
-////			return; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-////		}
-////		setWaitStatus(false);
-//		
-//		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
-//			fireUpdate("Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
-//			pipelineFlush = true;
-//			return;
-//		}
-//		
-//		//Transfer address from MAR to system bus, prompting read
-//		boolean successfulTransfer = getSystemBus().transferToMemory(getMAR().read(), null); 
-//		if (!successfulTransfer) { 
-//			//If SwingWorker is cancelled and thread of execution is interrupted, successfulTransfer will be false and the
-//			//method should not execute any further
-//			active = false;
-//			return;
-//		}
-//		//Flushing during system bus operation? 
-//		
-//		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
-//			fireUpdate("Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
-//			pipelineFlush = true;
-//			return;
-//		}
-//		
-//		this.fireUpdate("Load contents of memory address " + getMAR().read() + " into MBR \n");
-//		
-//		
-//		
-////		setWaitStatus(true);
-////		try {
-////			wait();
-////		} catch (InterruptedException e) {
-////			e.printStackTrace();
-////			setWaitStatus(false);
-////			return; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-////		}
-////		setWaitStatus(false);
-//		
-//		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
-//			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
-//			pipelineFlush = true;
-//			return;
-//		}
-//		
-//		
-//		
-//		System.out.println("Ln102, attempting to cast: " + getMBR().read());
-//		//A Data item should now be in MBR
-//		getIR().loadIR((Instruction) getMBR().read()); //Cast required as mbr holds type data, IR type Instruction; May need to handle exception
-//		System.out.println("Instruction: " + getMBR().read());
-//		this.fireUpdate("Load contents of MBR into IR \n");
-//		
-//		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
-//			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
-//			pipelineFlush = true;
-//			return;
-//		}
-//		
-////		setWaitStatus(true);
-////		try {
-////			wait();
-////		} catch (InterruptedException e) {
-////			e.printStackTrace();
-////			setWaitStatus(false);
-////			return; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-////		}
-////		setWaitStatus(false);
-//		
-//		getMAR().write(-1);//Reset MAR. Repositioned here for user clarity; mem. addr. remains in MAR until instr. in IR.		
-//		getMBR().write(null); //Clear MBR to reflect that instruction has moved to IR (should it be reset earlier, to better reflect
-//		//movement?)
-//		
 	}
 	//Fetch ends with instruction being loaded into IR.
 	
@@ -144,16 +44,16 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 		
 		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
 			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
-			setPipelineFlush(true);
+			//setPipelineFlush(true);
 			return -1; //Do not continue execution if interrupted (pipeline flush)
 		}
 		
-		getPC().incrementPC(); //Increment PC; done here so that with pipelining, the next instruction can be fetched at this point
-		this.fireUpdate("PC incremented by 1 (ready for next instruction fetch) \n");
+//		getPC().incrementPC(); //Increment PC; done here so that with pipelining, the next instruction can be fetched at this point
+//		this.fireUpdate("PC incremented by 1 (ready for next instruction fetch) \n");
 		
 		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
 			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
-			setPipelineFlush(true);
+			//setPipelineFlush(true);
 			return -1;
 		}
 		
@@ -204,14 +104,17 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	public boolean forward() {
 		Integer opcode = this.getOpcodeValue(); //Get opcode value from superclass to pass to queue
 		try {
-			System.out.println("About to put");
-			if (isPipelineFlush()) {
-				//Don't offer to queue; will possibly result in execution of instruction that should be skipped
-				return false;
-			}
-			fetchToExecuteQueue.put(opcode); //Waits here until put is successful (executeStage thread must be attempting take()).
-			System.out.println("Put successful");
-			((IRfile) getIR()).shuntContents(0, 1); //Move contents of IR register 0 to IR register 1 for use by execute stage
+			System.out.println("FD: Thread ID " + Thread.currentThread().getId() + " about to put instrucion: " + getIR().read(0));
+//			if (isPipelineFlush()) {
+//				//Don't offer to queue; will possibly result in execution of instruction that should be skipped
+//				return false;
+//			}
+			fetchToExecuteQueue.put(getIR().read(0)); //Waits here until put is successful (executeStage thread must be attempting take()).
+			System.out.println("Put " + getIR().read(0) + " successfully");
+			getPC().incrementPC(); //Increment PCdone here in pipelined mode so that it is ONLY incremented if the just-fetched
+			//instruction is accepted by the execute stage, preventing additional instructions being skipped in SKZ or 
+			//branch instructions.
+			this.fireUpdate("PC incremented by 1 (ready for next instruction fetch) \n");
 			if (opcode == 13) { //Don't attempt to fetch another instruction after HALT fetched. Execute stage won't send signal in time.
 				System.out.println("HALT, so no more fetching");
 				return false;
