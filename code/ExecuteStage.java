@@ -1,24 +1,24 @@
 package code;
 
-public abstract class ExecuteStage implements Runnable {
-	private BusController systemBus;
-	
-	private MemoryAddressRegister mar;
-	private MemoryBufferRegister mbr;	
-	
-	private InstructionRegister ir;
-	private ProgramCounter pc;
-	private RegisterFile genRegisters;
-	private Register statusRegister;
-	
-	private WriteBackStage writeBackStage;
-	
-	private boolean active;
-	private int opcode;
+public abstract class ExecuteStage extends Stage {
+//	private BusController systemBus;
+//	
+//	private MemoryAddressRegister mar;
+//	private MemoryBufferRegister mbr;	
+//	
+//	private InstructionRegister ir;
+//	private ProgramCounter pc;
+//	private RegisterFile genRegisters;
+//	private Register statusRegister;
+//	
+//	private WriteBackStage writeBackStage;
+//	
+//	private boolean active;
+//	private int opcode;
 	
 	private UpdateListener updateListener;
 	
-	private boolean isWaiting;
+//	private boolean isWaiting;
 	
 	
 	public ExecuteStage(BusController systemBus, InstructionRegister ir, ProgramCounter pc, RegisterFile genRegisters,
