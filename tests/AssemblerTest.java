@@ -346,9 +346,63 @@ public class AssemblerTest {
 		assertFalse(assembler.assembleCode());
 	}
 	
-	//Just add test to check that operands and instructions can be declared in any order!!	
 	
-	//And that SKZ/HALT instructions won't take arguments.
+	/*
+	 * Tests SKZ/HALT instructions aren't accepted with arguments (HALT instructions use the same
+	 * error handling block).
+	 */
+	@Test
+	public void testBadSKZDeclaration() { 
+		assembler.selectFile(new File("src/testAssemblyPrograms/badSKZ.txt"));
+		assertFalse(assembler.assembleCode());
+	}
+	
+	
+	@Test
+	public void testOutOfOrderDeclaration() { 
+		assembler.selectFile(new File("src/testAssemblyPrograms/outOfOrder.txt"));
+		assertTrue(assembler.assembleCode());
+	}
+	
+	
+	@Test
+	public void testTooFewFieldsLOAD() { //Tests that LOAD/BRE/BRNE (they use the same error handling code block) which do not declare
+										//enough fields are caught.
+		assembler.selectFile(new File("src/testAssemblyPrograms/noFieldsLOAD.txt"));
+		assertFalse(assembler.assembleCode());
+		
+	}
+	
+	@Test
+	public void testTooFewFieldsMOVE() { //Tests that MOVE/arithmetic instructions (they use the same error handling code block) 
+									//which do not declare enough fields are caught.
+		assembler.selectFile(new File("src/testAssemblyPrograms/oneFieldMOVE.txt"));
+		assertFalse(assembler.assembleCode());
+		
+	}
+	
+	@Test
+	public void testTooFewFieldsSTORE() { //Tests that STORE instructions which do not declare enough fields are caught.
+		assembler.selectFile(new File("src/testAssemblyPrograms/oneFieldSTORE.txt"));
+		assertFalse(assembler.assembleCode());
+		
+	}
+	
+	
+	@Test
+	public void testTooFewFieldsBR() { //Tests that BR/BRZ instructions which do not declare enough fields are caught
+										//BR/BRZ instructions use same error handling block
+		assembler.selectFile(new File("src/testAssemblyPrograms/noFieldBR.txt"));
+		assertFalse(assembler.assembleCode());
+		
+	}
+	
+	
+	
+	//BR fields, STore fields
+	
+	
+	
 		
 	
 	
