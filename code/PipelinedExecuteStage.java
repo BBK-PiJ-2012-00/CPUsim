@@ -3,9 +3,9 @@ package code;
 import java.util.concurrent.BlockingQueue;
 
 public class PipelinedExecuteStage extends ExecuteStage {
-	private BlockingQueue<Integer> fetchToExecuteQueue;
+	private BlockingQueue<Instruction> fetchToExecuteQueue;
 	private BlockingQueue<Operand> executeToWriteQueue;
-	private boolean active;
+	//private boolean active;
 	
 	private FetchDecodeStage fetchDecodeStage; //Needed for pipeline flushing
 	private Thread fetchDecodeThread;
@@ -13,8 +13,9 @@ public class PipelinedExecuteStage extends ExecuteStage {
 	
 	public PipelinedExecuteStage(BusController systemBus, InstructionRegister ir, ProgramCounter pc, RegisterFile genRegisters,
 			Register statusRegister, WriteBackStage writeBackStage, MemoryBufferRegister mbr, MemoryAddressRegister mar,
-			BlockingQueue<Integer> fetchToExecuteQueue, BlockingQueue<Operand> executeToWriteQueue, FetchDecodeStage fdStage) {
-		super(systemBus, ir, pc, genRegisters, statusRegister, writeBackStage, mbr, mar);
+			BlockingQueue<Instruction> fetchToExecuteQueue, BlockingQueue<Operand> executeToWriteQueue, FetchDecodeStage fdStage) {
+		
+		super(systemBus, ir, pc, genRegisters, statusRegister, mbr, mar, writeBackStage);
 		
 		this.fetchToExecuteQueue = fetchToExecuteQueue;
 		this.executeToWriteQueue = executeToWriteQueue;
@@ -444,7 +445,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					 if (getCC().read().unwrapInteger() == 0) {
 						 getPC().incrementPC();
 						 fireUpdate("PC set to " + getIR().read(1).getField1() + " as result of " + getIR().read(1).getOpcode() + " operation\n");
-						
+				
 						 pipelineFlush();
 						 
 //			 			setWaitStatus(true);
@@ -481,6 +482,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					 if (getCC().read().equals((Operand) getGenRegisters().read(genRegRef))) { //If equal
 						 getPC().setPC(getIR().read(1).getField1()); //Set PC to equal address in field1 of instruction in ir
 						 fireUpdate("PC set to " + getIR().read(1).getField1() + " as result of " + getIR().read(1).getOpcode() + " operation\n");
+						
 						 
 						 pipelineFlush();
 						 
@@ -576,19 +578,21 @@ public class PipelinedExecuteStage extends ExecuteStage {
 	 * restart the other threads in the event of a pipeline flush.
 	 */
 	public synchronized void run() {
-		active = true;
+		setActive(true);
 		fetchDecodeThread = new Thread(fetchDecodeStage);
 		fetchDecodeThread.start();
-		while (active) {			
+		while (isActive()) {			
 			try {
-				int opcodeValue = this.fetchToExecuteQueue.take();
-				System.out.println("Just taken from queue, opcode value is:" + opcodeValue);
-				System.out.println("IR at 1" + getIR().read(1));
-				active = this.instructionExecute(opcodeValue);
+				Instruction instr = this.fetchToExecuteQueue.take();
+				((IRfile) getIR()).loadIR(1, instr);
+				int opcodeValue = instr.getOpcode().getValue();
+				System.out.println("Just taken " + instr + " from queue");
+				System.out.println("IR at 1 " + getIR().read(1));
+				setActive(this.instructionExecute(opcodeValue));
 			}
 			catch (InterruptedException ex) {
 				ex.printStackTrace();
-				active = false;
+				setActive(false);
 				return;
 			}
 			
@@ -602,7 +606,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 			executeToWriteQueue.put(result);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-			active = false;
+			setActive(false);
 			return false;
 		}
 		return true;
@@ -611,9 +615,10 @@ public class PipelinedExecuteStage extends ExecuteStage {
 	
 	
 	public void pipelineFlush() {
+		System.out.println("** FLUSH **");
 		((PipelinedFetchDecodeStage) fetchDecodeStage).setPipelineFlush(true); //Allows for differentiation between reset and flush
 		fetchDecodeThread.interrupt(); //Poll Thread.isInterrupted() at crucial points
-		getIR().clear(); //Necessary to clear all IR registers?
+		getIR().clear(); //Clear all registers; be wary of clearing third IR register because WB stage may be busy
 		while (fetchDecodeThread.isAlive()); //Wait for f/d thread to terminate
 		fetchDecodeThread = new Thread(fetchDecodeStage); //Must create new thread, as old one cannot be restarted
 		fetchDecodeThread.start(); //Restart f/d thread, which will fetch from new PC address value
