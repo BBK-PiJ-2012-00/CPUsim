@@ -142,25 +142,25 @@ public class StandardFetchDecodeStage extends FetchDecodeStage {
 //		isWaiting = status;
 //	}
 	
-	public BusController getSystemBus() {
-		return getSystemBus();
-	}
-	
-	public MemoryAddressRegister getMAR() {
-		return getMAR();
-	}
-	
-	public MemoryBufferRegister getMBR() {
-		return getMBR();
-	}
-	
-	public InstructionRegister getIR() {
-		return getIR();
-	}
-	
-	public ProgramCounter getPC() {
-		return getPC();
-	}
+//	public BusController getSystemBus() {
+//		return getSystemBus();
+//	}
+//	
+//	public MemoryAddressRegister getMAR() {
+//		return getMAR();
+//	}
+//	
+//	public MemoryBufferRegister getMBR() {
+//		return getMBR();
+//	}
+//	
+//	public InstructionRegister getIR() {
+//		return getIR();
+//	}
+//	
+//	public ProgramCounter getPC() {
+//		return getPC();
+//	}
 	
 	public UpdateListener getUpdateListener() {
 		return this.updateListener;
