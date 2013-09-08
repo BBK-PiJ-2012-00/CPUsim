@@ -345,17 +345,12 @@ public class AssemblerTest {
 		assembler.selectFile(new File("src/testAssemblyPrograms/badBranch.txt"));
 		assertFalse(assembler.assembleCode());
 	}
-
 	
+	//Just add test to check that operands and instructions can be declared in any order!!	
 	
-	
-	
-	
-		
+	//And that SKZ/HALT instructions won't take arguments.
 		
 	
-	//Test error handling (best tested on GUI) file not found, bad assembly language;
 	
-	//Display code is tested using GUI
 
 }

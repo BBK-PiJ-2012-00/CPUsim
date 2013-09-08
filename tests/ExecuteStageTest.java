@@ -16,6 +16,7 @@ import code.ArithmeticInstr;
 import code.Assembler;
 import code.AssemblerImpl;
 import code.BranchInstr;
+import code.BusController;
 import code.CPUbuilder;
 import code.CPUframe;
 import code.ControlUnit;
@@ -61,7 +62,7 @@ public class ExecuteStageTest {
 	
 	private FetchDecodeStage pipelinedFetchDecodeStage;
 	private ExecuteStage pipelinedExecuteStage;
-	private BlockingQueue<Integer> testFetchToExecuteQueue;
+	private BlockingQueue<Instruction> testFetchToExecuteQueue;
 	private BlockingQueue<Operand> testExecuteToWriteQueue;
 	
 	
@@ -127,20 +128,22 @@ public class ExecuteStageTest {
 		statusRegister.registerListener(new UpdateListener(new TestFrame()));
 		
 		
-		fetchDecodeStage = new StandardFetchDecodeStage(builder.getBusController(), mar, mbr, ir, pc);
+		fetchDecodeStage = new StandardFetchDecodeStage(builder.getBusController(), ir, pc, genRegisters, statusRegister,
+				mbr, mar);
 		fetchDecodeStage.registerListener(new UpdateListener(new TestFrame()));
 		writeBackStage = new StandardWriteBackStage(ir, genRegisters);
-		executeStage = new StandardExecuteStage(builder.getBusController(), ir, pc, genRegisters, statusRegister, writeBackStage,
-				mbr, mar);
+		executeStage = new StandardExecuteStage(builder.getBusController(),ir, pc, genRegisters,
+				statusRegister, mbr, mar, writeBackStage);
 		executeStage.registerListener(new UpdateListener(new TestFrame()));
 		
 		memory = builder.getMemoryModule();
 		memory.registerListener(new UpdateListener(new TestFrame()));
 		
+		
 		InstructionRegister irFile = new IRfile();
-		testFetchToExecuteQueue = new SynchronousQueue<Integer>();
-		pipelinedFetchDecodeStage = new PipelinedFetchDecodeStage(builder.getBusController(), mar, mbr,irFile, pc,
-				testFetchToExecuteQueue);
+		testFetchToExecuteQueue = new SynchronousQueue<Instruction>();
+		pipelinedFetchDecodeStage = new PipelinedFetchDecodeStage(builder.getBusController(), irFile, pc, genRegisters, 
+				statusRegister, mbr, mar, testFetchToExecuteQueue);
 		pipelinedFetchDecodeStage.registerListener(new UpdateListener(new TestFrame()));
 		
 		pipelinedExecuteStage = new PipelinedExecuteStage(builder.getBusController(), irFile, pc, genRegisters, statusRegister, 
@@ -173,23 +176,23 @@ public class ExecuteStageTest {
 	}
 
 
-//	@Test
-//	public void testForward() { //Tests forward() method (forwards result of arithmetic operations to write back)
-//		ir.loadIR(testInstrDIV); //Load instruction to IR (should store operand in r3)
-//		executeStage.forward(new OperandImpl(300));
-//		
-//		Operand output = (Operand) genRegisters.read(3); //300 should be in r3 as result of calling forward()
-//		Operand expected = new OperandImpl(300);
-//		
-//		assertEquals(expected, output);		
-//	}
-//	
-//	/*
-//	 * A test operand has been loaded into memory address 50 in the setup. 
-//	 * testInstrLOAD is a LOAD instruction which loads the operand at memory address 50 to register 0
-//	 * So it must be checked that register 0 contains the operand (1000) contained at address 50, for the successful
-//	 * execution of a LOAD instruction.
-//	 */
+	@Test
+	public void testForward() { //Tests forward() method (forwards result of arithmetic operations to write back)
+		ir.loadIR(testInstrDIV); //Load instruction to IR (should store operand in r3)
+		executeStage.forward(new OperandImpl(300));
+		
+		Operand output = (Operand) genRegisters.read(3); //300 should be in r3 as result of calling forward()
+		Operand expected = new OperandImpl(300);
+		
+		assertEquals(expected, output);		
+	}
+	
+	/*
+	 * A test operand has been loaded into memory address 50 in the setup. 
+	 * testInstrLOAD is a LOAD instruction which loads the operand at memory address 50 to register 0
+	 * So it must be checked that register 0 contains the operand (1000) contained at address 50, for the successful
+	 * execution of a LOAD instruction.
+	 */
 //	@Test
 //	public void testInstructionExecuteLOAD() { //Test execution of LOAD instruction
 //		//Load a LOAD instruction into memory address, and prompt a fetch which will call decode, and then execute
@@ -526,7 +529,7 @@ public class ExecuteStageTest {
 		pipelinedExecuteStage.run(); 		
 		Data genRegistersR1 = pipelinedExecuteStage.getGenRegisters().read(1); //Retrieve contents of r1
 		Operand r1Contents = (Operand) genRegistersR1; //Cast to operand
-		assertNull(r1Contents); //r1 contents should be null, as the BR instruction should ensure the operand value 33
+		assertNull(r1Contents); //r1 contents should be null, as the BR instruction should ensure the operand value #33
 								//is never loaded into r1 via LOAD instruction 
 	}
 	
@@ -542,7 +545,7 @@ public class ExecuteStageTest {
 		assembler.loadToLoader();
 		assembler.getLoader().loadToMemory();
 		
-		pipelinedExecuteStage.run(); 		
+		pipelinedExecuteStage.run(); 	
 		Data genRegistersR5 = pipelinedExecuteStage.getGenRegisters().read(5); //Retrieve contents of r5
 		Operand r5Contents = (Operand) genRegistersR5; //Cast to operand
 		assertEquals(12, r5Contents.unwrapInteger()); //Check r5 contains #12
@@ -575,7 +578,7 @@ public class ExecuteStageTest {
 		pipelinedExecuteStage.run(); 		
 		Data genRegistersR5 = pipelinedExecuteStage.getGenRegisters().read(5); //Retrieve contents of r5
 		Operand r5Contents = (Operand) genRegistersR5; //Cast to operand
-		assertEquals(112, r5Contents.unwrapInteger()); //Check r5 contains #12
+		assertEquals(112, r5Contents.unwrapInteger()); //Check r5 contains #112
 	}
 	
 
@@ -589,8 +592,8 @@ public class ExecuteStageTest {
 		pipelinedExecuteStage.run(); 		
 		Data genRegistersR4 = pipelinedExecuteStage.getGenRegisters().read(4); //Retrieve contents of r1
 		Operand r4Contents = (Operand) genRegistersR4; //Cast to operand
-		assertNull(r4Contents); //r1 contents should be null, as the BR instruction should ensure the operand value 33
-								//is never loaded into r1 via LOAD instruction 	
+		assertNull(r4Contents); //r4 contents should be null, as the BR instruction should ensure the operand value #55
+								//is never loaded into r4 via LOAD instruction 	
 		
 	}
 	
@@ -609,6 +612,36 @@ public class ExecuteStageTest {
 		Data genRegistersR7 = pipelinedExecuteStage.getGenRegisters().read(7); //Retrieve contents of r5
 		Operand r7Contents = (Operand) genRegistersR7; //Cast to operand
 		assertEquals(117, r7Contents.unwrapInteger()); //Check r5 contains #12
+		
+	}
+	
+	@Test
+	public void testFlushBRE() {
+		assembler.selectFile(new File("src/testAssemblyPrograms/testBREflush.txt"));
+		assembler.assembleCode();
+		assembler.loadToLoader();
+		assembler.getLoader().loadToMemory();
+		
+		pipelinedExecuteStage.run(); 		
+		Data genRegistersR1 = pipelinedExecuteStage.getGenRegisters().read(1); //Retrieve contents of r1
+		Operand r1Contents = (Operand) genRegistersR1; //Cast to operand
+		assertNull(r1Contents); //r1 contents should be null, as the BRE instruction should ensure the operand value 44
+								//is never loaded into r1 via LOAD instruction 	
+		
+	}
+	
+	
+	@Test
+	public void testFlushBRE2() { //Checks branch target is executed
+		assembler.selectFile(new File("src/testAssemblyPrograms/testBREflush.txt"));
+		assembler.assembleCode();
+		assembler.loadToLoader();
+		assembler.getLoader().loadToMemory();		
+		
+		pipelinedExecuteStage.run(); 		
+		Data genRegistersR5 = pipelinedExecuteStage.getGenRegisters().read(5); //Retrieve contents of r5
+		Operand r5Contents = (Operand) genRegistersR5; //Cast to operand
+		assertEquals(112, r5Contents.unwrapInteger()); //Check r5 contains #112
 		
 	}
 

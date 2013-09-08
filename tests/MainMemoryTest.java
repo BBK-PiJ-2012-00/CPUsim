@@ -63,5 +63,7 @@ public class MainMemoryTest {
 	public void badNotifyRead() { //Test a case that shouldn't work
 		assertFalse(memory.notifyRead(100)); //100 is invalid address
 	}
+	
+	//Test load!!
 
 }

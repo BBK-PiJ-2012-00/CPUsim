@@ -61,7 +61,7 @@ public class FetchDecodeStageTest {
 	
 	private Assembler assembler;
 	
-	private BlockingQueue<Integer> testFetchToExecuteQueue; //This queue emulates the queue that would normally "sit between" the
+	private BlockingQueue<Instruction> testFetchToExecuteQueue; //This queue emulates the queue that would normally "sit between" the
 	//f/d stage object and execute stage object, and is used to coordinate the threads running in the stages during pipelined
 	//execution.
 	
@@ -103,7 +103,7 @@ public class FetchDecodeStageTest {
 				mbr, mar);
 		fetchDecodeStage.registerListener(new UpdateListener(new TestFrame()));
 		
-		testFetchToExecuteQueue = new SynchronousQueue<Integer>(); //Allows this to be used in testing
+		testFetchToExecuteQueue = new SynchronousQueue<Instruction>(); //Allows this to be used in testing
 		
 		pipelinedFDstage = new PipelinedFetchDecodeStage(builder.getBusController(), new IRfile(), pc, genRegisters, statusRegister,
 				mbr, mar, testFetchToExecuteQueue);
@@ -217,14 +217,14 @@ public class FetchDecodeStageTest {
 	public void testInterrupt() {
 		Thread testThread = new Thread(pipelinedFDstage); //A thread running through pipelined FDstage.
 		testThread.start(); //Start the thread, which runs until interrupted (execute stage is responsible for terminating
-		int opcode = 0;
+		Instruction instr;
 		int instructionFetchCount = 0; //Record number of instructions fetched
 		for (int i = 0; i < 5; i++) { //Allow 5 of the 10 instructions in the file to be fetched
 			try {
-				opcode = testFetchToExecuteQueue.take(); //This thread must take from the queue to enable the f/d stage to continue
+				instr = testFetchToExecuteQueue.take(); //This thread must take from the queue to enable the f/d stage to continue
 				//running; the f/d stage thread waits until another thread (in this case this thread) takes the opcode before fetching
 				//the next instruction.
-				System.out.println(opcode);
+				System.out.println(instr);
 				instructionFetchCount++;
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -256,7 +256,7 @@ public class FetchDecodeStageTest {
 		int opcodeValue = 0; 
 		for (int i = 0; i < 10; i ++) { //There are 10 instruction declarations in simpleEquation.txt program used in assembler
 			try {
-				opcodeValue = testFetchToExecuteQueue.take(); //Have THIS thread Take from the queue
+				opcodeValue = testFetchToExecuteQueue.take().getOpcode().getValue(); //Have THIS thread Take from the queue
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

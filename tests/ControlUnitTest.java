@@ -53,13 +53,13 @@ public class ControlUnitTest {
 		 * Listeners are registered with control unit registers to prevent null pointer exceptions during testing,
 		 * although they serve no purpose here.
 		 */
-		controlUnit = new ControlUnitImpl(false); //False parameter deactivates pipelining
+		controlUnit = builder.getControlUnit();
 		controlUnit.getPC().registerListener(new UpdateListener(new TestFrame())); 
 		controlUnit.getIR().registerListener(new UpdateListener(new TestFrame()));
 		controlUnit.getRegisters().registerListener(new UpdateListener(new TestFrame()));
 		//controlUnit.getStatusRegister().registerListener(new UpdateListener(new TestFrame()));
-		//MBR.getInstance().registerListener(new UpdateListener(new TestFrame()));
-		//MAR.getInstance().registerListener(new UpdateListener(new TestFrame()));
+		controlUnit.getMBR().registerListener(new UpdateListener(new TestFrame()));
+		controlUnit.getMAR().registerListener(new UpdateListener(new TestFrame()));
 		
 		controlUnit.getFetchDecodeStage().registerListener(new UpdateListener(new TestFrame()));
 		controlUnit.getExecuteStage().registerListener(new UpdateListener(new TestFrame()));
