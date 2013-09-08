@@ -35,7 +35,11 @@ import code.OperandImpl;
 import code.PC;
 import code.PipelinedFetchDecodeStage;
 import code.ProgramCounter;
+import code.Register;
+import code.RegisterFile;
+import code.RegisterFile16;
 import code.StandardFetchDecodeStage;
+import code.StatusRegister;
 import code.TransferInstr;
 import code.UpdateListener;
 
@@ -50,6 +54,8 @@ public class FetchDecodeStageTest {
 	private FetchDecodeStage pipelinedFDstage;
 	private InstructionRegister ir;
 	private ProgramCounter pc;
+	private RegisterFile genRegisters;
+	private Register statusRegister;
 	
 	private MainMemory memory;	
 	
@@ -77,6 +83,11 @@ public class FetchDecodeStageTest {
 		mar.registerListener(new UpdateListener(new TestFrame()));
 		MemoryBufferRegister mbr = builder.getControlUnit().getMBR();
 		mbr.registerListener(new UpdateListener(new TestFrame()));
+		genRegisters = new RegisterFile16();
+		genRegisters.registerListener(new UpdateListener(new TestFrame()));
+		statusRegister = new StatusRegister();
+		statusRegister.registerListener(new UpdateListener(new TestFrame()));
+		
 		builder.getBusController().accessControlLine().getAddressBus().registerListener(new UpdateListener(new TestFrame()));
 		builder.getBusController().accessControlLine().getDataBus().registerListener(new UpdateListener(new TestFrame()));
 		builder.getBusController().accessControlLine().registerListener(new UpdateListener(new TestFrame()));
@@ -88,14 +99,14 @@ public class FetchDecodeStageTest {
 		ir = builder.getControlUnit().getIR();
 		ir.registerListener(new UpdateListener(new TestFrame()));
 		
-		
-		fetchDecodeStage = new StandardFetchDecodeStage(builder.getBusController(), mar, mbr, ir, pc);
+		fetchDecodeStage = new StandardFetchDecodeStage(builder.getBusController(), ir, pc, genRegisters, statusRegister,
+				mbr, mar);
 		fetchDecodeStage.registerListener(new UpdateListener(new TestFrame()));
 		
 		testFetchToExecuteQueue = new SynchronousQueue<Integer>(); //Allows this to be used in testing
 		
-		pipelinedFDstage = new PipelinedFetchDecodeStage(builder.getBusController(), mar, mbr, new IRfile(), pc,
-				testFetchToExecuteQueue);
+		pipelinedFDstage = new PipelinedFetchDecodeStage(builder.getBusController(), new IRfile(), pc, genRegisters, statusRegister,
+				mbr, mar, testFetchToExecuteQueue);
 		pipelinedFDstage.registerListener(new UpdateListener(new TestFrame()));
 		
 		memory = builder.getMemoryModule();
