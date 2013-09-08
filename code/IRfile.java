@@ -1,34 +1,33 @@
 package code;
 
+/*
+ * For use with pipelined Stages; a file of instruction registers.
+ */
 public class IRfile implements InstructionRegister {
-	Instruction[] irRegisters;
-	int registerPointer; //Points to next available register location
-	
-	private UpdateListener updateListener;
+	private Instruction[] irRegisters;	
+	private UpdateListener updateListener;	
+
 	
 	public IRfile() {
-		irRegisters = new Instruction[3];
-		registerPointer = 0;
+		irRegisters = new Instruction[3]; //Create register file of size 3
 	}
+	
 
 	@Override
 	public void loadIR(Instruction instr) {
-//		irRegisters[registerPointer] = instr;
-//		if (registerPointer == 2) { //Once pointer points to last index of irRegisters, reset to 0 to avoid overflow
-//			registerPointer = 0;
-//		}
-//		else { //If not at the last index, increment by one to next available
-//			registerPointer++;
-//		}
-		irRegisters[0] = instr; //loadIR() only ever called by FetchDecodeStage. When fetch/decode is finished, it is responsible
-							//for moving the instruction to the next register for the execute stage to work with.
-
+		irRegisters[0] = instr; //loadIR() most often called by FetchDecodeStage.
+		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, 0, instr.toString()); //0 represents index
+		updateListener.handleUpDateEvent(updateEvent);
 	}
 	
-	public void shuntContents(int sourceIndex, int destinationIndex) { //For moving contents of one register to another between stages
-		irRegisters[destinationIndex] = irRegisters[sourceIndex];
-		clear(sourceIndex); //Clear source
+	
+	@Override
+	public void loadIR(int index, Instruction instr) { //For use by execute stage in pipelining mode (possibly also by w/b stage).
+		irRegisters[index] = instr;
+		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, index, instr.toString());
+		updateListener.handleUpDateEvent(updateEvent);
 	}
+		
 
 	@Override
 	public Instruction read() {
@@ -50,20 +49,20 @@ public class IRfile implements InstructionRegister {
 	public void clear() {
 		System.out.println("IRfile clear() called.");
 		for (int i = 0; i < irRegisters.length; i++) {
-			irRegisters[i] = null;
+			clear(i);
 		}
 	}
 	
 	@Override
 	public void clear(int index) {
 		irRegisters[index] = null;
+		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, index, "");
+		updateListener.handleUpDateEvent(updateEvent);			
 		
 	}
 
 	@Override
-	public String display() {
-		String displayString = "";
-		
+	public String display() {		
 		return null;
 	}
 

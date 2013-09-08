@@ -49,4 +49,11 @@ public class IR implements InstructionRegister {
 		
 	}
 
+	@Override
+	public void loadIR(int index, Instruction instr) {
+		this.contents = instr;
+		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, this.display());
+		updateListener.handleUpDateEvent(updateEvent);		
+	}
+
 }
