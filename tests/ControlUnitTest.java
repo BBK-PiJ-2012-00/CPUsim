@@ -1,8 +1,10 @@
 package tests;
 
 /*
- * Much of the testing code in this class will be moved and adjusted after the implementation of
- * Stage classes (even if the methods i.e. instructionFetch() remain all but unchanged).
+ * This tests that the stages (both pipelined and standard) work as expected when used via the 
+ * control unit class, as will be the case in the finished simulator. Note that the wait() statements
+ * must be commented out/removed from all Stage classes and the system bus classes in order to run
+ * these tests.
  */
 
 import static org.junit.Assert.*;
