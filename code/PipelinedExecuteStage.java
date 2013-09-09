@@ -7,7 +7,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 	private BlockingQueue<Instruction> executeToWriteQueue;
 	//private boolean active;
 	
-	private FetchDecodeStage fetchDecodeStage; 
+	private FetchDecodeStage fetchDecodeStage; //This has a field as reference is only needed in pipelined mode
 	private Thread fetchDecodeThread;
 	
 	private Thread writeBackThread; //Managed by this stage
@@ -244,8 +244,8 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						return false; //Stop execution
 					}
 					
-					fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
-					fireUpdate("Result operand " + result + " written to r" + getIR().read(1).getField1() + " from ALU\n");
+//					fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
+//					fireUpdate("Result operand " + result + " written to r" + getIR().read(1).getField1() + " from ALU\n");
 					
 //					setWaitStatus(true);
 //					try {
@@ -283,8 +283,8 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					//writeBackStage.run();
 					this.forward(result);
 					
-					fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
-					fireUpdate("Result operand " + result + " written to r" + getIR().read(1).getField1() + " from ALU\n");
+//					fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
+//					fireUpdate("Result operand " + result + " written to r" + getIR().read(1).getField1() + " from ALU\n");
 //					
 //					setWaitStatus(true);
 //					try {
@@ -322,8 +322,8 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					//writeBackStage.run();
 					this.forward(result);
 					
-					fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
-					fireUpdate("Result operand " + result + " written to r" + getIR().read(1).getField1() + " from ALU\n");
+//					fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
+//					fireUpdate("Result operand " + result + " written to r" + getIR().read(1).getField1() + " from ALU\n");
 					
 //					setWaitStatus(true);
 //					try {
@@ -361,8 +361,8 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					//writeBackStage.run();
 					this.forward(result);
 					
-					fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
-					fireUpdate("Result operand " + result + " written to r" + getIR().read(1).getField1() + " from ALU\n");
+//					fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
+//					fireUpdate("Result operand " + result + " written to r" + getIR().read(1).getField1() + " from ALU\n");
 					
 //					setWaitStatus(true);
 //					try {
@@ -580,12 +580,15 @@ public class PipelinedExecuteStage extends ExecuteStage {
 	 * restart the other threads in the event of a pipeline flush.
 	 */
 	public synchronized void run() {
-		setActive(true);
+		
 		fetchDecodeThread = new Thread(fetchDecodeStage);
 		fetchDecodeThread.start();
 		
 		writeBackThread = new Thread(getWriteBackStage());
 		writeBackThread.start(); //This runs until reset is clicked or HALT is encountered.
+		
+		setActive(true);
+		
 		while (isActive()) {			
 			try {
 				Instruction instr = this.fetchToExecuteQueue.take();
@@ -602,6 +605,9 @@ public class PipelinedExecuteStage extends ExecuteStage {
 			}
 			
 		}
+		//Terminate other stages once this stage is no longer active; alternatively use static boolean for active
+		fetchDecodeThread.interrupt();
+		writeBackThread.interrupt();
 		return;
 	}
 
@@ -631,5 +637,6 @@ public class PipelinedExecuteStage extends ExecuteStage {
 		fetchDecodeThread.start(); //Restart f/d thread, which will fetch from new PC address value
 		
 	}
+	
 
 }
