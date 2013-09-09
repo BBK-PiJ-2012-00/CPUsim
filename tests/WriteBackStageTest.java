@@ -2,6 +2,7 @@ package tests;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 
@@ -9,6 +10,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import code.ArithmeticInstr;
+import code.Assembler;
+import code.AssemblerImpl;
 import code.CPUbuilder;
 import code.ControlUnit;
 import code.ExecuteStage;
@@ -17,6 +20,7 @@ import code.IR;
 import code.IRfile;
 import code.Instruction;
 import code.InstructionRegister;
+import code.MainMemory;
 import code.MemoryAddressRegister;
 import code.MemoryBufferRegister;
 import code.Opcode;
@@ -40,11 +44,14 @@ import code.WriteBackStage;
 public class WriteBackStageTest {
 	private WriteBackStage writeBackStage;
 	private WriteBackStage pipelinedWriteBackStage;
+	private ExecuteStage pipelinedExecuteStage;
 	private BlockingQueue<Instruction> testExecuteToWriteQueue;
 	
 	private InstructionRegister ir;
 	private InstructionRegister irFile;
 	private RegisterFile genRegisters;
+	private MainMemory memory;
+	private Assembler assembler;
 	
 	private Instruction testInstrADD;
 	private Instruction testInstrSUB;
@@ -83,7 +90,8 @@ public class WriteBackStageTest {
 		Register statusRegister = new StatusRegister();
 		statusRegister.registerListener(new UpdateListener(new TestFrame()));	
 		
-		builder.getMemoryModule().registerListener(new UpdateListener(new TestFrame()));
+		memory = builder.getMemoryModule();
+		memory.registerListener(new UpdateListener(new TestFrame()));
 		
 		
 		irFile = new IRfile();
@@ -96,20 +104,26 @@ public class WriteBackStageTest {
 				genRegisters, statusRegister, mbr, mar, testFetchToExecuteQueue);
 		pipelinedFetchDecodeStage.registerListener(new UpdateListener(new TestFrame()));
 		
-		ExecuteStage pipelinedExecuteStage = new PipelinedExecuteStage(builder.getBusController(), irFile, pc, genRegisters, 
-				statusRegister,	mbr, mar, testFetchToExecuteQueue, testExecuteToWriteQueue, pipelinedFetchDecodeStage, writeBackStage);
-		pipelinedExecuteStage.registerListener(new UpdateListener(new TestFrame()));
-		
 		pipelinedWriteBackStage = new PipelinedWriteBackStage(builder.getBusController(), irFile, pc, genRegisters, statusRegister,
 				mbr, mar, testExecuteToWriteQueue);
 		
 		writeBackStage = new StandardWriteBackStage(builder.getBusController(), ir, pc, genRegisters, statusRegister,
 				mbr, mar);	
 		
+		pipelinedExecuteStage = new PipelinedExecuteStage(builder.getBusController(), irFile, pc, genRegisters, 
+				statusRegister,	mbr, mar, testFetchToExecuteQueue, testExecuteToWriteQueue, pipelinedFetchDecodeStage,
+				pipelinedWriteBackStage);
+		pipelinedExecuteStage.registerListener(new UpdateListener(new TestFrame()));
+		
+		
+		
 		testInstrADD = new ArithmeticInstr(Opcode.ADD, 2, 4); //Add contents of r2 and r4, storing in r2
 		testInstrSUB = new ArithmeticInstr(Opcode.SUB, 9, 10); //Sub contents of r10 from r9, storing in r9
 		testInstrDIV = new ArithmeticInstr(Opcode.DIV, 3, 12); //Divide contents of r3 by contents of r12, storing in r3
 		testInstrMUL = new ArithmeticInstr(Opcode.MUL, 5, 8); //Multiply contents of r5 by contents of r8, storing in r5
+		
+		assembler = new AssemblerImpl(builder.getLoader());
+		
 	}
 
 	@Test
@@ -165,6 +179,60 @@ public class WriteBackStageTest {
 		assertEquals(22, ((Operand) genRegisters.read(3)).unwrapInteger()); //If successful, #22 should be stored in r3.
 		
 	}
+	
+	
+	/*
+	 * This tests the full execution of an assembly file using all stages, but with particular attention
+	 * to the values written by the write back stage. The file writeBackTest1 contains an instruction
+	 * ADD r14, r15 which should result in the value #17 being written into r14.
+	 */
+	@Test
+	public void testFullExecutionWithWriteBack() {
+		assembler.selectFile(new File("src/testAssemblyPrograms/writeBackTest1.txt"));
+		assembler.assembleCode();
+		assembler.loadToLoader();
+		assembler.getLoader().loadToMemory();
+		pipelinedExecuteStage.run();
+				
+		assertEquals(17, ((Operand) genRegisters.read(14)).unwrapInteger()); //Check result of 17 is written to r14		
+		
+	}
+	
+	
+	/*
+	 * The following tests use a test file (writeBackTest2) to check that pipeline flushing doesn't affect the write back stage,
+	 * and also that flushed write back instructions are not executed. The file contains a BRZ instruction that should cause
+	 * an ADD instruction to be skipped and a MUL instruction to be executed.
+	 * 
+	 * The result of executing this program should be as follows:
+	 * r12 should contain #40
+	 * r6 should contain #30 (not #17, which would be the case if ADD were executed.
+	 */
+	
+	@Test
+	public void testFullExecutionWithWriteBack2() {
+		assembler.selectFile(new File("src/testAssemblyPrograms/writeBackTest2.txt"));
+		assembler.assembleCode();
+		assembler.loadToLoader();
+		assembler.getLoader().loadToMemory();
+		pipelinedExecuteStage.run();
+		
+		assertEquals(30, ((Operand) genRegisters.read(6)).unwrapInteger()); //r6 should contain #30
+	}
+	
+
+	@Test
+	public void testFullExecutionWithWriteBack3() {
+		assembler.selectFile(new File("src/testAssemblyPrograms/writeBackTest2.txt"));
+		assembler.assembleCode();
+		assembler.loadToLoader();
+		assembler.getLoader().loadToMemory();
+		pipelinedExecuteStage.run();
+		
+		assertEquals(40, ((Operand) genRegisters.read(12)).unwrapInteger()); //r12 should contain #40
+	}
+	
+	
 
 	
 	
