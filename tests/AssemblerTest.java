@@ -28,8 +28,8 @@ public class AssemblerTest {
 	public void setUp() throws Exception {
 		CPUbuilder builder = new CPUbuilder(false);
 		assembler = new AssemblerImpl(builder.getLoader());
-		testFile = new File("src/assemblyPrograms/assemblerTestProgram.txt");
-		testFile2 = new File("src/assemblyPrograms/assemblerTestProgram2.txt");
+		testFile = new File("src/testAssemblyPrograms/assemblerTestProgram.txt");
+		testFile2 = new File("src/testAssemblyPrograms/assemblerTestProgram2.txt");
 		testFile3 = new File("src/assemblyPrograms/TransferInstructionDemo.txt");
 	}
 
@@ -399,7 +399,7 @@ public class AssemblerTest {
 	
 	
 	
-	//BR fields, STore fields
+	
 	
 	
 	
