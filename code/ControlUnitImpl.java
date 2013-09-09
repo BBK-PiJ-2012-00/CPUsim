@@ -31,8 +31,8 @@ public class ControlUnitImpl implements ControlUnit {
 	private ExecuteStage executeStage;
 	private WriteBackStage writeBackStage;
 	
-	private BlockingQueue<Integer> fetchToExecuteQueue; //Queues that facilitate coordination of stages of instruction cycle
-	private BlockingQueue<Operand> executeToWriteQueue; //Only during pipelining
+	private BlockingQueue<Instruction> fetchToExecuteQueue; //Queues that facilitate coordination of stages of instruction cycle
+	private BlockingQueue<Instruction> executeToWriteQueue; //Only during pipelining
 	
 	public ControlUnitImpl(boolean pipeliningMode, MemoryBufferRegister mbr, BusController systemBus) {
 		this.pipeliningMode = pipeliningMode;
@@ -47,18 +47,26 @@ public class ControlUnitImpl implements ControlUnit {
 		
 		if (!pipeliningMode) { //If not pipelined, create standard stages
 			ir = new IR();
-			fetchDecodeStage = new StandardFetchDecodeStage(this.systemBus, mar, this.mbr, ir, pc);
-			writeBackStage = new StandardWriteBackStage(ir, genRegisters);
-			executeStage = new StandardExecuteStage(this.systemBus, ir, pc, genRegisters, statusRegister, writeBackStage,
-					this.mbr, mar);	
+
+			fetchDecodeStage = new StandardFetchDecodeStage(this.systemBus, ir, pc, genRegisters, statusRegister, this.mbr, mar);
+			writeBackStage = new StandardWriteBackStage(this.systemBus, ir, pc, genRegisters, statusRegister, this.mbr, mar);
+			executeStage = new StandardExecuteStage(this.systemBus, ir, pc, genRegisters, statusRegister,
+					this.mbr, mar, writeBackStage);	
 		}
 		
 		if (pipeliningMode) { //Queues only required if pipelining enabled
 			ir = new IRfile();
-			fetchToExecuteQueue = new SynchronousQueue<Integer>(); //Integer representation of opcode
-			executeToWriteQueue = new SynchronousQueue<Operand>(); //Operand to reflect that result of arithmetic is passed
+			fetchToExecuteQueue = new SynchronousQueue<Instruction>();//To pass instruction from one IR index to next
+			executeToWriteQueue = new SynchronousQueue<Instruction>();
 			
-			fetchDecodeStage = new PipelinedFetchDecodeStage(this.systemBus, mar, this.mbr, ir, pc, fetchToExecuteQueue);
+			fetchDecodeStage = new PipelinedFetchDecodeStage(this.systemBus, ir, pc, genRegisters, statusRegister,
+					this.mbr, mar, fetchToExecuteQueue);
+			
+			executeStage = new PipelinedExecuteStage(this.systemBus, ir, pc, genRegisters, statusRegister,
+					this.mbr, mar, fetchToExecuteQueue, executeToWriteQueue, fetchDecodeStage, writeBackStage);
+			
+			writeBackStage = new PipelinedWriteBackStage(this.systemBus, ir, pc, genRegisters, statusRegister,
+					this.mbr, mar, executeToWriteQueue);
 		}
 		
 	}
@@ -119,11 +127,11 @@ public class ControlUnitImpl implements ControlUnit {
 //			Thread writeBackThread = new Thread(writeBackStage);
 //			writeBackThread.start();
 			
-			while (active) {
+			
 				
 				executeStage.run(); //This manages the fetch and write back stages
 				
-			}
+			
 			
 			
 			
@@ -158,14 +166,14 @@ public class ControlUnitImpl implements ControlUnit {
 		statusRegister.write(null);		
 	}
 	
-	public void resetStages() { //Used when restarting an assembly program
-		if (!pipeliningMode) { //If not pipelined, create standard stages
-			fetchDecodeStage = new StandardFetchDecodeStage(this.systemBus, mar, this.mbr, ir, pc);
-			writeBackStage = new StandardWriteBackStage(ir, genRegisters);
-			executeStage = new StandardExecuteStage(this.systemBus, ir, pc, genRegisters, statusRegister, writeBackStage,
-					this.mbr, mar);	
-		}
-	}
+//	public void resetStages() { //Used when restarting an assembly program
+//		if (!pipeliningMode) { //If not pipelined, create standard stages
+//			fetchDecodeStage = new StandardFetchDecodeStage(this.systemBus, mar, this.mbr, ir, pc);
+//			writeBackStage = new StandardWriteBackStage(ir, genRegisters);
+//			executeStage = new StandardExecuteStage(this.systemBus, ir, pc, genRegisters, statusRegister, writeBackStage,
+//					this.mbr, mar);	
+//		}
+//	}
 	
 	
 	
