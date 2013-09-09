@@ -27,18 +27,38 @@ public class PipelinedWriteBackStage extends WriteBackStage {
 		//It is implicit in the nature of arithmetic instructions that the result is stored in the register
 		//referenced in the first field of the instruction after the opcode (field1)
 		getGenRegisters().write(getIR().read(2).getField1(), result);
+		
+		fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
+		fireUpdate("Result operand " + result + " written to r" + getIR().read(2).getField1() + " from ALU\n");
 	}
 
 	@Override
 	public void run() {
+		setActive(true);
 		while (isActive()) {
 			try {
+				System.out.println("Attempting take...");
 				Instruction instr = executeToWriteQueue.take();
+				System.out.println("Taken instruction: " + instr.toString());
+				
+				if (Thread.currentThread().isInterrupted()) {
+					setActive(false);
+					return;
+				}
+				
 				getIR().loadIR(2, instr); //Load instruction into last IR index
+				System.out.println("IR 2: " + getIR().read(2).toString());
+				
+				if (Thread.currentThread().isInterrupted()) {
+					setActive(false);
+					return;
+				}
+				
 				instructionWriteBack(getResult()); //Get result from result field in WriteBackStage
 				getIR().clear(2); //Reset IR once write back operation complete.
+				System.out.println("Cleared.");
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
+				setActive(false);
 				e.printStackTrace();
 				return; //Stop executing if interrupted (signals a reset or HALT).
 			}
