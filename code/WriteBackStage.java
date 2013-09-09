@@ -1,14 +1,15 @@
 package code;
 
-public abstract class WriteBackStage implements Runnable {
-	private InstructionRegister ir;
-	private RegisterFile genRegisters;
+public abstract class WriteBackStage extends Stage {
+	//private InstructionRegister ir;
+	//private RegisterFile genRegisters;
 	private Operand result;
 	
 	
-	public WriteBackStage(InstructionRegister ir, RegisterFile genRegisters) {
-		this.ir = ir;
-		this.genRegisters = genRegisters;
+	public WriteBackStage(BusController systemBus, InstructionRegister ir, ProgramCounter pc, RegisterFile genRegisters,
+			Register statusRegister, MemoryBufferRegister mbr, MemoryAddressRegister mar) {
+		
+		super(systemBus, ir, pc, genRegisters, statusRegister, mbr, mar);
 	}
 	
 	public Operand getResult() {
@@ -21,17 +22,11 @@ public abstract class WriteBackStage implements Runnable {
 		
 	
 	//Writing of results to register file
-	public void instructionWriteBack(Operand result) { //Not required in every cycle
-		//It is implicit in the nature of arithmetic instructions that the result is stored in the register
-		//referenced in the first field of the instruction after the opcode (field1)
-		genRegisters.write(ir.read().getField1(), result);
-	}
+	public abstract void instructionWriteBack(Operand result);
 	
 	public abstract void receive(Operand result); //To receive operand reference from previous stage (pipelined and standard modes
 										//will implement this differently)
 		
-
-	public synchronized void run() {
-		this.instructionWriteBack(result);
-	}
+	@Override
+	public abstract void run();
 }
