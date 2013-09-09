@@ -1,0 +1,4 @@
+#A test file for BR instructions that do not have enough fields.
+
+BR #Target reference missing
+HALT

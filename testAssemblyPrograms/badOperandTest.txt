@@ -1,0 +1,7 @@
+
+# An erroneous test assembly file for invalid operands.
+
+LOAD r0, badOperand
+HALT
+
+badOperand: DATA five #Only numerical values are allowed

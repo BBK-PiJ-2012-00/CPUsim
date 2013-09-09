@@ -1,0 +1,10 @@
+# A test file to test that SKZ instructions with arguments are caught as
+# errors.
+
+LOAD var1, r0
+SKZ badReference
+STORE r0 location
+HALT
+
+var1: DATA 1
+location: DATA 0

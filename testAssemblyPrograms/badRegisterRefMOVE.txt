@@ -1,0 +1,7 @@
+
+# A test file to check that invalid register reference in a MOVE instruction is handled.
+
+MOVE r2, r-1 
+HALT
+
+location: DATA 1

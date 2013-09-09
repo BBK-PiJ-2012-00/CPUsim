@@ -1,0 +1,26 @@
+
+# A file to test that MBR/MAR write conflicts are avoided by use of the 
+# synchronized accessMemory() method in the Stage class, preventing
+# multiple threads from reading/writing to the MBR/MAR at the sae time.
+
+# After this program, the following should be true:
+# r0 should contain value 1
+# r3 should contain value 22
+# location1 should hold value 1
+# r8 should contain value 34
+# location2 should hold value 22
+
+var1: DATA 1
+var22: DATA 22
+var34: DATA 34
+location1: DATA 0
+location2: DATA 0
+location3: DATA 0
+
+LOAD var1, r0
+LOAD var22, r3
+STORE r0, location1
+LOAD var34, r8
+STORE r3, location2
+HALT
+

@@ -1,0 +1,13 @@
+
+# A file for use in testing flushing of pipeline f/d stage; SKZ instruction.
+
+LOAD var1, r0
+LOAD var0, rCC #Set CC to 0
+SKZ
+LOAD var1, r4 #This should never be executed
+LOAD var5, r7
+HALT
+
+var1: DATA 55
+var5: DATA 117
+var0: DATA 0

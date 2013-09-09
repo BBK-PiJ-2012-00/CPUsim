@@ -1,0 +1,6 @@
+# A test file to check that invalid register reference in a STORE instruction is handled.
+
+STORE r29, location
+HALT
+
+location: DATA 1

@@ -1,0 +1,4 @@
+#A test file for MOVE instructions that do not have enough fields.
+
+MOVE r3 #Register reference missing
+HALT

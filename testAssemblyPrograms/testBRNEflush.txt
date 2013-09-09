@@ -1,0 +1,13 @@
+# A file for use in testing flushing of pipeline f/d stage; BRNE instruction.
+
+LOAD var66, r10
+LOAD var101, rCC #Set CC to 101
+BRNE testLocation, r10 #Branch taken as r10 contents not equal to rCC #contents
+LOAD var99, r15 #This should never be executed
+testLocation: LOAD var88, r11
+HALT
+
+var66: DATA 66
+var101: DATA 101
+var88: DATA 88
+var99: DATA 99

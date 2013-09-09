@@ -1,0 +1,13 @@
+
+# A test file to ensure write back stage is working properly (no pipeline
+# flush).
+
+LOAD var7, r15
+LOAD var10, r14
+ADD r14, r15 #Value of 17 should be stored in r14
+STORE r14, location
+HALT
+
+var7: DATA 7
+var10: DATA 10
+location: DATA 0

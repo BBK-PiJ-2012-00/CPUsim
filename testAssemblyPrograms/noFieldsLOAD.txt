@@ -1,0 +1,4 @@
+#A test file for LOAD instructions that do not have enough fields.
+
+LOAD var1 #Register reference missing
+HALT

@@ -1,0 +1,10 @@
+
+# A test program to check that if operands are declared first, the 
+# assembler deals with them appropriately.
+
+var1: DATA 1
+var2: DATA 2
+
+LOAD var1, r0
+LOAD var2, r1
+HALT

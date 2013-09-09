@@ -1,0 +1,26 @@
+
+# A test file to ensure write back stage is working properly and is
+# not affected by pipeline flushing.
+# The result of executing this program should be as follows:
+# r12 should contain #40
+# r6 should contain #30 (not #17, which would be the case if ADD were 
+# executed.
+
+
+LOAD var50, r12
+LOAD var10, r14
+SUB r12, r14 #Value of 40 should be stored in r12
+LOAD var15, r6
+LOAD var2, r7
+LOAD var0, rCC
+BRZ mulInstruction #If rCC holds 0, branch to mulInstruction
+ADD r6, r7 #This should be skipped 
+mulInstruction: MUL r6, r7
+HALT
+
+var50: DATA 50
+var10: DATA 10
+var15: DATA 15
+var2: DATA 2
+var0: DATA 0
+location: DATA 0

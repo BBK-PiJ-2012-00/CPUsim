@@ -1,0 +1,9 @@
+
+# A test file to check that rCC cannot be referred to in an arithmetic instruction.
+
+LOAD operand, r6
+ADD r6, r2
+MUL r6, rCC
+HALT
+
+operand: DATA 1

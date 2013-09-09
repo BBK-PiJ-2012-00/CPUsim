@@ -1,0 +1,7 @@
+
+# A test assembly file to check that invalid opcodes are handled.
+
+STORE r5, location
+HAL #Should be HALT
+
+location: DATA 0

@@ -1,0 +1,6 @@
+#A test file for STORE instructions that do not have enough fields.
+
+STORE var4 #Register reference missing
+HALT
+
+var4: DATA 0

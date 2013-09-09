@@ -1,0 +1,9 @@
+
+# A test file to test invalid BR/BRZ instruction declarations.
+
+BR Line1 # This is valid
+Line1: LOAD operand, r7
+BRZ Line3 # This is invalid, as Line3 has not been declared
+HALT
+
+operand: DATA 1 

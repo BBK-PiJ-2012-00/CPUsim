@@ -1,0 +1,21 @@
+
+# A file to test that operands and instructions can be declared in any order
+# and still be assembled successfully.
+
+var1: DATA 1
+var2: DATA 2
+
+Target: LOAD var1, r8
+LOAD var2, r9
+
+var3: DATA 3
+
+STORE r8, var3
+
+location: DATA 0
+
+LOAD var3, rCC
+
+BRNE Target r8
+
+HALT

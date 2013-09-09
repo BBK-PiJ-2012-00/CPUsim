@@ -1,0 +1,7 @@
+
+# An erroneous test assembly file for invalid DATA declaration keyword.
+
+LOAD operand, r0
+HALT
+
+operand: 5

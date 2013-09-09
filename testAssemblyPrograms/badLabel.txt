@@ -1,0 +1,7 @@
+
+# A test assembly file to check that invalid/undeclared labels are handled.
+
+LOAD unknownLabel, r1
+HALT
+
+anotherLabel: DATA 13

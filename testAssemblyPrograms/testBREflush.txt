@@ -1,0 +1,12 @@
+# A file for use in testing flushing of pipeline f/d stage; BRE instruction.
+
+LOAD var22, r0
+LOAD var22, rCC #Set CC to 22
+BRE testLocation, r0
+LOAD var44, r1 #This should never be executed
+testLocation: LOAD var112, r5
+HALT
+
+var44: DATA 44
+var112: DATA 112
+var22: DATA 22

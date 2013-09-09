@@ -1,0 +1,7 @@
+
+# A test file to check that invalid register reference in a LOAD instruction is handled.
+
+LOAD location, r-1
+HALT
+
+location: DATA 1
