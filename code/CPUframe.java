@@ -98,6 +98,10 @@ public class CPUframe extends JFrame {
 	private Font buttonFont;
 	
 	private JButton fileOpenButton;
+	private JButton modeSwitchButton;
+	
+	private Border magentaLine;
+	private Border cyanLine;
 	
 	
 	public CPUframe() {	
@@ -118,59 +122,31 @@ public class CPUframe extends JFrame {
 	
 	
 	
-	private void createComponents() {
+	private void createComponents() {	
+	
 		
 		this.getContentPane().setLayout(new BoxLayout(this.getContentPane(), BoxLayout.X_AXIS)); //Arrange panels horizontally
 		
 		//panel1 = new JPanel();
 		//panel1.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));	
 		//panel2 = new JPanel();
-		panel3 = new JPanel();
-		panel4 = new JPanel();
-		panel4.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+//		panel3 = new JPanel();
+//		panel4 = new JPanel();
+//		panel4.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		
 		
-		
-		/*
-		 * Code for memory display.
-		 *
-		 */		
-		JPanel memoryContentsPanel = new JPanel(); //A panel to store the scrollpane and text area for memory display
-		memoryContentsPanel.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5));
-		
-		memoryContentArea = new JTextArea(35, 12);
-		//memoryContentArea.setFont(textFont);
-		memoryContentArea.setText(memory.display()); //Text area for memory display
-		memoryContentArea.setCaretPosition(0);
-		memoryContentArea.setEditable(false); //Memory display is not editable
-		
-		JScrollPane scroller = new JScrollPane(memoryContentArea);		
-		
-		memoryContentsPanel.add(scroller); //Add text area to memory panel
+		drawStandardPanel1();
+		drawStandardPanel2();
+		drawPanel3();
+		drawPanel4();
+	}
 	
-		UpdateListener memoryListener = new UpdateListener(this);
-		memory.registerListener(memoryListener);
 
-		//scroller.setBorder(BorderFactory.createTitledBorder(" Main Memory "));
-		//memoryPanel.add(scroller);
-		
-		JPanel memoryPanel = new JPanel(); //Main panel for all memory related items
-		memoryPanel.setLayout(new BoxLayout(memoryPanel, BoxLayout.Y_AXIS));
-		memoryPanel.add(memoryContentsPanel);
-		
-//		resetButton = new JButton("Reset");
-//		resetButton.addActionListener(new ResetListener());
-//		resetButton.setAlignmentX(CENTER_ALIGNMENT);
-//		memoryPanel.add(resetButton);
-		
-		memoryPanel.setBorder(BorderFactory.createTitledBorder(" Main Memory "));
-		
-		panel4.add(memoryPanel);
-		
 		
 		/*
 		 * Panel 1: assembler and activity monitor
 		 */
+	public void drawStandardPanel1() {
 		
 		panel1 = new JPanel();
 		panel1.setLayout(new BoxLayout(panel1, BoxLayout.Y_AXIS));
@@ -232,11 +208,16 @@ public class CPUframe extends JFrame {
 		
 		panel1.add(activityPanel);
 		
+		this.getContentPane().add(panel1);
+	}
+	
+		
 		
 		/*
 		 * CPU registers
 		 */
 		
+	public void drawStandardPanel2() {
 		
 		panel2 = new JPanel();
 		panel2.setLayout(new BoxLayout(panel2, BoxLayout.Y_AXIS));
@@ -305,7 +286,7 @@ public class CPUframe extends JFrame {
 		JPanel marPanel = new JPanel();
 		marPanel.setMaximumSize(new Dimension(150, 60));
 		marPanel.add(marField);
-		Border cyanLine = BorderFactory.createLineBorder(Color.blue);
+		cyanLine = BorderFactory.createLineBorder(Color.blue);
 		marPanel.setBorder(BorderFactory.createTitledBorder(cyanLine, " MAR "));
 		controlUnit.getMAR().registerListener(new UpdateListener(this));
 		
@@ -314,7 +295,7 @@ public class CPUframe extends JFrame {
 		JPanel mbrPanel = new JPanel();
 		mbrPanel.setMaximumSize(new Dimension(150, 60));
 		mbrPanel.add(mbrField);
-		Border magentaLine = BorderFactory.createLineBorder(Color.magenta);
+		magentaLine = BorderFactory.createLineBorder(Color.magenta);
 		mbrPanel.setBorder(BorderFactory.createTitledBorder(magentaLine, " MBR "));
 		controlUnit.getMBR().registerListener(new UpdateListener(this));
 		
@@ -686,10 +667,17 @@ public class CPUframe extends JFrame {
 		
 		ALU.registerListener(new UpdateListener(this));
 		
+		this.getContentPane().add(panel2);
+		
+	}
 		
 		/*
 		 * System Bus
 		 */
+	public void drawPanel3() {
+		panel3 = new JPanel();
+		
+		System.out.println("Drawing panel 3");
 		
 		JPanel systemBusPanel = new JPanel();
 		systemBusPanel.setLayout(new BoxLayout(systemBusPanel, BoxLayout.Y_AXIS));//Add bus panels vertically
@@ -793,7 +781,13 @@ public class CPUframe extends JFrame {
 		controlPanel.add(subControlPanel3);
 
 		
-		JButton modeSwitchButton = new JButton("Pipelined Mode");
+		if (!pipeliningEnabled) {
+			modeSwitchButton = new JButton("Pipelined Mode");
+		}
+		else {
+			modeSwitchButton = new JButton("Standard Mode");
+		}
+		modeSwitchButton.addActionListener(new ModeSwitchListener());
 		//modeSwitchButton.setFont(buttonFont);
 		subControlPanel4.add(modeSwitchButton);	
 		controlPanel.add(subControlPanel4);
@@ -812,7 +806,7 @@ public class CPUframe extends JFrame {
 		controlPanel.add(subControlPanel5);
 		
 		//Border formatting for button control panel
-	   Border controlPanelLine = BorderFactory.createLineBorder(Color.BLUE, 3);
+		Border controlPanelLine = BorderFactory.createLineBorder(Color.BLUE, 3);
 		//Border controlPanelLine = BorderFactory.createLineBorder(new Color(21, 129, 239), 3);
 		Font controlPanelFont = new Font("default", Font.ITALIC, 15);
 		controlPanel.setBorder(BorderFactory.createTitledBorder(controlPanelLine, "* Control Panel *",0, 0, controlPanelFont));		
@@ -830,20 +824,66 @@ public class CPUframe extends JFrame {
 		imagePanel.add(logoLabel);
 		panel3.add(imagePanel);
 		
-		
-		//Add panels to window and set colours
-		this.getContentPane().add(panel1); //Leftmost panel
-		//panel1.setBackground(Color.cyan);
-		this.getContentPane().add(panel2);
-		//panel2.setBackground(Color.DARK_GRAY);
-		//panel2.setBackground(new Color(119, 123, 123));
 		this.getContentPane().add(panel3);
-		//panel3.setBackground(Color.orange);
-		panel3BufferPanel.setBackground(panel3.getBackground());
-		this.getContentPane().add(panel4); //Rightmost panel
-		//this.getContentPane().setBackground(new Color(119, 123, 123));
 		
 		
+//		//Add panels to window and set colours
+//		this.getContentPane().add(panel1); //Leftmost panel
+//		//panel1.setBackground(Color.cyan);
+//		this.getContentPane().add(panel2);
+//		//panel2.setBackground(Color.DARK_GRAY);
+//		//panel2.setBackground(new Color(119, 123, 123));
+//		this.getContentPane().add(panel3);
+//		//panel3.setBackground(Color.orange);
+//		panel3BufferPanel.setBackground(panel3.getBackground());
+//		this.getContentPane().add(panel4); //Rightmost panel
+//		//this.getContentPane().setBackground(new Color(119, 123, 123));		
+		
+	}
+	
+	public void drawPanel4() {
+		
+		panel4 = new JPanel();
+		panel4.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		
+		/*
+		 * Code for memory display.
+		 *
+		 */		
+		JPanel memoryContentsPanel = new JPanel(); //A panel to store the scrollpane and text area for memory display
+		memoryContentsPanel.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5));
+		
+		memoryContentArea = new JTextArea(35, 12);
+		//memoryContentArea.setFont(textFont);
+		memoryContentArea.setText(memory.display()); //Text area for memory display
+		memoryContentArea.setCaretPosition(0);
+		memoryContentArea.setEditable(false); //Memory display is not editable
+		
+		JScrollPane scroller = new JScrollPane(memoryContentArea);		
+		
+		memoryContentsPanel.add(scroller); //Add text area to memory panel
+	
+		UpdateListener memoryListener = new UpdateListener(this);
+		memory.registerListener(memoryListener);
+
+		//scroller.setBorder(BorderFactory.createTitledBorder(" Main Memory "));
+		//memoryPanel.add(scroller);
+		
+		JPanel memoryPanel = new JPanel(); //Main panel for all memory related items
+		memoryPanel.setLayout(new BoxLayout(memoryPanel, BoxLayout.Y_AXIS));
+		memoryPanel.add(memoryContentsPanel);
+		
+//		resetButton = new JButton("Reset");
+//		resetButton.addActionListener(new ResetListener());
+//		resetButton.setAlignmentX(CENTER_ALIGNMENT);
+//		memoryPanel.add(resetButton);
+		
+		memoryPanel.setBorder(BorderFactory.createTitledBorder(" Main Memory "));
+		
+		panel4.add(memoryPanel);
+		
+		this.getContentPane().add(panel4);
+	
 	}
 	
 	
@@ -1034,6 +1074,44 @@ public class CPUframe extends JFrame {
 		}
 			
 	}
+	
+	
+	class ModeSwitchListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			int option = JOptionPane.showConfirmDialog(null, "Are you sure you want to switch execution mode?" +
+					"\nAny assembly language progam progress will be lost.", "Switch Modes?", JOptionPane.OK_CANCEL_OPTION);
+			if (option == JOptionPane.OK_OPTION) { //If ok is pressed
+				
+				if (!pipeliningEnabled) {
+					//Redraw panel 1 and panel 2, set pipelining mode boolean to true;
+					//Redraw control panel to change button label.
+					pipeliningEnabled = true;
+					//modeSwitchButton.setText("Standard Mode");
+					
+					getContentPane().remove(panel1);
+					getContentPane().remove(panel2);
+					getContentPane().remove(panel3);
+					getContentPane().remove(panel4);
+					drawStandardPanel1();
+					drawStandardPanel2();
+					drawPanel3();
+					drawPanel4();
+					revalidate();
+					
+					
+
+				
+				}
+				
+				
+			}
+			
+		}
+		
+		
+	}
 		
 	
 	
@@ -1147,6 +1225,10 @@ public class CPUframe extends JFrame {
 	public JTextField getControlLineField() {
 		return this.controlLineField;
 	}
+
+
+
+
 
 	
 	
