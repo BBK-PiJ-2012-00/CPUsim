@@ -1090,6 +1090,14 @@ public class CPUframe extends JFrame {
 					pipeliningEnabled = true;
 					//modeSwitchButton.setText("Standard Mode");
 					
+					CPUbuilder cpuBuilder = new CPUbuilder(true); //Create pipelined components
+					
+					//Reassign component fields
+					CPUframe.this.controlUnit = cpuBuilder.getControlUnit(); //Get pipelined control unit
+					CPUframe.this.memory = cpuBuilder.getMemoryModule();
+					CPUframe.this.loader = cpuBuilder.getLoader();
+					CPUframe.this.systemBusController = cpuBuilder.getBusController();	
+					
 					getContentPane().remove(panel1);
 					getContentPane().remove(panel2);
 					getContentPane().remove(panel3);
