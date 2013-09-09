@@ -41,7 +41,7 @@ public interface ControlUnit {
 	
 	public void clearRegisters();
 	
-	public void resetStages();
+	//public void resetStages();
 
 		
 	
