@@ -6,10 +6,11 @@ public class PipelinedWriteBackStage extends WriteBackStage {
 	
 	private BlockingQueue<Instruction> executeToWriteQueue;
 
-	public PipelinedWriteBackStage(InstructionRegister ir, RegisterFile genRegisters,
+	public PipelinedWriteBackStage(BusController systemBus, InstructionRegister ir, ProgramCounter pc, RegisterFile genRegisters,
+			Register statusRegister, MemoryBufferRegister mbr, MemoryAddressRegister mar,
 			BlockingQueue<Instruction> executeToWriteQueue) {
 		
-		super(ir, genRegisters);
+		super(systemBus, ir, pc, genRegisters, statusRegister, mbr, mar);
 		this.executeToWriteQueue = executeToWriteQueue;
 	}
 
@@ -35,14 +36,18 @@ public class PipelinedWriteBackStage extends WriteBackStage {
 				Instruction instr = executeToWriteQueue.take();
 				getIR().loadIR(2, instr); //Load instruction into last IR index
 				instructionWriteBack(getResult()); //Get result from result field in WriteBackStage
+				getIR().clear(2); //Reset IR once write back operation complete.
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return; //Stop executing if interrupted (signals a reset or HALT).
 			}
 		}
+		return;
 
 	}
+	
+	//What about making active boolean static? This would mean all stages are accessing the same one.
 
 
 
