@@ -4,24 +4,26 @@ import java.util.concurrent.BlockingQueue;
 
 public class PipelinedExecuteStage extends ExecuteStage {
 	private BlockingQueue<Instruction> fetchToExecuteQueue;
-	private BlockingQueue<Operand> executeToWriteQueue;
+	private BlockingQueue<Instruction> executeToWriteQueue;
 	//private boolean active;
 	
-	private FetchDecodeStage fetchDecodeStage; //Needed for pipeline flushing
+	private FetchDecodeStage fetchDecodeStage; 
 	private Thread fetchDecodeThread;
+	
+	private Thread writeBackThread; //Managed by this stage
 	
 	
 	public PipelinedExecuteStage(BusController systemBus, InstructionRegister ir, ProgramCounter pc, RegisterFile genRegisters,
-			Register statusRegister, WriteBackStage writeBackStage, MemoryBufferRegister mbr, MemoryAddressRegister mar,
-			BlockingQueue<Instruction> fetchToExecuteQueue, BlockingQueue<Operand> executeToWriteQueue, FetchDecodeStage fdStage) {
+			Register statusRegister, MemoryBufferRegister mbr, MemoryAddressRegister mar,
+			BlockingQueue<Instruction> fetchToExecuteQueue, BlockingQueue<Instruction> executeToWriteQueue, FetchDecodeStage fdStage,
+			WriteBackStage wbStage) {
 		
-		super(systemBus, ir, pc, genRegisters, statusRegister, mbr, mar, writeBackStage);
+		super(systemBus, ir, pc, genRegisters, statusRegister, mbr, mar, wbStage);
 		
 		this.fetchToExecuteQueue = fetchToExecuteQueue;
 		this.executeToWriteQueue = executeToWriteQueue;
 		
 		this.fetchDecodeStage = fdStage;
-		this.fetchDecodeThread = new Thread(fetchDecodeStage);
 	}
 	
 	public synchronized boolean instructionExecute(int opcode) {
@@ -565,9 +567,9 @@ public class PipelinedExecuteStage extends ExecuteStage {
 		return true;
 	}
 	
-	public WriteBackStage getWriteBackStage() {
-		return null;
-	} 
+//	public WriteBackStage getWriteBackStage() {
+//		return null;
+//	} 
 	
 	
 	/*
@@ -581,6 +583,9 @@ public class PipelinedExecuteStage extends ExecuteStage {
 		setActive(true);
 		fetchDecodeThread = new Thread(fetchDecodeStage);
 		fetchDecodeThread.start();
+		
+		writeBackThread = new Thread(getWriteBackStage());
+		writeBackThread.start(); //This runs until reset is clicked or HALT is encountered.
 		while (isActive()) {			
 			try {
 				Instruction instr = this.fetchToExecuteQueue.take();
@@ -603,7 +608,9 @@ public class PipelinedExecuteStage extends ExecuteStage {
 	@Override
 	public boolean forward(Operand result) {
 		try {
-			executeToWriteQueue.put(result);
+			getWriteBackStage().receive(result); //Transfer result
+			executeToWriteQueue.put(getIR().read(1));
+			getIR().clear(1); //Clear IR index 2 once instruction passed.
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 			setActive(false);
