@@ -18,28 +18,10 @@ public class ControlUnitTest {
 	private ControlUnit controlUnit;
 	private MainMemory memory;
 	private Assembler assembler;
-	private Loader loader;
 	
-	private Instruction testInstrLOAD_2;
-	private Instruction testInstrLOAD_4;
-	private Instruction testInstrSTORE_7;
-	
-	private Instruction testInstrSTORE;
-	private Instruction testInstrLOAD;
-	private Instruction testInstrMOVE;
-	
-	private Instruction testInstrADD;
-	private Instruction testInstrSUB;
-	private Instruction testInstrDIV;
-	private Instruction testInstrMUL;
-	
-	private Instruction testInstrBR;
-	private Instruction testInstrBRZ;
-	private Instruction testInstrSKZ;
-	private Instruction testInstrBRE;
-	private Instruction testInstrBRNE;
-	
-	private Instruction testInstrHALT;
+	private ControlUnit pControlUnit; //Pipelined versions
+	private MainMemory pMemory;
+	private Assembler pAssembler;
 	
 	
 
@@ -57,92 +39,287 @@ public class ControlUnitTest {
 		controlUnit.getPC().registerListener(new UpdateListener(new TestFrame())); 
 		controlUnit.getIR().registerListener(new UpdateListener(new TestFrame()));
 		controlUnit.getRegisters().registerListener(new UpdateListener(new TestFrame()));
-		//controlUnit.getStatusRegister().registerListener(new UpdateListener(new TestFrame()));
 		controlUnit.getMBR().registerListener(new UpdateListener(new TestFrame()));
 		controlUnit.getMAR().registerListener(new UpdateListener(new TestFrame()));
+		controlUnit.getStatusRegister().registerListener(new UpdateListener(new TestFrame()));
 		
 		controlUnit.getFetchDecodeStage().registerListener(new UpdateListener(new TestFrame()));
 		controlUnit.getExecuteStage().registerListener(new UpdateListener(new TestFrame()));
+		
+		builder.getBusController().accessControlLine().registerListener(new UpdateListener(new TestFrame()));
+		builder.getBusController().accessControlLine().getAddressBus().registerListener(new UpdateListener(new TestFrame()));
+		builder.getBusController().accessControlLine().getDataBus().registerListener(new UpdateListener(new TestFrame()));
+		
+		
+		/*
+		 * For pipelined execution
+		 */
+		CPUbuilder pBuilder = new CPUbuilder(true); //Create simulator components
+		pMemory = pBuilder.getMemoryModule();
+		pMemory.registerListener(new UpdateListener(new TestFrame()));
+		
+		/*
+		 * Listeners are registered with control unit registers to prevent null pointer exceptions during testing,
+		 * although they serve no purpose here.
+		 */
+		pControlUnit = pBuilder.getControlUnit();
+		pControlUnit.getPC().registerListener(new UpdateListener(new TestFrame())); 
+		pControlUnit.getIR().registerListener(new UpdateListener(new TestFrame()));
+		pControlUnit.getRegisters().registerListener(new UpdateListener(new TestFrame()));
+		pControlUnit.getMBR().registerListener(new UpdateListener(new TestFrame()));
+		pControlUnit.getMAR().registerListener(new UpdateListener(new TestFrame()));
+		pControlUnit.getStatusRegister().registerListener(new UpdateListener(new TestFrame()));
+		
+		pControlUnit.getFetchDecodeStage().registerListener(new UpdateListener(new TestFrame()));
+		pControlUnit.getExecuteStage().registerListener(new UpdateListener(new TestFrame()));
+		
+		pBuilder.getBusController().accessControlLine().registerListener(new UpdateListener(new TestFrame()));
+		pBuilder.getBusController().accessControlLine().getAddressBus().registerListener(new UpdateListener(new TestFrame()));
+		pBuilder.getBusController().accessControlLine().getDataBus().registerListener(new UpdateListener(new TestFrame()));
 	
-		loader = builder.getLoader();
-		assembler = new AssemblerImpl(loader);
+		
+		assembler = new AssemblerImpl(builder.getLoader());
+		pAssembler = new AssemblerImpl(pBuilder.getLoader());
 		
 		
-		testInstrLOAD_2 = new TransferInstr(Opcode.LOAD, 5, 2); //Load contents of addr. 5 to r2
-		testInstrLOAD_4 = new TransferInstr(Opcode.LOAD, 6, 4); //Load contents of addr. 6 to r4
-		testInstrSTORE_7 = new TransferInstr(Opcode.STORE, 2, 7); //Store contents of r2 to addr. 7
-		
-		testInstrSTORE = new TransferInstr(Opcode.STORE, 0, 99); //source r0, destination address 99
-		testInstrLOAD = new TransferInstr(Opcode.LOAD, 50, 0); //Load contents of address 50 to register 0
-		testInstrMOVE = new TransferInstr(Opcode.MOVE, 0, 15); //Move contents of r0 to r15
-		
-		testInstrADD = new ArithmeticInstr(Opcode.ADD, 2, 4); //Add contents of r2 and r4, storing in r2
-		testInstrSUB = new ArithmeticInstr(Opcode.SUB, 9, 10); //Sub contents of r10 from r9, storing in r9
-		testInstrDIV = new ArithmeticInstr(Opcode.DIV, 3, 12); //Divide contents of r3 by contents of r12, storing in r3
-		testInstrMUL = new ArithmeticInstr(Opcode.MUL, 5, 8); //Multiply contents of r5 by contents of r8, storing in r5
-		
-		testInstrBR = new BranchInstr(Opcode.BR, 10); //Branch to memory address 10
-		testInstrBRZ = new BranchInstr(Opcode.BRZ, 37); //Branch to memory address 37
-		testInstrSKZ = new BranchInstr(Opcode.SKZ); //Skip if zero
-		testInstrBRE = new BranchInstr(Opcode.BRE, 92, 1); //Branch to address 92 if contents of r1 equals contents of status reg
-		testInstrBRNE = new BranchInstr(Opcode.BRNE, 77, 6);//Branch to addr. 77 if contents of r6 doesn't equal contents of s. reg.
-		
-		testInstrHALT = new HaltInstr(Opcode.HALT); //Halt instruction 
-		
-		memory.notifyWrite(50, new OperandImpl(1000)); //Load operand (integer) 1000 to memory address 50
-		
+
 	}
+	
+	
 	
 	/*
-	 * Test non-pipelined execution.
+	 * Executes the fullProgramTest file in standard execution mode. After executing this file
+	 * the following should be true:
+	 * r12 holds value 4
+	 * r14 holds value 10
+	 * r6 holds value 30
+	 * r7 holds value 2
+	 * rCC holds value 0
+	 * r5 holds null
+	 * Memory address referenced by storePoint in file holds value 4.
+	 * 
+	 * The following seven tests assert that this information is true.
 	 */
 	@Test
-	public void activateTest() { //Test activate() of ControlUnit, which triggers instruction cycle
-		memory.notifyWrite(0, testInstrLOAD_2); //Put LOAD instruction into memory addr 0
-		memory.notifyWrite(1, testInstrLOAD_4); //Put LOAD instruction into memory addr 1
-		memory.notifyWrite(2, testInstrADD); //Load ADD instruction to memory addr 2
-		memory.notifyWrite(3, testInstrSTORE_7); //Load STORE instruction to memory addr 3
-		memory.notifyWrite(4, testInstrHALT); //Load HALT instruction to memory addr 4
-		memory.notifyWrite(5, new OperandImpl(10)); //Load operand 10 to memory address 5
-		memory.notifyWrite(6, new OperandImpl(20)); //Load operand 20 to memory address 6
+	public void fullTestStandard1() {
+		memory.clearMemory();
+		assembler.selectFile(new File("src/testAssemblyPrograms/fullProgramTest.txt"));
+		assembler.assembleCode();
+		assembler.loadToLoader();
+		assembler.getLoader().loadToMemory();		
 		
-		//Result of this instruction cycle should be that a value of 30 is stored in memory address 4
 		controlUnit.activate();
-		System.out.println("r2: " + controlUnit.getRegisters().read(2));
-		for (int i = 0; i < 8; i++) {
-			System.out.println(memory.accessAddress(i));
-		}
 		
-		((MemoryModule) memory).display();
+		int result = ((Operand) controlUnit.getRegisters().read(12)).unwrapInteger();
 		
-		Operand output = (Operand) memory.accessAddress(7);
-		Operand expected = new OperandImpl(30);
+		assertEquals(4, result);
+	}
+	
+	@Test
+	public void fullTestStandard2() {
+		memory.clearMemory();
+		assembler.selectFile(new File("src/testAssemblyPrograms/fullProgramTest.txt"));
+		assembler.assembleCode();
+		assembler.loadToLoader();
+		assembler.getLoader().loadToMemory();		
 		
-		assertEquals(expected, output);
+		controlUnit.activate();
 		
+		int result = ((Operand) controlUnit.getRegisters().read(14)).unwrapInteger();
+		
+		assertEquals(10, result);
+	}
+	
+	@Test
+	public void fullTestStandard3() {
+		memory.clearMemory();
+		assembler.selectFile(new File("src/testAssemblyPrograms/fullProgramTest.txt"));
+		assembler.assembleCode();
+		assembler.loadToLoader();
+		assembler.getLoader().loadToMemory();		
+		
+		controlUnit.activate();
+		
+		int result = ((Operand) controlUnit.getRegisters().read(6)).unwrapInteger();
+		
+		assertEquals(30, result);
+	}
+	
+	@Test
+	public void fullTestStandard4() {
+		memory.clearMemory();
+		assembler.selectFile(new File("src/testAssemblyPrograms/fullProgramTest.txt"));
+		assembler.assembleCode();
+		assembler.loadToLoader();
+		assembler.getLoader().loadToMemory();		
+		
+		controlUnit.activate();
+		
+		int result = ((Operand) controlUnit.getRegisters().read(7)).unwrapInteger();
+		
+		assertEquals(2, result);
 	}
 	
 	
 	@Test
-	public void fullTest() {
+	public void fullTestStandard5() {
 		memory.clearMemory();
-		assembler.selectFile(new File("src/assemblyPrograms/assemblerTestProgram2"));
+		assembler.selectFile(new File("src/testAssemblyPrograms/fullProgramTest.txt"));
 		assembler.assembleCode();
 		assembler.loadToLoader();
-		((AssemblerImpl) assembler).getLoader().loadToMemory();
-		
-		
-		
+		assembler.getLoader().loadToMemory();		
 		
 		controlUnit.activate();
 		
-		for (int i = 0; i < assembler.getProgramCode().length; i++) {
-			System.out.println(memory.accessAddress(i));
-			
-		}
+		int result = ((Operand) controlUnit.getStatusRegister().read()).unwrapInteger();
+		
+		assertEquals(0, result);
 	}
 	
-	//Test a branch instruction
+	@Test
+	public void fullTestStandard6() {
+		memory.clearMemory();
+		assembler.selectFile(new File("src/testAssemblyPrograms/fullProgramTest.txt"));
+		assembler.assembleCode();
+		assembler.loadToLoader();
+		assembler.getLoader().loadToMemory();		
+		
+		controlUnit.activate();
+		
+		Operand result = (Operand) controlUnit.getRegisters().read(5);
+		
+		assertNull(result);
+	}
+	
+	@Test
+	public void fullTestStandard7() {
+		memory.clearMemory();
+		assembler.selectFile(new File("src/testAssemblyPrograms/fullProgramTest.txt"));
+		assembler.assembleCode();
+		assembler.loadToLoader();
+		assembler.getLoader().loadToMemory();		
+		
+		controlUnit.activate();
+		
+		Data dataResult = memory.accessAddress(assembler.getLookupTable().get("storePoint"));
+		int result = ((Operand) dataResult).unwrapInteger();
+		
+		assertEquals(4, result);
+	}
+	
+	
+	/*
+	 * The following tests repeat the previous 7, only in pipelined execution.
+	 */
+	
+	@Test
+	public void fullTestStandard1Pipelined() {
+		pMemory.clearMemory();
+		pAssembler.selectFile(new File("src/testAssemblyPrograms/fullProgramTest.txt"));
+		pAssembler.assembleCode();
+		pAssembler.loadToLoader();
+		pAssembler.getLoader().loadToMemory();		
+		
+		pControlUnit.activate();
+		
+		int result = ((Operand) pControlUnit.getRegisters().read(12)).unwrapInteger();
+		
+		assertEquals(4, result);
+	}
+	
+	@Test
+	public void fullTestStandard2Pipelined() {
+		pMemory.clearMemory();
+		pAssembler.selectFile(new File("src/testAssemblyPrograms/fullProgramTest.txt"));
+		pAssembler.assembleCode();
+		pAssembler.loadToLoader();
+		pAssembler.getLoader().loadToMemory();		
+		
+		pControlUnit.activate();
+		
+		int result = ((Operand) pControlUnit.getRegisters().read(14)).unwrapInteger();
+		
+		assertEquals(10, result);
+	}
+	
+	@Test
+	public void fullTestStandard3Pipelined() {
+		pMemory.clearMemory();
+		pAssembler.selectFile(new File("src/testAssemblyPrograms/fullProgramTest.txt"));
+		pAssembler.assembleCode();
+		pAssembler.loadToLoader();
+		pAssembler.getLoader().loadToMemory();		
+		
+		pControlUnit.activate();
+		
+		int result = ((Operand) pControlUnit.getRegisters().read(6)).unwrapInteger();
+		
+		assertEquals(30, result);
+	}
+	
+	@Test
+	public void fullTestStandard4Pipelined() {
+		pMemory.clearMemory();
+		pAssembler.selectFile(new File("src/testAssemblyPrograms/fullProgramTest.txt"));
+		pAssembler.assembleCode();
+		pAssembler.loadToLoader();
+		pAssembler.getLoader().loadToMemory();		
+		
+		pControlUnit.activate();
+		
+		int result = ((Operand) pControlUnit.getRegisters().read(7)).unwrapInteger();
+		
+		assertEquals(2, result);
+	}
+	
+	
+	@Test
+	public void fullTestStandard5Pipelined() {
+		pMemory.clearMemory();
+		pAssembler.selectFile(new File("src/testAssemblyPrograms/fullProgramTest.txt"));
+		pAssembler.assembleCode();
+		pAssembler.loadToLoader();
+		pAssembler.getLoader().loadToMemory();		
+		
+		pControlUnit.activate();
+		
+		int result = ((Operand) pControlUnit.getStatusRegister().read()).unwrapInteger();
+		
+		assertEquals(0, result);
+	}
+	
+	@Test
+	public void fullTestStandard6Pipelined() {
+		pMemory.clearMemory();
+		pAssembler.selectFile(new File("src/testAssemblyPrograms/fullProgramTest.txt"));
+		pAssembler.assembleCode();
+		pAssembler.loadToLoader();
+		pAssembler.getLoader().loadToMemory();		
+		
+		pControlUnit.activate();
+		
+		Operand result = (Operand) pControlUnit.getRegisters().read(5);
+		
+		assertNull(result);
+	}
+	
+	@Test
+	public void fullTestStandard7Pipelined() {
+		pMemory.clearMemory();
+		pAssembler.selectFile(new File("src/testAssemblyPrograms/fullProgramTest.txt"));
+		pAssembler.assembleCode();
+		pAssembler.loadToLoader();
+		pAssembler.getLoader().loadToMemory();		
+		
+		pControlUnit.activate();
+		
+		Data dataResult = pMemory.accessAddress(pAssembler.getLookupTable().get("storePoint"));
+		int result = ((Operand) dataResult).unwrapInteger();
+		
+		assertEquals(4, result);
+	}
+	
+	
 	
 
 	
