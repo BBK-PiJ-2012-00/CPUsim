@@ -2,9 +2,13 @@ package code;
 
 import java.util.concurrent.BlockingQueue;
 
+import javax.swing.SwingUtilities;
+
 public class PipelinedWriteBackStage extends WriteBackStage {
 	
 	private BlockingQueue<Instruction> executeToWriteQueue;
+	
+
 
 	public PipelinedWriteBackStage(BusController systemBus, InstructionRegister ir, ProgramCounter pc, RegisterFile genRegisters,
 			Register statusRegister, MemoryBufferRegister mbr, MemoryAddressRegister mar,
@@ -28,15 +32,26 @@ public class PipelinedWriteBackStage extends WriteBackStage {
 		//referenced in the first field of the instruction after the opcode (field1)
 		getGenRegisters().write(getIR().read(2).getField1(), result);
 		
-		fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
 		fireUpdate("Result operand " + result + " written to r" + getIR().read(2).getField1() + " from ALU\n");
+		
+		setWaitStatus(true);
+		try {
+			wait();
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+			setWaitStatus(false);
+			return; //Not enough to stop execution!
+		}
+		setWaitStatus(false);
 	}
 
 	@Override
-	public void run() {
+	public synchronized void run() {
 		setActive(true);
 		while (isActive()) {
 			try {
+				fireUpdate("(Idle)");
 				System.out.println("Attempting take...");
 				Instruction instr = executeToWriteQueue.take();
 				System.out.println("Taken instruction: " + instr.toString());
@@ -67,14 +82,21 @@ public class PipelinedWriteBackStage extends WriteBackStage {
 
 	}
 	
+	@Override
+	public void fireUpdate(final String update) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+			    ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(PipelinedWriteBackStage.this, update);
+				PipelinedWriteBackStage.this.getUpdateListener().handleUpDateEvent(updateEvent);	
+			}
+		});
+	}
+	
 	//What about making active boolean static? This would mean all stages are accessing the same one.
 
 
 
-	@Override
-	protected void fireUpdate(String update) {
-		// TODO Auto-generated method stub
-		
-	}
+	
+	
 
 }
