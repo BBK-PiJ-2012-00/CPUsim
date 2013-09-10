@@ -42,6 +42,8 @@ public interface RegisterFile {
 	
 	public void registerListener(UpdateListener listener);
 	
+	public void fireUpdate(int index, String update);
+	
 
 
 }
