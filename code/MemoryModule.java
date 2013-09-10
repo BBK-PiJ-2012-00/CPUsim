@@ -1,5 +1,7 @@
 package code;
 
+import javax.swing.SwingUtilities;
+
 /*
  * All read and write operations should be atomic and commandeer the bus for the duration of the operation; this is 
  * simpler for GUI and clarity.
@@ -72,8 +74,9 @@ public class MemoryModule implements MainMemory {
 			//System.out.println(MEMORY[pointer].toString());
 			pointer++;
 		}
-		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, display());
-		updateListener.handleUpDateEvent(updateEvent);
+//		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, display());
+//		updateListener.handleUpDateEvent(updateEvent);
+		fireUpdate(display());
 	}
 	
 	public void setPC() { //Method to send start address of program code via system bus to set PC before execution begins
@@ -86,8 +89,9 @@ public class MemoryModule implements MainMemory {
 		//No checking of address being empty or not; up to programmer
 		if (address < 100 && address >= 0) {
 			MEMORY[address] = data;
-			ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, display());
-			updateListener.handleUpDateEvent(updateEvent);
+//			ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, display());
+//			updateListener.handleUpDateEvent(updateEvent);
+			fireUpdate(display());
 			return true;
 		}
 		return false;
@@ -142,6 +146,18 @@ public class MemoryModule implements MainMemory {
 	@Override
 	public void registerListener(UpdateListener listener) {
 		this.updateListener = listener;
+	}
+	
+	//GUI events should be handled from EDT
+	//This adds the update event to the EDT thread. Need to test this works on the GUI
+	@Override
+	public void fireUpdate(final String update) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+			    ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(MemoryModule.this, update);
+				MemoryModule.this.updateListener.handleUpDateEvent(updateEvent);	
+			}
+		});
 	}
 	
 

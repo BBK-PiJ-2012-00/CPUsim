@@ -60,5 +60,7 @@ public interface MainMemory {
 	
 	public void registerBusController(BusController systemBusController);
 	
+	public void fireUpdate(String update);
+	
 
 }
