@@ -37,6 +37,8 @@ public interface AddressBus {
 	 * 
 	 * @param UpdateListener listener the listener object to handle update events.
 	 */
-	public void registerListener(UpdateListener listener);		
+	public void registerListener(UpdateListener listener);	
+	
+	public void fireUpdate(String update);
 
 }
