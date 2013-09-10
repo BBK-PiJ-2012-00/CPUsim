@@ -1,5 +1,7 @@
 package code;
 
+import javax.swing.SwingUtilities;
+
 /*
  * A class to represent a status register, generally for use with conditional branch instructions. User-visible,
  * can be referenced as r16 in assembly code.
@@ -19,8 +21,9 @@ public class StatusRegister implements Register {
 	@Override
 	public void write(Operand operand) {
 		this.contents = operand;
-		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, this.display());
-		updateListener.handleUpDateEvent(updateEvent);
+//		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, this.display());
+//		updateListener.handleUpDateEvent(updateEvent);
+		fireUpdate(display());
 	}
 
 	@Override
@@ -37,6 +40,18 @@ public class StatusRegister implements Register {
 		}
 		displayString += this.contents;
 		return displayString;
+	}
+	
+	//GUI events should be handled from EDT
+	//This adds the update event to the EDT thread. Need to test this works on the GUI
+	@Override
+	public void fireUpdate(final String update) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+			    ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(StatusRegister.this, update);
+				StatusRegister.this.updateListener.handleUpDateEvent(updateEvent);	
+			}
+		});
 	}
 
 }

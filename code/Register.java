@@ -10,6 +10,8 @@ public interface Register {
 	
 	public String display();
 	
+	public void fireUpdate(String update);
+	
 	
 
 }
