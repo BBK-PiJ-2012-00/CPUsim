@@ -2,8 +2,6 @@ package code;
 
 import java.util.EventListener;
 
-import javax.swing.JFrame;
-import javax.swing.JTextField;
 
 public class UpdateListener implements EventListener {
 	private CPUframe frame; //Reference to main window frame object
@@ -18,7 +16,7 @@ public class UpdateListener implements EventListener {
 		}
 		
 		else if (e.getSource() instanceof InstructionRegister) {
-			frame.getIRfield().setText(e.getUpdate());
+			frame.getIRfield(e.getRegisterReference()).setText(e.getUpdate());
 		}
 		
 		else if (e.getSource() instanceof MainMemory) {
