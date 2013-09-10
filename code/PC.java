@@ -1,5 +1,7 @@
 package code;
 
+import javax.swing.SwingUtilities;
+
 public class PC implements ProgramCounter {
 	private int nextInstructionPointer; //address of the next instruction to be fetched
 	private UpdateListener updateListener;
@@ -10,14 +12,18 @@ public class PC implements ProgramCounter {
 	
 	public void incrementPC() {
 		nextInstructionPointer++;
-		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, "" + nextInstructionPointer);
-		updateListener.handleUpDateEvent(updateEvent);
+//		System.out.println("PC incremented to address: " + nextInstructionPointer);
+//		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, "" + nextInstructionPointer);
+//		updateListener.handleUpDateEvent(updateEvent);
+		fireUpdate("" + nextInstructionPointer);
 	}
 	
 	public void setPC(int address) { //Used to set PC pointer
 		this.nextInstructionPointer = address;
-		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, "" + nextInstructionPointer);
-		updateListener.handleUpDateEvent(updateEvent);
+		//System.out.println("PC set to address " + address);
+//		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, "" + nextInstructionPointer);
+//		updateListener.handleUpDateEvent(updateEvent);
+		fireUpdate("" + nextInstructionPointer);
 	}
 	
 	public String display() {
@@ -28,6 +34,18 @@ public class PC implements ProgramCounter {
 	
 	public void registerListener(UpdateListener listener) {
 		this.updateListener = listener;
+	}
+	
+	//GUI events should be handled from EDT
+	//This adds the update event to the EDT thread. Need to test this works on the GUI
+	@Override
+	public void fireUpdate(final String update) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+			    ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(PC.this, update);
+				PC.this.updateListener.handleUpDateEvent(updateEvent);	
+			}
+		});
 	}
 	
 

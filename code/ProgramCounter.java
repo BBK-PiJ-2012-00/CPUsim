@@ -26,5 +26,7 @@ public interface ProgramCounter {
 	public void registerListener(UpdateListener listener);
 	
 	public String display();
+	
+	public void fireUpdate(String update);
 
 }
