@@ -73,9 +73,10 @@ public class CPUframe extends JFrame {
 	private JTextArea activityArea2; //For pipelined mode (write back stage activity monitor)
 	
 	private JTextField pcField;
-	private JTextField irField;
-	private JTextField irField1; //Index 1 of IRfile (pipelined mode only)
-	private JTextField irField2; //Index 2 of IRfile (pipelined mode only)
+	private JTextField[] irRegisters; //Index 0 used for standard IR, all three for IRfile in pipelined mode.
+//	private JTextField irField;
+//	private JTextField irField1; //Index 1 of IRfile (pipelined mode only)
+//	private JTextField irField2; //Index 2 of IRfile (pipelined mode only)
 	private JTextField statusField;
 	private JTextField marField;
 	private JTextField mbrField;
@@ -262,44 +263,46 @@ public class CPUframe extends JFrame {
 		JPanel irPanel = new JPanel();
 		
 		if (!pipeliningEnabled) { //In standard mode, just a single IR
-			irField = new JTextField(8);
-			irField.setEditable(false);
+			irRegisters = new JTextField[1];
+			irRegisters[0] = new JTextField(8);
+			irRegisters[0].setEditable(false);
 			irPanel.setMaximumSize(new Dimension(145, 60));
-			irPanel.add(irField);
+			irPanel.add(irRegisters[0]);
 			irPanel.setBorder(BorderFactory.createTitledBorder(" IR "));
 		}
 		
 		else {
 			irPanel.setLayout(new BoxLayout(irPanel, BoxLayout.Y_AXIS));			
+			irRegisters = new JTextField[3];
 			
 			JPanel ir0Panel = new JPanel();
 			ir0Panel.setBorder(BorderFactory.createEmptyBorder(5, 0, 2, 0));
-			irField = new JTextField(8);
-			irField.setEditable(false);
+			irRegisters[0] = new JTextField(8);
+			irRegisters[0].setEditable(false);
 			JLabel ir0Label = new JLabel("F/D  ");
 			ir0Panel.setMaximumSize(new Dimension(130, 50));
 			ir0Panel.setLayout(new BoxLayout(ir0Panel, BoxLayout.X_AXIS));
 			ir0Panel.add(ir0Label);
-			ir0Panel.add(irField);
+			ir0Panel.add(irRegisters[0]);
 			
 			JPanel ir1Panel = new JPanel();
-			irField1 = new JTextField(8);
-			irField1.setEditable(false);
+			irRegisters[1] = new JTextField(8);
+			irRegisters[1].setEditable(false);
 			JLabel ir1Label = new JLabel("Ex.   ");
 			ir1Panel.setMaximumSize(new Dimension(130, 50));
 			ir1Panel.setLayout(new BoxLayout(ir1Panel, BoxLayout.X_AXIS));
 			ir1Panel.add(ir1Label);
-			ir1Panel.add(irField1);
+			ir1Panel.add(irRegisters[1]);
 			
 			JPanel ir2Panel = new JPanel();
 			ir2Panel.setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 2));
-			irField2 = new JTextField(8);
-			irField2.setEditable(false);
+			irRegisters[2] = new JTextField(8);
+			irRegisters[2].setEditable(false);
 			JLabel ir2Label = new JLabel("WB   ");
 			ir2Panel.setMaximumSize(new Dimension(130, 50));
 			ir2Panel.setLayout(new BoxLayout(ir2Panel, BoxLayout.X_AXIS));
 			ir2Panel.add(ir2Label);
-			ir2Panel.add(irField2);
+			ir2Panel.add(irRegisters[2]);
 			
 			
 			
@@ -1036,98 +1039,7 @@ public class CPUframe extends JFrame {
 		this.getContentPane().add(panel1);
 	}
 	
-//	private void drawStandardCPU() {
-//		
-//		JPanel registerPanel = new JPanel();
-//		registerPanel.setMaximumSize(new Dimension(400, 400));
-//		//registerPanel.setPreferredSize(new Dimension(400, 400));
-//		registerPanel.setAlignmentX(CENTER_ALIGNMENT);
-//		registerPanel.setAlignmentY(TOP_ALIGNMENT);
-//		//registerPanel.setMaximumSize(new Dimension(20, 20));
-//		registerPanel.setBorder(BorderFactory.createTitledBorder(" CPU Registers "));
-//		registerPanel.setLayout(new BoxLayout(registerPanel, BoxLayout.Y_AXIS));
-//		//registerPanel.setLayout(new BoxLayout(registerPanel, BoxLayout.X_AXIS));
-//		
-//		JPanel topRegisterPanel = new JPanel();
-//		topRegisterPanel.setLayout(new BoxLayout(topRegisterPanel, BoxLayout.X_AXIS));
-//		
-//		JPanel controlRegistersPanel1 = new JPanel();		
-//		//controlRegistersPanel1.setLayout(new BoxLayout(controlRegistersPanel1, BoxLayout.X_AXIS));
-//		controlRegistersPanel1.setLayout(new BoxLayout(controlRegistersPanel1, BoxLayout.Y_AXIS));
-//		
-//		pcField = new JTextField(6);		
-//		pcField.setEditable(false);
-//		pcField.setAlignmentX(CENTER_ALIGNMENT);
-//		pcField.setAlignmentY(CENTER_ALIGNMENT);
-//		JPanel pcPanel = new JPanel();
-//		pcPanel.setMaximumSize(new Dimension(125, 60));
-//		pcPanel.add(pcField);
-//		pcPanel.setBorder(BorderFactory.createTitledBorder(" PC "));
-//		
-//		//UpdateListener registerListener = new UpdateListener(this);
-//		controlUnit.getPC().registerListener(new UpdateListener(this));
-//		
-//		irField = new JTextField(8);
-//		irField.setEditable(false);
-//		JPanel irPanel = new JPanel();
-//		irPanel.setMaximumSize(new Dimension(150, 90));
-//		irPanel.add(irField);
-//		irPanel.setBorder(BorderFactory.createTitledBorder(" IR "));
-//		
-//		controlUnit.getIR().registerListener(new UpdateListener(this));
-//		
-//		statusField = new JTextField(6);
-//		statusField.setEditable(false);
-//		JPanel statusPanel = new JPanel();
-//		statusPanel.setMaximumSize(new Dimension(125, 60));
-//		//statusPanel.setSize(5, 5);
-//		statusPanel.add(statusField);
-//		statusPanel.setBorder(BorderFactory.createTitledBorder(" CC "));
-//		
-//		controlUnit.getStatusRegister().registerListener(new UpdateListener(this));
-//		
-//		controlRegistersPanel1.add(pcPanel);
-//		//controlRegistersPanel1.add(irPanel);
-//		controlRegistersPanel1.add(statusPanel);
-//		controlRegistersPanel1.setBorder(BorderFactory.createEmptyBorder(0, 15, 15, 20));
-//		//registerPanel.add(controlRegistersPanel1);
-//		
-//		
-//		JPanel controlRegistersPanel2 = new JPanel();
-//		//controlRegistersPanel2.setLayout(new BoxLayout(controlRegistersPanel2, BoxLayout.X_AXIS));
-//		controlRegistersPanel2.setLayout(new BoxLayout(controlRegistersPanel2, BoxLayout.Y_AXIS));
-//		
-//		marField = new JTextField(8);
-//		marField.setEditable(false);		
-//		JPanel marPanel = new JPanel();
-//		marPanel.setMaximumSize(new Dimension(150, 60));
-//		marPanel.add(marField);
-//		cyanLine = BorderFactory.createLineBorder(Color.blue);
-//		marPanel.setBorder(BorderFactory.createTitledBorder(cyanLine, " MAR "));
-//		controlUnit.getMAR().registerListener(new UpdateListener(this));
-//		
-//		mbrField = new JTextField(8);
-//		mbrField.setEditable(false);
-//		JPanel mbrPanel = new JPanel();
-//		mbrPanel.setMaximumSize(new Dimension(150, 60));
-//		mbrPanel.add(mbrField);
-//		magentaLine = BorderFactory.createLineBorder(Color.magenta);
-//		mbrPanel.setBorder(BorderFactory.createTitledBorder(magentaLine, " MBR "));
-//		controlUnit.getMBR().registerListener(new UpdateListener(this));
-//		
-//		controlRegistersPanel2.add(marPanel);
-//		controlRegistersPanel2.add(mbrPanel);
-//		controlRegistersPanel2.add(irPanel);
-//		controlRegistersPanel2.setBorder(BorderFactory.createEmptyBorder(0, 15, 30, 0));
-//		
-//		topRegisterPanel.add(controlRegistersPanel1);
-//		topRegisterPanel.add(controlRegistersPanel2);
-//		//topRegisterPanel.setPreferredSize(new Dimension(500, 600));
-//		
-//		//registerPanel.add(controlRegistersPanel2);
-//		registerPanel.add(topRegisterPanel);
-//		//registerPanel.setMinimumSize(new Dimension(10000, 1000));
-//	}
+
 	
 	/*
 	 * Event listening inner classes
@@ -1331,6 +1243,7 @@ public class CPUframe extends JFrame {
 					CPUframe.this.memory = cpuBuilder.getMemoryModule();
 					CPUframe.this.loader = cpuBuilder.getLoader();
 					CPUframe.this.systemBusController = cpuBuilder.getBusController();	
+				
 					
 					getContentPane().remove(panel1);
 					getContentPane().remove(panel2);
@@ -1385,8 +1298,8 @@ public class CPUframe extends JFrame {
 
 
 
-	public JTextComponent getIRfield() {
-		return this.irField;
+	public JTextField getIRfield(int index) {
+		return this.irRegisters[index];
 	}
 	
 	public JTextArea getMemoryField() {
@@ -1472,6 +1385,14 @@ public class CPUframe extends JFrame {
 	
 	public JTextArea getActivityMonitor() {		
 		return this.activityArea;		
+	}
+	
+	public JTextArea getActivityMonitor1() { //For pipelined execute stage updates
+		return this.activityArea1;
+	}
+	
+	public JTextArea getActivityMonitor2() { //For pipelined write back stage updates
+		return this.activityArea2;
 	}
 	
 	public JTextField getAddressBusField() {
