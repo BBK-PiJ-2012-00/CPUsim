@@ -79,4 +79,9 @@ public interface InstructionRegister {
 	 * @param int index the index of the slot in the IRfile.
 	 */
 	public void loadIR(int index, Instruction instr);
+	
+	
+
+
+	void fireUpdate(int index, String update);
 }
