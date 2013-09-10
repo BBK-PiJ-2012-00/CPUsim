@@ -1,5 +1,7 @@
 package code;
 
+import javax.swing.SwingUtilities;
+
 /*
  * This class is now a singleton (there can only be once instance, with a global access point). Because this class
  * is referenced by the ControlLine class, as well as the ControlUnit class, it is important that only one instance
@@ -15,29 +17,14 @@ public class MBR implements MemoryBufferRegister {
 	private Data registerContents;
 	private UpdateListener updateListener;
 	
-	private boolean lockAcquired;
-	
-	public synchronized void acquireLock() {
-		lockAcquired = true;
-	}
-	
-	public synchronized void releaseLock() {
-		lockAcquired = false;
-	}
-	
-	public boolean lockIsAcquired() {
-		return lockAcquired;
-	}
-	
-	
 	
 	@Override
 	public synchronized boolean write(Data data) { //Successful write returns true
 		//Size is restricted in Instruction/Operand classes
 		registerContents = data;
-		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, display());
-		updateListener.handleUpDateEvent(updateEvent);
-		
+//		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, display());
+//		updateListener.handleUpDateEvent(updateEvent);
+		fireUpdate(display());
 		if (registerContents == null) {
 			return false;
 		}
@@ -64,6 +51,18 @@ public class MBR implements MemoryBufferRegister {
 	public void registerListener(UpdateListener listener) {
 		this.updateListener = listener;
 		
+	}
+	
+	//GUI events should be handled from EDT
+	//This adds the update event to the EDT thread. Need to test this works on the GUI
+	@Override
+	public void fireUpdate(final String update) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+			    ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(MBR.this, update);
+				MBR.this.updateListener.handleUpDateEvent(updateEvent);	
+			}
+		});
 	}
 
 

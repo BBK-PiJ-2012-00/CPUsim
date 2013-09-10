@@ -22,4 +22,7 @@ public interface MemoryAddressRegister {
 	public String display();
 
 	public void registerListener(UpdateListener registerListener);
+	
+	public void fireUpdate(String update);
 }
+

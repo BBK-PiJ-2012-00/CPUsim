@@ -1,5 +1,7 @@
 package code;
 
+import javax.swing.SwingUtilities;
+
 /*
  * Class to represent Memory Address Register. This is a singleton to ensure only one instance.  See MBR
  * class for motivation.
@@ -8,21 +10,6 @@ public class MAR implements MemoryAddressRegister {
 	private UpdateListener updateListener;
 	
 	private int registerContents;
-	
-	private boolean lockAcquired;
-	
-	public synchronized void acquireLock() {
-		lockAcquired = true;
-	}
-	
-	public synchronized void releaseLock() {
-		lockAcquired = false;
-	}
-	
-	public synchronized boolean lockIsAcquired() {
-		return lockAcquired;
-	}
-	
 	
 	
 	public void registerListener(UpdateListener listener) {
@@ -40,8 +27,9 @@ public class MAR implements MemoryAddressRegister {
 	@Override
 	public void write(int address) {
 		registerContents = address;
-		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, display());
-		updateListener.handleUpDateEvent(updateEvent);
+//		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, display());
+//		updateListener.handleUpDateEvent(updateEvent);
+		fireUpdate(display());
 		
 	}
 	
@@ -61,4 +49,18 @@ public class MAR implements MemoryAddressRegister {
 		return marDisplay;
 	}
 
+
+
+	//GUI events should be handled from EDT
+	//This adds the update event to the EDT thread. Need to test this works on the GUI
+	@Override
+	public void fireUpdate(final String update) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+			    ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(MAR.this, update);
+				MAR.this.updateListener.handleUpDateEvent(updateEvent);	
+			}
+		});
+	}
+	
 }
