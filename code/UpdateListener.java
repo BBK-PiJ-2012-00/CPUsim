@@ -49,7 +49,7 @@ public class UpdateListener implements EventListener {
 		}
 		
 		else if (e.getSource() instanceof ControlLine) {
-			if (e.isControlLineUpdate()) {
+			if (e.isControlLineUpdate()) { //Boolean to differentiate between control line field update and activity monitor update
 				frame.getControlLineField().setText(e.getUpdate());
 			}
 			else {
@@ -58,10 +58,21 @@ public class UpdateListener implements EventListener {
 			}
 		}
 		
-		else if ((e.getSource() instanceof FetchDecodeStage) || (e.getSource() instanceof ExecuteStage) ||
-				(e.getSource() instanceof WriteBackStage)) {
+		//Handles updates for pipelined and standard f/d stages, and standard execute and write back stages.
+		else if ((e.getSource() instanceof FetchDecodeStage) || (e.getSource() instanceof StandardExecuteStage) ||
+				(e.getSource() instanceof StandardWriteBackStage)) {
 			frame.getActivityMonitor().append(e.getUpdate()); //Append new update to existing text
 			frame.getActivityMonitor().setCaretPosition(frame.getActivityMonitor().getDocument().getLength());
+		}
+		
+		else if (e.getSource() instanceof PipelinedExecuteStage) { //Write to execute stage activity monitor (pipelined)
+			frame.getActivityMonitor1().append(e.getUpdate()); //Append new update to existing text
+			frame.getActivityMonitor1().setCaretPosition(frame.getActivityMonitor1().getDocument().getLength());
+		}
+		
+		else if (e.getSource() instanceof PipelinedWriteBackStage) { //Write to write back activity monitor (pipelined)
+			frame.getActivityMonitor2().append(e.getUpdate());
+			frame.getActivityMonitor2().setCaretPosition(frame.getActivityMonitor2().getDocument().getLength());
 		}
 		
 		/*
