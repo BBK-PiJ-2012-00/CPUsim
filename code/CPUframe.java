@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.Thread.State;
 import java.util.EventListener;
 
 import javax.swing.BorderFactory;
@@ -74,9 +75,6 @@ public class CPUframe extends JFrame {
 	
 	private JTextField pcField;
 	private JTextField[] irRegisters; //Index 0 used for standard IR, all three for IRfile in pipelined mode.
-//	private JTextField irField;
-//	private JTextField irField1; //Index 1 of IRfile (pipelined mode only)
-//	private JTextField irField2; //Index 2 of IRfile (pipelined mode only)
 	private JTextField statusField;
 	private JTextField marField;
 	private JTextField mbrField;
@@ -103,8 +101,6 @@ public class CPUframe extends JFrame {
 	private JTextField addressBusField;
 	private JTextField dataBusField;
 	
-	private Font buttonFont;
-	
 	private JButton fileOpenButton;
 	private JButton modeSwitchButton;
 	
@@ -121,8 +117,6 @@ public class CPUframe extends JFrame {
 		this.memory = cpuBuilder.getMemoryModule();
 		this.loader = cpuBuilder.getLoader();
 		this.systemBusController = cpuBuilder.getBusController();	
-		
-		buttonFont = new Font("andale mono", Font.PLAIN, 13);
 		
 		createComponents();		
 		
@@ -143,8 +137,8 @@ public class CPUframe extends JFrame {
 //		panel4.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		
 		
-		drawStandardPanel1();
-		drawStandardPanel2();
+		drawPanel1();
+		drawPanel2();
 		drawPanel3();
 		drawPanel4();
 	}
@@ -154,7 +148,7 @@ public class CPUframe extends JFrame {
 		/*
 		 * Panel 1: assembler and activity monitor
 		 */
-	public void drawStandardPanel1() {
+	public void drawPanel1() {
 		
 		panel1 = new JPanel();
 		panel1.setLayout(new BoxLayout(panel1, BoxLayout.Y_AXIS));
@@ -163,13 +157,20 @@ public class CPUframe extends JFrame {
 		//panel1.setMaximumSize(new Dimension(0, 1000)); //Use Box to keep things rigid
 		panel1.setMinimumSize(new Dimension(340, 800));
 
-	
+
 		/*
 		 * Assembler display in panel 1
 		 */
 		JPanel assemblerBufferPanel = new JPanel(); //To make border equal to controlPanel above
 		JPanel assemblerContentPanel = new JPanel();
-		assemblyProgramArea = new JTextArea(20, 32);
+		
+		if (!pipeliningEnabled) {
+			assemblyProgramArea = new JTextArea(20, 32);
+		}
+		else {
+			assemblyProgramArea = new JTextArea(17, 32); //Slightly smaller assembly program area for pipelined mode as more content must fit in window
+		}
+		
 		assemblyProgramArea.setEditable(false);
 		assemblyProgramArea.setCaretPosition(0);
 		
@@ -179,12 +180,8 @@ public class CPUframe extends JFrame {
 		
 		assemblerContentPanel.add(assemblerBufferPanel);
 		
-		JPanel assemblerPanel = new JPanel();
-		//assemblerPanel.setLayout(new BoxLayout(assemblerPanel, BoxLayout.Y_AXIS));
-		assemblerPanel.add(assemblerContentPanel);		
-		//assemblerPanel.setAlignmentX(LEFT_ALIGNMENT);
-		//assemblerPanel.setAlignmentY(BOTTOM_ALIGNMENT);
-		
+		JPanel assemblerPanel = new JPanel();		
+		assemblerPanel.add(assemblerContentPanel);	
 		
 		assemblerContentPanel.setBorder(BorderFactory.createTitledBorder(" Assembly Program "));
 		
@@ -196,27 +193,79 @@ public class CPUframe extends JFrame {
 		 */
 		JPanel activityBufferPanel = new JPanel(); //To make border equal to controlPanel and assembly above
 		JPanel activityContentPanel = new JPanel();
-		activityArea = new JTextArea(18, 32);
-		activityArea.setEditable(false);
 		
-		JScrollPane activityScroller = new JScrollPane(activityArea);
+		if (!pipeliningEnabled) { //One large activity monitor in standard mode
+			activityArea = new JTextArea(18, 32);
+			activityArea.setEditable(false);
+			JScrollPane activityScroller = new JScrollPane(activityArea);
+			
+			activityBufferPanel.add(activityScroller);
+			
+			activityContentPanel.add(activityBufferPanel);
+			
+			JPanel activityPanel = new JPanel();
+			activityPanel.add(activityContentPanel);			
+			
+			activityContentPanel.setBorder(BorderFactory.createTitledBorder(" Activity Monitor "));
+			//activityPanel.setAlignmentX(LEFT_ALIGNMENT);
+			
+			panel1.add(activityPanel);
 		
-		activityBufferPanel.add(activityScroller);
+		}
 		
-		activityContentPanel.add(activityBufferPanel);
-		
-		JPanel activityPanel = new JPanel();
-		activityPanel.add(activityContentPanel);			
-		
-		activityContentPanel.setBorder(BorderFactory.createTitledBorder(" Activity Monitor "));
-		//activityPanel.setAlignmentX(LEFT_ALIGNMENT);
+		else { //Pipelining enabled, create three smaller activity monitors specific to each stage
+			
+			JPanel activityBufferPanel1 = new JPanel();
+			JPanel activityBufferPanel2 = new JPanel();
+			
+			//JPanel activityContentPanel = new JPanel();
+			activityContentPanel.setLayout(new BoxLayout(activityContentPanel, BoxLayout.Y_AXIS));
+			
+			//Activity area for fetch/decode stage
+			activityArea = new JTextArea(6, 32);
+			activityArea.setEditable(false);		
+			JScrollPane activityScroller = new JScrollPane(activityArea);
+			
+			//Activity area for execute stage
+			activityArea1 = new JTextArea(6, 32);
+			activityArea1.setEditable(false);
+			JScrollPane activityScroller1 = new JScrollPane(activityArea1);
+			
+			//Activity area for ewriteBackStage stage
+			activityArea2 = new JTextArea(5, 32);
+			activityArea2.setEditable(false);
+			JScrollPane activityScroller2 = new JScrollPane(activityArea2);
+			
+			
+			
+			activityBufferPanel.add(activityScroller);
+			activityBufferPanel1.add(activityScroller1);
+			activityBufferPanel2.add(activityScroller2);
+			
+			activityBufferPanel.setBorder(BorderFactory.createTitledBorder(" Fetch/Decode Stage Activity "));
+			activityBufferPanel1.setBorder(BorderFactory.createTitledBorder(" Execute Stage Activity "));
+			activityBufferPanel2.setBorder(BorderFactory.createTitledBorder(" Write Back Stage Activity "));
+			
+			activityContentPanel.add(activityBufferPanel);
+			activityContentPanel.add(activityBufferPanel1);
+			activityContentPanel.add(activityBufferPanel2);
+			
+			JPanel activityPanel = new JPanel();
+			activityPanel.add(activityContentPanel);
+			
+			panel1.add(activityPanel);
+			
+		}
 		
 		controlUnit.getFetchDecodeStage().registerListener(new UpdateListener(this)); //Register a listener with FD stage
 		controlUnit.getExecuteStage().registerListener(new UpdateListener(this)); //Register a listener with Ex. stage
+		controlUnit.getWriteBackStage().registerListener(new UpdateListener(this)); //Register a listener with WB stage
 		
-		panel1.add(activityPanel);
+		
 		
 		this.getContentPane().add(panel1);
+		
+		
 	}
 	
 		
@@ -225,7 +274,7 @@ public class CPUframe extends JFrame {
 		 * CPU registers
 		 */
 		
-	public void drawStandardPanel2() {
+	public void drawPanel2() {
 		
 		panel2 = new JPanel();
 		panel2.setLayout(new BoxLayout(panel2, BoxLayout.Y_AXIS));
@@ -248,12 +297,12 @@ public class CPUframe extends JFrame {
 		//controlRegistersPanel1.setLayout(new BoxLayout(controlRegistersPanel1, BoxLayout.X_AXIS));
 		controlRegistersPanel1.setLayout(new BoxLayout(controlRegistersPanel1, BoxLayout.Y_AXIS));
 		
-		pcField = new JTextField(8);		
+		pcField = new JTextField(9);		
 		pcField.setEditable(false);
 		pcField.setAlignmentX(CENTER_ALIGNMENT);
 		pcField.setAlignmentY(CENTER_ALIGNMENT);
 		JPanel pcPanel = new JPanel();
-		pcPanel.setMaximumSize(new Dimension(145, 60));
+		pcPanel.setMaximumSize(new Dimension(150, 60));
 		pcPanel.add(pcField);
 		pcPanel.setBorder(BorderFactory.createTitledBorder(" PC "));
 		
@@ -266,7 +315,7 @@ public class CPUframe extends JFrame {
 			irRegisters = new JTextField[1];
 			irRegisters[0] = new JTextField(8);
 			irRegisters[0].setEditable(false);
-			irPanel.setMaximumSize(new Dimension(145, 60));
+			irPanel.setMaximumSize(new Dimension(150, 60));
 			irPanel.add(irRegisters[0]);
 			irPanel.setBorder(BorderFactory.createTitledBorder(" IR "));
 		}
@@ -277,29 +326,29 @@ public class CPUframe extends JFrame {
 			
 			JPanel ir0Panel = new JPanel();
 			ir0Panel.setBorder(BorderFactory.createEmptyBorder(5, 0, 2, 0));
-			irRegisters[0] = new JTextField(8);
+			irRegisters[0] = new JTextField(9);
 			irRegisters[0].setEditable(false);
 			JLabel ir0Label = new JLabel("F/D  ");
-			ir0Panel.setMaximumSize(new Dimension(130, 50));
+			ir0Panel.setMaximumSize(new Dimension(140, 50));
 			ir0Panel.setLayout(new BoxLayout(ir0Panel, BoxLayout.X_AXIS));
 			ir0Panel.add(ir0Label);
 			ir0Panel.add(irRegisters[0]);
 			
 			JPanel ir1Panel = new JPanel();
-			irRegisters[1] = new JTextField(8);
+			irRegisters[1] = new JTextField(9);
 			irRegisters[1].setEditable(false);
 			JLabel ir1Label = new JLabel("Ex.   ");
-			ir1Panel.setMaximumSize(new Dimension(130, 50));
+			ir1Panel.setMaximumSize(new Dimension(140, 50));
 			ir1Panel.setLayout(new BoxLayout(ir1Panel, BoxLayout.X_AXIS));
 			ir1Panel.add(ir1Label);
 			ir1Panel.add(irRegisters[1]);
 			
 			JPanel ir2Panel = new JPanel();
 			ir2Panel.setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 2));
-			irRegisters[2] = new JTextField(8);
+			irRegisters[2] = new JTextField(9);
 			irRegisters[2].setEditable(false);
 			JLabel ir2Label = new JLabel("WB   ");
-			ir2Panel.setMaximumSize(new Dimension(130, 50));
+			ir2Panel.setMaximumSize(new Dimension(140, 50));
 			ir2Panel.setLayout(new BoxLayout(ir2Panel, BoxLayout.X_AXIS));
 			ir2Panel.add(ir2Label);
 			ir2Panel.add(irRegisters[2]);
@@ -949,96 +998,7 @@ public class CPUframe extends JFrame {
 	
 	}
 	
-	
-	//Redraws panel 1 to acheive GUI display suitable for pipelined mode
-	private void drawPipelinedPanel1() {		
-		
-		panel1 = new JPanel();
-		panel1.setLayout(new BoxLayout(panel1, BoxLayout.Y_AXIS));
-		panel1.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5));
-		//panel1.setBackground(Color.cyan);
-		//panel1.setMaximumSize(new Dimension(0, 1000)); //Use Box to keep things rigid
-		panel1.setMinimumSize(new Dimension(340, 800));
 
-	
-		/*
-		 * Assembler display in panel 1
-		 */
-		JPanel assemblerBufferPanel = new JPanel(); //To make border equal to controlPanel above
-		JPanel assemblerContentPanel = new JPanel();
-		assemblyProgramArea = new JTextArea(17, 32);
-		assemblyProgramArea.setEditable(false);
-		assemblyProgramArea.setCaretPosition(0);
-		
-		JScrollPane assemblerScroller = new JScrollPane(assemblyProgramArea);
-		
-		assemblerBufferPanel.add(assemblerScroller);
-		
-		assemblerContentPanel.add(assemblerBufferPanel);
-		
-		JPanel assemblerPanel = new JPanel();
-		//assemblerPanel.setLayout(new BoxLayout(assemblerPanel, BoxLayout.Y_AXIS));
-		assemblerPanel.add(assemblerContentPanel);		
-		//assemblerPanel.setAlignmentX(LEFT_ALIGNMENT);
-		//assemblerPanel.setAlignmentY(BOTTOM_ALIGNMENT);
-		
-		
-		assemblerContentPanel.setBorder(BorderFactory.createTitledBorder(" Assembly Program "));
-		
-		panel1.add(assemblerPanel);		
-		//Assembly program panel isn't fixed size; things move when frame resied; panels not fixed size.
-		
-		
-		/*
-		 * Activity Monitor display in panel1
-		 */
-		JPanel activityBufferPanel = new JPanel(); //To make border equal to controlPanel and assembly above
-		JPanel activityBufferPanel1 = new JPanel();
-		JPanel activityBufferPanel2 = new JPanel();
-		
-		JPanel activityContentPanel = new JPanel();
-		activityContentPanel.setLayout(new BoxLayout(activityContentPanel, BoxLayout.Y_AXIS));
-		
-		//Activity area for fetch/decode stage
-		activityArea = new JTextArea(6, 32);
-		activityArea.setEditable(false);		
-		JScrollPane activityScroller = new JScrollPane(activityArea);
-		
-		//Activity area for execute stage
-		activityArea1 = new JTextArea(6, 32);
-		activityArea1.setEditable(false);
-		JScrollPane activityScroller1 = new JScrollPane(activityArea1);
-		
-		//Activity area for ewriteBackStage stage
-		activityArea2 = new JTextArea(5, 32);
-		activityArea2.setEditable(false);
-		JScrollPane activityScroller2 = new JScrollPane(activityArea2);
-		
-		
-		
-		activityBufferPanel.add(activityScroller);
-		activityBufferPanel1.add(activityScroller1);
-		activityBufferPanel2.add(activityScroller2);
-		
-		activityBufferPanel.setBorder(BorderFactory.createTitledBorder(" Fetch/Decode Stage Activity "));
-		activityBufferPanel1.setBorder(BorderFactory.createTitledBorder(" Execute Stage Activity "));
-		activityBufferPanel2.setBorder(BorderFactory.createTitledBorder(" Write Back Stage Activity "));
-		
-		activityContentPanel.add(activityBufferPanel);
-		activityContentPanel.add(activityBufferPanel1);
-		activityContentPanel.add(activityBufferPanel2);
-		
-		JPanel activityPanel = new JPanel();
-		activityPanel.add(activityContentPanel);			
-		
-		controlUnit.getFetchDecodeStage().registerListener(new UpdateListener(this)); //Register a listener with FD stage
-		controlUnit.getExecuteStage().registerListener(new UpdateListener(this)); //Register a listener with Ex. stage
-		
-		panel1.add(activityPanel);
-		
-		this.getContentPane().add(panel1);
-	}
-	
 
 	
 	/*
@@ -1071,6 +1031,7 @@ public class CPUframe extends JFrame {
 					executionWorker = new ExecutionWorker();
 					System.out.println("Created new thread, ready to exectute.");
 					executionWorker.execute();
+					
 				}
 				else {
 					System.out.println("Execution worker isn't null, so nothing created.");
@@ -1095,10 +1056,15 @@ public class CPUframe extends JFrame {
 				executionWorker.cancel(true); //Old worker thread needs terminating
 				executionWorker = null;
 				
-				//Clear fields
+				//Clear fields				
 				memory.clearMemory();
 	            activityArea.setText("");
-	            controlUnit.clearRegisters();            
+	            controlUnit.clearRegisters(); 
+	            if (pipeliningEnabled) {
+	            	activityArea1.setText("");
+	            	activityArea2.setText("");
+	            }
+				
 	           
 	            assembler = new AssemblerImpl(loader);
 	            assembler.selectFile(currentAssemblyFile); //Reopen previously selected assembly file
@@ -1151,6 +1117,11 @@ public class CPUframe extends JFrame {
 			    		
 			    		assemblyProgramArea.setText(assembler.display());
 			    		assemblyProgramArea.setCaretPosition(0);
+			    		
+			    		if (executionWorker != null) { //Cancel and nullify execution worker if it's active
+				    		executionWorker.cancel(true);
+				    		executionWorker = null;
+			    		}
 		    		}
 		    		else {
 		    			currentAssemblyFile = null; //Prevent execution from being allowed if file not found	    			
@@ -1170,26 +1141,35 @@ public class CPUframe extends JFrame {
 				JLabel noFileErrorMessage = new JLabel("Please select an assembly file first!");
 				JOptionPane.showMessageDialog(null, noFileErrorMessage, "Error!", JOptionPane.WARNING_MESSAGE);
 			}
-			else if (systemBusController.accessControlLine().isWaiting()) {
-				synchronized(systemBusController.accessControlLine()) {
-					systemBusController.accessControlLine().notify();
-					System.out.println("bus notify called");
-				}
-			}
-			else if (controlUnit.getFetchDecodeStage().isWaiting()) {
-				synchronized(controlUnit.getFetchDecodeStage()) {
-					controlUnit.getFetchDecodeStage().notify();
-					System.out.println("f/d notify called");
-				}
-			}
-			else if (controlUnit.getExecuteStage().isWaiting()) {
-				synchronized(controlUnit.getExecuteStage()) {
-					controlUnit.getExecuteStage().notify();
-					System.out.println("ex notify called");
-				}
-			}
 			else {
-				System.out.println("No action taken by Step button.");
+				if (systemBusController.accessControlLine().isWaiting()) {
+					synchronized(systemBusController.accessControlLine()) {
+						systemBusController.accessControlLine().notifyAll();
+						System.out.println("bus notify called");
+					}
+				}
+				if (controlUnit.getFetchDecodeStage().isWaiting()) {
+					synchronized(controlUnit.getFetchDecodeStage()) {
+						controlUnit.getFetchDecodeStage().notifyAll();
+						System.out.println("f/d notify called");
+					}
+				}
+				if (controlUnit.getExecuteStage().isWaiting()) {
+					System.out.println("About to enter synchronized notify for execute stage.");
+					synchronized(controlUnit.getExecuteStage()) {
+						controlUnit.getExecuteStage().notifyAll();
+						System.out.println("ex notify called");
+					}
+				}
+				if (controlUnit.getWriteBackStage().isWaiting()) {
+					synchronized(controlUnit.getWriteBackStage()) {
+						controlUnit.getWriteBackStage().notifyAll();
+						System.out.println("wb notify called");
+					}
+				}
+				else {
+					System.out.println("No action taken by Step button.");
+				}
 			}
 		}
 		
@@ -1243,14 +1223,15 @@ public class CPUframe extends JFrame {
 					CPUframe.this.memory = cpuBuilder.getMemoryModule();
 					CPUframe.this.loader = cpuBuilder.getLoader();
 					CPUframe.this.systemBusController = cpuBuilder.getBusController();	
+					CPUframe.this.executionWorker = null;
 				
 					
 					getContentPane().remove(panel1);
 					getContentPane().remove(panel2);
 					getContentPane().remove(panel3);
 					getContentPane().remove(panel4);
-					drawPipelinedPanel1();
-					drawStandardPanel2();
+					drawPanel1();
+					drawPanel2();
 					drawPanel3();
 					drawPanel4();
 					revalidate();
@@ -1268,13 +1249,14 @@ public class CPUframe extends JFrame {
 					CPUframe.this.memory = cpuBuilder.getMemoryModule();
 					CPUframe.this.loader = cpuBuilder.getLoader();
 					CPUframe.this.systemBusController = cpuBuilder.getBusController();	
+					CPUframe.this.executionWorker = null;
 					
 					getContentPane().remove(panel1);
 					getContentPane().remove(panel2);
 					getContentPane().remove(panel3);
 					getContentPane().remove(panel4);
-					drawStandardPanel1();
-					drawStandardPanel2();
+					drawPanel1();
+					drawPanel2();
 					drawPanel3();
 					drawPanel4();
 					revalidate();
