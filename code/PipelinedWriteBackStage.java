@@ -38,11 +38,11 @@ public class PipelinedWriteBackStage extends WriteBackStage {
 		try {
 			wait();
 		}
-		catch (InterruptedException e) {
-			e.printStackTrace();
+		catch (InterruptedException e) { //If reset is clicked on GUI, swing worker thread in ex. stage will trigger interrupt
+			e.printStackTrace();		//and stop this thread from running
 			setWaitStatus(false);
-			Thread.currentThread().interrupt();
-			return; //Not enough to stop execution!
+			Thread.currentThread().interrupt(); 
+			return; 
 		}
 		setWaitStatus(false);
 	}
@@ -52,10 +52,11 @@ public class PipelinedWriteBackStage extends WriteBackStage {
 		setActive(true);
 		while (isActive()) {
 			try {
-				fireUpdate("(Idle)");
+				fireUpdate("> Waiting to receive operand from Ex. Stage.\n");
 				System.out.println("Attempting take...");
 				Instruction instr = executeToWriteQueue.take();
-				System.out.println("Taken instruction: " + instr.toString());
+				fireUpdate("> Received operand " + getResult() + " from Ex. Stage.\n");
+				
 				
 				if (Thread.currentThread().isInterrupted()) {
 					setActive(false);
@@ -71,8 +72,8 @@ public class PipelinedWriteBackStage extends WriteBackStage {
 				}
 				
 				instructionWriteBack(getResult()); //Get result from result field in WriteBackStage
-				if (Thread.currentThread().isInterrupted()) {
-					setActive(false);
+				if (Thread.currentThread().isInterrupted()) { 
+					setActive(false); //Signal to ex. stage that interrupt has been issued (Ex. checks status of WB's active).
 					return;
 				}
 				getIR().clear(2); //Reset IR once write back operation complete.
@@ -96,8 +97,7 @@ public class PipelinedWriteBackStage extends WriteBackStage {
 			}
 		});
 	}
-	
-	//What about making active boolean static? This would mean all stages are accessing the same one.
+
 
 
 
