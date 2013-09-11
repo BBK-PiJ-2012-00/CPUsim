@@ -20,8 +20,12 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	}
 	
 	/*
-	 * Interrupted status must be polled continuously to check for a pipeline flush originating 
-	 * from execute stage.
+	 * Interrupted status must be polled continuously to check for an interrupt originating 
+	 * from execute stage, which occurs if the pipelined is flushed or the user clicks "reset"
+	 * on the GUI. Although it is far more likely that the thread will be interrupted at
+	 * a wait() statement, it is still possible that it will receive an interrupt before it hits
+	 * a wait() statement, which will not cause an InterruptedException to be thrown, only its interrupted
+	 * flag to bet set to true.
 	 */
 	public boolean instructionFetch() {
 		
@@ -34,25 +38,20 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	
 	/*
 	 * Similarly to the fetch method above, the interrupted status of the thread must be continuously
-	 * polled to check for an interrupt caused by a pipeline flush originating in execute stage.
+	 * polled to check for an interrupt caused by a pipeline flush originating in execute stage, or
+	 * from the user clicking "rest" on the GUI (which also causes an interrupt to be issued).
 	 */
 	public int instructionDecode() { //Returns int value of opcode
 		Instruction instr = getIR().read();
 		System.out.println("Instruction fetched and about to be decoded is: " + instr.toString());
 		int opcodeValue = instr.getOpcode().getValue(); //Gets instruction opcode as int value
 		
-		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
-			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
-			//setPipelineFlush(true);
+		if (Thread.currentThread().isInterrupted()) { 
 			return -1; //Do not continue execution if interrupted (pipeline flush)
 		}
 		
-//		getPC().incrementPC(); //Increment PC; done here so that with pipelining, the next instruction can be fetched at this point
-//		this.fireUpdate("PC incremented by 1 (ready for next instruction fetch) \n");
 		
-		if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
-			fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
-			//setPipelineFlush(true);
+		if (Thread.currentThread().isInterrupted()) { 
 			return -1;
 		}
 		
@@ -82,8 +81,22 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 			setActive(this.instructionFetch()); //Set to false if interrupted, and execution is cancelled below
 			System.out.println("FD returned from fetch, active = " + isActive());
 			if (!isActive() || isPipelineFlush()) { //This will happen if an interrupt takes places within instructionFetch()
-				System.out.println("PipelineFlush: " + isPipelineFlush());
-				System.out.println("About to call return before getting to decode() from within run()");
+				if (isPipelineFlush()) {
+					fireUpdate("** PIPELINE FLUSH ** \nFetch/decode of instruction at address " + getMAR().read() + 
+							" abandoned.");
+					
+					//Wait here so that user has a chance to see this update and think about it.
+					setWaitStatus(true);
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+						setWaitStatus(false);
+						return; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called)
+					}
+					setWaitStatus(false);						
+				}
+				
 				if (((ReentrantLock) getLock()).isHeldByCurrentThread()) {//If interrupted during accessMemory(), must release lock
 					getLock().unlock();
 				}
@@ -91,11 +104,42 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 			}
 			this.setOpcodeValue(this.instructionDecode());
 			if (this.getOpcodeValue() == -1) { //Signals interrupted wait(); execution should be cancelled
+				if (isPipelineFlush()) {
+					fireUpdate("** PIPELINE FLUSH ** \nFetch/decode of instruction at address " + getMAR().read() + 
+							" abandoned.");
+					
+					//Wait here so that user has a chance to see this update and think about it.
+					setWaitStatus(true);
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+						setWaitStatus(false);
+						return; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called)
+					}
+					setWaitStatus(false);				
+					
+				}
 				setActive(false);
 				return; //Additional boolean may need to be set so controlUnit knows what's going on
 			}
 			boolean forwardSuccessful = this.forward();
 			if (!forwardSuccessful) { //Interrupt meaning reset clicked or HALT decoded; cancel execution of THIS stage.
+				if (isPipelineFlush()) {
+					fireUpdate("** PIPELINE FLUSH ** \nFetch/decode of instruction at address " + getMAR().read() + 
+							" abandoned.");
+					
+					//Wait here so that user has a chance to see this update and think about it.
+					setWaitStatus(true);
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+						setWaitStatus(false);
+						return; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called)
+					}
+					setWaitStatus(false);				
+				}
 				setActive(false);
 				return;
 			}
@@ -134,9 +178,7 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	//If this stage is waiting on a put(), and branch is taken, the put should be interrupted, and this stage is 
 	//deactivated.
 	
-//	public boolean isActive() {
-//		return this.active;
-//	}
+
 	
 	/*
 	 * There must be a way to differentiate between interrupts generated by pipelining flushing
@@ -145,15 +187,7 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	 * altogether.
 	 * 
 	 */
-//	@Override
-//	public void setPipelineFlush(boolean isFlush) { //For pipeline flushing
-//		this.pipelineFlush = isFlush;
-//		System.out.println("PIPELINE FLUSH TRIGGERED");
-//	}
-	
-//	public boolean flushed() {
-//		return this.pipelineFlush;
-//	}
+
 	
 	//GUI events should not be handled from this thread but from EDT or SwingWorker
 	//This adds the update event to the EDT thread. Need to test this works on the GUI
