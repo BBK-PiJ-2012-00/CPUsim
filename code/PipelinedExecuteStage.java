@@ -1,6 +1,7 @@
 package code;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.SwingUtilities;
 
@@ -36,20 +37,21 @@ public class PipelinedExecuteStage extends ExecuteStage {
 			case 1: //A LOAD instruction
 					
 					System.out.println("E: about to accesMemory()");
-					accessMemory(false, true, false); //For pipelined execution, there is the possibility of conflicts
+					boolean loadSuccessful = accessMemory(false, true, false); //For pipelined execution, there is the possibility of conflicts
 					//with the f/d stage, as both this operation and fetch operations in the f/d stage make use of the
 					//MAR and MBR registers. accessMemory() is synchronized on a static lock object and ensures that
 					//only one of a LOAD, STORE or instruction fetch operation may take place at any one time.
-					
+					return loadSuccessful;
 					
 
-					break;
+					//break;
 					
 					
 			case 2: //A STORE instruction
 				
-					accessMemory(false, false, true);					
-					break;
+					boolean storeSuccessful = accessMemory(false, false, true);	
+					return storeSuccessful;
+					//break;
 					
 					
 			case 3: //A MOVE instruction (moving data between registers)
@@ -471,7 +473,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 	public synchronized void run() {
 		setActive(true);
 		
-		System.out.println("Entering E run()");
+		System.out.println("Entering E run(), SW thread ID: " + Thread.currentThread().getId());
 		fetchDecodeThread = new Thread(fetchDecodeStage);
 		fetchDecodeThread.start();
 		
@@ -490,12 +492,21 @@ public class PipelinedExecuteStage extends ExecuteStage {
 				System.out.println("Just taken " + instr + " from queue");
 				System.out.println("IR at 1 " + getIR().read(1));
 				setActive(this.instructionExecute(opcodeValue));
+				System.out.println("E: just returned from instructionExecute.");
+				if (!isActive()) {
+					System.out.println("Throwing homemade interrupt exception after returning false from execute.");
+					throw new InterruptedException(); //Prompt termination of other threads
+				}
 				getIR().clear(1); //Reset
 			}
 			catch (InterruptedException ex) {
 				ex.printStackTrace();
 				fetchDecodeThread.interrupt();
 				writeBackThread.interrupt();
+				if (((ReentrantLock) getLock()).isHeldByCurrentThread()) {//If interrupted during accessMemory(), must release lock
+					getLock().unlock();
+				}
+				System.out.println("!@!@!@!@" + ((ReentrantLock) getLock()).isLocked());
 				setActive(false);
 				return;
 			}

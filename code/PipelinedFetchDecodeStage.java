@@ -1,6 +1,7 @@
 package code;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.SwingUtilities;
 
@@ -76,18 +77,15 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 		System.out.println("Starting run() in FDstage");
 		setActive(true);
 		setPipelineFlush(false);
+		System.out.println("FD: about to enter while loop.");
 		while (isActive()) { //Continue fetching instructions		
 			setActive(this.instructionFetch()); //Set to false if interrupted, and execution is cancelled below
 			System.out.println("FD returned from fetch, active = " + isActive());
 			if (!isActive() || isPipelineFlush()) { //This will happen if an interrupt takes places within instructionFetch()
 				System.out.println("PipelineFlush: " + isPipelineFlush());
 				System.out.println("About to call return before getting to decode() from within run()");
-				//Forward a null value to fetchToExecuteQueue to signal interrupt?
-				try {
-					fetchToExecuteQueue.put(null);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if (((ReentrantLock) getLock()).isHeldByCurrentThread()) {//If interrupted during accessMemory(), must release lock
+					getLock().unlock();
 				}
 				return;
 			}
