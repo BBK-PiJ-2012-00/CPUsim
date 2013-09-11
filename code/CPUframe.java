@@ -302,7 +302,7 @@ public class CPUframe extends JFrame {
 		pcField.setAlignmentX(CENTER_ALIGNMENT);
 		pcField.setAlignmentY(CENTER_ALIGNMENT);
 		JPanel pcPanel = new JPanel();
-		pcPanel.setMaximumSize(new Dimension(150, 60));
+		pcPanel.setMaximumSize(new Dimension(155, 60));
 		pcPanel.add(pcField);
 		pcPanel.setBorder(BorderFactory.createTitledBorder(" PC "));
 		
@@ -315,7 +315,7 @@ public class CPUframe extends JFrame {
 			irRegisters = new JTextField[1];
 			irRegisters[0] = new JTextField(8);
 			irRegisters[0].setEditable(false);
-			irPanel.setMaximumSize(new Dimension(150, 60));
+			irPanel.setMaximumSize(new Dimension(155, 60));
 			irPanel.add(irRegisters[0]);
 			irPanel.setBorder(BorderFactory.createTitledBorder(" IR "));
 		}
@@ -329,7 +329,7 @@ public class CPUframe extends JFrame {
 			irRegisters[0] = new JTextField(9);
 			irRegisters[0].setEditable(false);
 			JLabel ir0Label = new JLabel("F/D  ");
-			ir0Panel.setMaximumSize(new Dimension(140, 50));
+			ir0Panel.setMaximumSize(new Dimension(155, 50));
 			ir0Panel.setLayout(new BoxLayout(ir0Panel, BoxLayout.X_AXIS));
 			ir0Panel.add(ir0Label);
 			ir0Panel.add(irRegisters[0]);
@@ -338,7 +338,7 @@ public class CPUframe extends JFrame {
 			irRegisters[1] = new JTextField(9);
 			irRegisters[1].setEditable(false);
 			JLabel ir1Label = new JLabel("Ex.   ");
-			ir1Panel.setMaximumSize(new Dimension(140, 50));
+			ir1Panel.setMaximumSize(new Dimension(155, 50));
 			ir1Panel.setLayout(new BoxLayout(ir1Panel, BoxLayout.X_AXIS));
 			ir1Panel.add(ir1Label);
 			ir1Panel.add(irRegisters[1]);
@@ -348,7 +348,7 @@ public class CPUframe extends JFrame {
 			irRegisters[2] = new JTextField(9);
 			irRegisters[2].setEditable(false);
 			JLabel ir2Label = new JLabel("WB   ");
-			ir2Panel.setMaximumSize(new Dimension(140, 50));
+			ir2Panel.setMaximumSize(new Dimension(155, 50));
 			ir2Panel.setLayout(new BoxLayout(ir2Panel, BoxLayout.X_AXIS));
 			ir2Panel.add(ir2Label);
 			ir2Panel.add(irRegisters[2]);
@@ -356,7 +356,7 @@ public class CPUframe extends JFrame {
 			
 			
 			irPanel.setBorder(BorderFactory.createTitledBorder(" IR File "));
-			irPanel.setMaximumSize(new Dimension(145, 115));
+			irPanel.setMaximumSize(new Dimension(155, 115));
 			
 			
 			irPanel.add(ir0Panel);
@@ -374,7 +374,7 @@ public class CPUframe extends JFrame {
 		controlRegistersPanel1.add(pcPanel);
 		//controlRegistersPanel1.add(irPanel);
 		controlRegistersPanel1.add(irPanel);
-		controlRegistersPanel1.setBorder(BorderFactory.createEmptyBorder(0, 10, 25, 20));
+		controlRegistersPanel1.setBorder(BorderFactory.createEmptyBorder(0, 10, 30, 20));
 		//registerPanel.add(controlRegistersPanel1);
 		
 		
@@ -1038,7 +1038,7 @@ public class CPUframe extends JFrame {
 				
 				if (executionWorker == null) { //Only create worker thread if the current one is null (to avoid several threads).;
 					executionWorker = new ExecutionWorker();
-					System.out.println("Created new thread, ready to exectute.");
+					System.out.println("Created new thread with ID, ready to exectute.");
 					executionWorker.execute();
 					
 				}
@@ -1074,6 +1074,7 @@ public class CPUframe extends JFrame {
 	            if (pipeliningEnabled) {
 	            	activityArea1.setText("");
 	            	activityArea2.setText("");
+	            	controlUnit.getExecuteStage().setActive(false); //Signal swing worker to stop if blocked on accessMemory()
 	            }
 				
 	           
