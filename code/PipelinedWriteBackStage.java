@@ -41,6 +41,7 @@ public class PipelinedWriteBackStage extends WriteBackStage {
 		catch (InterruptedException e) {
 			e.printStackTrace();
 			setWaitStatus(false);
+			Thread.currentThread().interrupt();
 			return; //Not enough to stop execution!
 		}
 		setWaitStatus(false);
@@ -70,6 +71,10 @@ public class PipelinedWriteBackStage extends WriteBackStage {
 				}
 				
 				instructionWriteBack(getResult()); //Get result from result field in WriteBackStage
+				if (Thread.currentThread().isInterrupted()) {
+					setActive(false);
+					return;
+				}
 				getIR().clear(2); //Reset IR once write back operation complete.
 				System.out.println("Cleared.");
 			} catch (InterruptedException e) {
