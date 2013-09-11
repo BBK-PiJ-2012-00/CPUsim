@@ -29,7 +29,7 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	 */
 	public boolean instructionFetch() {
 		
-		boolean successful = accessMemory(true, false, false); //Fetch requires access to MAR, MBR and memory; use 
+		boolean successful = accessMemory(true, false, false, true); //Fetch requires access to MAR, MBR and memory; use 
 											//synchronized block to do this - see Stage super class for details of fetch.
 		return successful;
 		

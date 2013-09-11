@@ -37,7 +37,8 @@ public class PipelinedExecuteStage extends ExecuteStage {
 			case 1: //A LOAD instruction
 					
 					System.out.println("E: about to accesMemory()");
-					boolean loadSuccessful = accessMemory(false, true, false); //For pipelined execution, there is the possibility of conflicts
+					boolean loadSuccessful = accessMemory(false, true, false, true); 
+					//For pipelined execution, there is the possibility of conflicts
 					//with the f/d stage, as both this operation and fetch operations in the f/d stage make use of the
 					//MAR and MBR registers. accessMemory() is synchronized on a static lock object and ensures that
 					//only one of a LOAD, STORE or instruction fetch operation may take place at any one time.
@@ -49,7 +50,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					
 			case 2: //A STORE instruction
 				
-					boolean storeSuccessful = accessMemory(false, false, true);	
+					boolean storeSuccessful = accessMemory(false, false, true, true);	
 					return storeSuccessful;
 					//break;
 					

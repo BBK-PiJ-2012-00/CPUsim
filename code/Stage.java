@@ -54,25 +54,30 @@ public abstract class Stage implements Runnable {
 	 * isInstructionFetch is used to signify if the operation is an instruction fetch
 	 * or operand fetch.
 	 */
-	public synchronized boolean accessMemory(boolean isInstructionFetch, boolean isOperandLoad, boolean isOperandStore) {
+	public synchronized boolean accessMemory(boolean isInstructionFetch, boolean isOperandLoad, boolean isOperandStore,
+			boolean isPipelined) {
+		
 		
 		String operation = "";
 		String stage = "";
-		//if (pc.getValue() != 0) { //Not good enough!
-		if (isInstructionFetch) {
-			operation = "instruction fetch";
-			stage = "F/D Stage";
+		if (isPipelined) {
+			
+			//if (pc.getValue() != 0) { //Not good enough!
+			if (isInstructionFetch) {
+				operation = "instruction fetch";
+				stage = "F/D Stage";
+			}
+			if (isOperandLoad) {
+				operation = "LOAD";
+				stage = "Ex. Stage";
+			}
+			if (isOperandStore) {
+				operation = "STORE";
+				stage = "Ex. Stage";
+			}
+			fireUpdate("> Waiting to acquire use of MAR, MBR and system bus to \ncomplete " + operation + " operation.\n" );
+		//	}
 		}
-		if (isOperandLoad) {
-			operation = "LOAD";
-			stage = "Ex. Stage";
-		}
-		if (isOperandStore) {
-			operation = "STORE";
-			stage = "Ex. Stage";
-		}
-		fireUpdate("> Waiting to acquire use of MAR, MBR and system bus to \ncomplete " + operation + " operation.\n" );
-	//	}
 		
 		
 		
@@ -90,8 +95,9 @@ public abstract class Stage implements Runnable {
 			return false;
 		}
 	//	System.out.println(getClass() + " just acquired lock.");
-		
-		fireUpdate("> Exclusive use of MAR, MBR and system bus acquired by\n" + stage + " for " + operation + " operation.\n");
+		if (isPipelined) {
+			fireUpdate("> Exclusive use of MAR, MBR and system bus acquired by\n" + stage + " for " + operation + " operation.\n");
+		}
 	
 		if (isInstructionFetch) {
 			//Instruction fetch code; accessed in pipelined mode by a separate thread running in the F/D stage,
@@ -104,7 +110,9 @@ public abstract class Stage implements Runnable {
 			//System.out.println("IN ACCESS MEMORY METHOD: Fetch Operation");
 			
 			//this.fireUpdate("\n** INSTRUCTION FETCH/DECODE STAGE ** \n");
-			//getIR().clear(); //Clear previous instruction from display++++++++ SORT FOR STANDaRD
+			if (!isPipelined) {
+				getIR().clear(); //Clear previous instruction from display, standard mode only
+			}
 			
 			if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
 				//System.out.println("Entering interrupted block 1");
