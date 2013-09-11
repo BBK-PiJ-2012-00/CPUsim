@@ -1,10 +1,14 @@
 package code;
 
+import java.util.concurrent.locks.ReentrantLock;
+
+import javax.swing.SwingUtilities;
+
 public class StandardFetchDecodeStage extends FetchDecodeStage {
 	
 	//private int opcodeValue; //This is accessed by control unit to pass to next stage.
 	
-	private UpdateListener updateListener; //Update event listener
+	//private UpdateListener updateListener; //Update event listener
 	
 	//private boolean isWaiting;
 	
@@ -108,22 +112,27 @@ public class StandardFetchDecodeStage extends FetchDecodeStage {
 		System.out.println("In f/d stage run.");
 		if (this.instructionFetch() == false) { //Returns false if interrupted during fetch
 			setOpcodeValue(-1); //Signals to control unit to stop execution
+//			if (((ReentrantLock) getLock()).isHeldByCurrentThread()) {//If interrupted during accessMemory(), must release lock
+//				getLock().unlock();
+//			}
 			return; //Cancel execution if interrupted during fetch
 		}
 		setOpcodeValue(this.instructionDecode());
 	}
 	
 	@Override
-	protected void fireUpdate(String update) {
-		System.out.println("in fire update");
-		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, update);
-		System.out.println("Update Event created:" + updateEvent);
-		updateListener.handleUpDateEvent(updateEvent);		
+	public void fireUpdate(final String update) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+			    ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(StandardFetchDecodeStage.this, update);
+				StandardFetchDecodeStage.this.getUpdateListener().handleUpDateEvent(updateEvent);	
+			}
+		});
 	}
 	
-	public void registerListener(UpdateListener listener) {
-		this.updateListener = listener;
-	}
+//	public void registerListener(UpdateListener listener) {
+//		this.updateListener = listener;
+//	}
 	
 //	public int getOpcodeValue() {
 //		return this.opcodeValue;

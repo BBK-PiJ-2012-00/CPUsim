@@ -12,7 +12,7 @@ public abstract class FetchDecodeStage extends Stage {
 	
 	private int opcodeValue; //This is accessed by control unit to pass to next stage.
 	
-	//private UpdateListener updateListener; //Update event listener
+	private UpdateListener updateListener; //Update event listener
 	
 	//private boolean isWaiting;
 	
@@ -139,7 +139,14 @@ public abstract class FetchDecodeStage extends Stage {
 	@Override
 	protected abstract void fireUpdate(String update); 
 	
-	public abstract void registerListener(UpdateListener listener);
+	public void registerListener(UpdateListener listener) {
+		this.updateListener = listener;
+	}
+	
+	public UpdateListener getUpdateListener() {
+		return this.updateListener;
+	}
+	
 	
 	
 	/*
