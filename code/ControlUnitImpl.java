@@ -2,6 +2,7 @@ package code;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 /*
@@ -103,6 +104,9 @@ public class ControlUnitImpl implements ControlUnit {
 					executeStage.run();//Note that writeBackStage is called from executeStage if necessary
 					this.active = executeStage.isActive();
 				}				
+			}
+			if (((ReentrantLock) Stage.getLock()).isHeldByCurrentThread()) {//If interrupted during accessMemory(), must release lock
+				Stage.getLock().unlock();
 			}
 		}
 		
