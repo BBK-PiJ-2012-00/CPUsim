@@ -21,71 +21,7 @@ public class StandardExecuteStage extends ExecuteStage {
 					if (!successful) {
 						return false;
 					}
-//					this.fireUpdate("Executing LOAD instruction; memory address " +	getIR().read().getField1() + "\nplaced into MAR to initiate operand fetch \n");
-//					getMAR().write(getIR().read().getField1()); //Load mar with source address of instruction in IR
-//					//Request a read from memory via system bus, with address contained in mar
-//					
-////					isWaiting = true;
-////					try {
-////						wait();
-////					} catch (InterruptedException e) {
-////						e.printStackTrace();
-////						isWaiting = false;
-////						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-////					}
-////					isWaiting = false;
-//					
-//					getSystemBus().transferToMemory(getMAR().read(), null);
-//					this.fireUpdate("Operand " + getMBR().read().toString() + " loaded from address " + getIR().read().getField1() + " into MBR\n");
-//					
-////					isWaiting = true;
-////					try {
-////						wait();
-////					} catch (InterruptedException e) {
-////						e.printStackTrace();
-////						isWaiting = false;
-////						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-////					}
-////					isWaiting = false;
-////					
-////					mar.write(-1); //Reset MAR
-//					
-//					
-//					if (getIR().read().getField2() == 16) { //ConditionCodeRegister reference
-//						getCC().write((Operand) getMBR().read()); //Write operand in mbr to condition/status register
-//						
-//						this.fireUpdate("Loaded operand " + getMBR().read() + " into condition code register\n");
-//						
-////						isWaiting = true;
-////						try {
-////							wait();
-////						} catch (InterruptedException e) {
-////							e.printStackTrace();
-////							isWaiting = false;
-////							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-////						}
-////						isWaiting = false;
-//					}
-//					
-//					
-//					
-//					//Transfer data in mbr to destination field in instruction in ir (field2).
-//					getGenRegisters().write(getIR().read().getField2(), getMBR().read());//getField2() gives reg. destination index, mbr.read()
-//					//gives the operand to be moved from mbr to genRegisters at index given in getField2().
-//					this.fireUpdate("Operand " + getMBR().read() + " loaded into r" + getIR().read().getField2() + "\n");
-//					
-////					isWaiting = true;
-////					try {
-////						wait();
-////					} catch (InterruptedException e) {
-////						e.printStackTrace();
-////						isWaiting = false;
-////						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-////					}
-////					isWaiting = false;
-//					
-//					
-//					getMBR().write(null); //Reset MBR
+
 					break;
 					
 					
@@ -94,51 +30,7 @@ public class StandardExecuteStage extends ExecuteStage {
 					if (!successful) {
 						return false;
 					}
-//					this.fireUpdate("Executing STORE instruction; destination memory \naddress " + getIR().read().getField2() + 
-//						" placed into MAR \n");
-//					getMAR().write(getIR().read().getField2()); //Load mar with destination (memory address)
-//					
-////					isWaiting = true;
-////					try {
-////						wait();
-////					} catch (InterruptedException e) {
-////						e.printStackTrace();
-////						isWaiting = false;
-////						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-////					}
-////					isWaiting = false;
-//					
-//					getMBR().write(getGenRegisters().read(getIR().read().getField1())); //Write to mbr the data held in genRegisters at index
-//					//given by field1(source) of instruction held in IR.
-//					this.fireUpdate("Operand " + getGenRegisters().read(getIR().read().getField1()) + " loaded from r" + getIR().read().getField1() + 
-//							" into MBR\n");
-//					
-////					isWaiting = true;
-////					try {
-////						wait();
-////					} catch (InterruptedException e) {
-////						e.printStackTrace();
-////						isWaiting = false;
-////						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-////					}
-////					isWaiting = false;
-//					
-//					
-//					getSystemBus().transferToMemory(getMAR().read(), getMBR().read()); //Transfer contents of mbr to address specified in mar
-//					
-//					this.fireUpdate("Operand " + getGenRegisters().read(getIR().read().getField1()) + " stored in memory address " +
-//							getIR().read().getField2() + "\n");
-//					
-////					isWaiting = true;
-////					try {
-////						wait();
-////					} catch (InterruptedException e) {
-////						e.printStackTrace();
-////						isWaiting = false;
-////						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-////					}
-////					isWaiting = false;
-//					
+
 					break;
 					
 					
