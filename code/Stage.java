@@ -62,7 +62,7 @@ public abstract class Stage implements Runnable {
 		String stage = "";
 		if (isPipelined) {
 			
-			//if (pc.getValue() != 0) { //Not good enough!
+			
 			if (isInstructionFetch) {
 				operation = "instruction fetch";
 				stage = "F/D Stage";
@@ -75,15 +75,15 @@ public abstract class Stage implements Runnable {
 				operation = "STORE";
 				stage = "Ex. Stage";
 			}
-			fireUpdate("> Waiting to acquire use of MAR, MBR and system bus to \ncomplete " + operation + " operation.\n" );
-		//	}
+//			if (pc.getValue() != 0) { //Prevent display of update below on first instruction fetch, as no wait will take place
+			if (((ReentrantLock) lock).isLocked()) {	
+				fireUpdate("> Pipeline delay: Waiting to acquire use of MAR, MBR and \nsystem bus to complete " + 
+						operation + " operation.\n" );
+			}
 		}
 		
-		
-		
-		//System.out.println(getClass() + " waiting to acquire lock.");
 	
-			
+		//Attempt to get lock to allow progression into body of accessMemory() method	
 		try {
 			lock.lockInterruptibly();
 		} catch (InterruptedException e1) {
@@ -94,10 +94,10 @@ public abstract class Stage implements Runnable {
 			active = false;
 			return false;
 		}
-	//	System.out.println(getClass() + " just acquired lock.");
-		if (isPipelined) {
-			fireUpdate("> Exclusive use of MAR, MBR and system bus acquired by\n" + stage + " for " + operation + " operation.\n");
-		}
+
+//		if (isPipelined) {
+//			fireUpdate("> Exclusive use of MAR, MBR and system bus acquired by\n" + stage + " for " + operation + " operation.\n");
+//		}
 	
 		if (isInstructionFetch) {
 			//Instruction fetch code; accessed in pipelined mode by a separate thread running in the F/D stage,
@@ -107,30 +107,31 @@ public abstract class Stage implements Runnable {
 			// flush (which is also signalled by an interrupt from the execute stage), this thread can return to 
 			//its run() method and terminate naturally without executing further code.
 			
-			//System.out.println("IN ACCESS MEMORY METHOD: Fetch Operation");
 			
-			//this.fireUpdate("\n** INSTRUCTION FETCH/DECODE STAGE ** \n");
 			if (!isPipelined) {
 				getIR().clear(); //Clear previous instruction from display, standard mode only
 			}
 			
 			if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
-				//System.out.println("Entering interrupted block 1");
-//				if (pipelineFlush) {
-//					fireUpdate("** PIPELINE FLUSH ** \nFetch/decode of " + ir.read(0).toString() + " abandoned.");
-//				}
-				//pipelineFlush = true;
-				//properLock.unlock();
 				return false;
+			}
+			
+			if (isPipelined) { //Additional wait for clarity in pipelined mode, as PC incremented at different point
+				setWaitStatus(true);
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+					active = false;
+					setWaitStatus(false);
+					return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+				}
+				setWaitStatus(false);
 			}
 			
 			getMAR().write(getPC().getValue()); //Write address value in PC to MAR.
 			
 			if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
-			//	System.out.println("Entering interrupted block 2");
-//				if (pipelineFlush) {
-//					fireUpdate("** PIPELINE FLUSH ** \nFetch/decode of " + ir.read(0).toString() + " abandoned.");
-//				}
 				return false;
 			}
 			
@@ -143,34 +144,19 @@ public abstract class Stage implements Runnable {
 				e.printStackTrace();
 				active = false;
 				setWaitStatus(false);
-//				if (pipelineFlush) {
-//					fireUpdate("** PIPELINE FLUSH ** \nFetch/decode of " + ir.read(0).toString() + " abandoned.");
-//				}
-				//System.out.println("FD interrupted during wait 1");
-				//properLock.unlock();
 				return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 			}
 			setWaitStatus(false);
 			
 			if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
-			//	System.out.println("Entering interrupted block 3");
-//				if (pipelineFlush) {
-//					fireUpdate("** PIPELINE FLUSH ** \nFetch/decode of " + ir.read(0).toString() + " abandoned.");
-//				}
-				//pipelineFlush = true;
-			//	properLock.unlock();
 				return false;
 			}
 			
 			//Transfer address from MAR to system bus, prompting read
 			boolean successfulTransfer = getSystemBus().transferToMemory(getMAR().read(), null); 
 			if (!successfulTransfer) { 
-//				if (pipelineFlush) {
-//					fireUpdate("** PIPELINE FLUSH ** \nFetch/decode of " + ir.read(0).toString() + " abandoned.");
-//				}
 				//If SwingWorker is cancelled and thread of execution is interrupted, successfulTransfer will be false and the
 				//method should not execute any further
-			//	properLock.unlock();
 				return false;
 			}
 			//Flushing during system bus operation? 
@@ -226,19 +212,21 @@ public abstract class Stage implements Runnable {
 			}
 			
 			
-			setWaitStatus(true);
-			try {
-				wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				active = false;
+			if (!isPipelined) { //Incrementing PC is next step in standard mode (not pipeliend mode), so a wait() is necessary
+				setWaitStatus(true);
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+					active = false;
+					setWaitStatus(false);
+	//				if (pipelineFlush) {
+	//					fireUpdate("** PIPELINE FLUSH ** \nFetch/decode of " + ir.read(0).toString() + " abandoned.");
+	//				}
+					return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+				}
 				setWaitStatus(false);
-//				if (pipelineFlush) {
-//					fireUpdate("** PIPELINE FLUSH ** \nFetch/decode of " + ir.read(0).toString() + " abandoned.");
-//				}
-				return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 			}
-			setWaitStatus(false);
 			
 			getMAR().write(-1);//Reset MAR. Repositioned here for user clarity; mem. addr. remains in MAR until instr. in IR.		
 			getMBR().write(null); //Clear MBR to reflect that instruction has moved to IR (should it be reset earlier, to 
