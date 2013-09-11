@@ -1,6 +1,8 @@
 package code;
 
-import javax.swing.SwingWorker;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 
 public abstract class Stage implements Runnable {
 	
@@ -16,6 +18,8 @@ public abstract class Stage implements Runnable {
 	
 	private static Object lock; //Static object that is used to synchronize accessMemory() method
 												//across fetch/decode and execute stage objects.
+	
+	private static Lock properLock;
 	
 	private boolean active;
 	private boolean pipelineFlush;
@@ -37,8 +41,14 @@ public abstract class Stage implements Runnable {
 		
 		lock = new Object();
 		
+		properLock = new ReentrantLock();
+		
 	
 		
+	}
+	
+	public static Lock getLock() {
+		return properLock;
 	}
 	
 	
@@ -70,17 +80,43 @@ public abstract class Stage implements Runnable {
 		
 		//setWaitStatus(true);
 		System.out.println(getClass() + " waiting to acquire lock.");
-		synchronized(lock) {
+		//synchronized(lock) {
+			
+		try {
+			properLock.lockInterruptibly();
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			System.out.println(getClass() + " Caught at lockInterruptibly.");
+			//properLock.unlock();
+			active = false;
+			return false;
+		}
 			System.out.println(getClass() + " just acquired lock.");
 			
 			//setWaitStatus(false);
 			
+			if (Thread.currentThread().isInterrupted()) { //For if reset is clicked on GUI while SwingWorker thread running
+				//in execute stage is waiting on the synchronized lock object to enter this method. It needs to be caught
+				//here.
+				
+			}
+			
+			//Best solution would be to force the release of the lock when an interrupt is triggered, allowing this
+			//thread to terminate on just one reset click.
+			
 			
 		
 			if (isInstructionFetch) {
+				//Instruction fetch code; accessed in pipelined mode by a separate thread running in the F/D stage,
+				//therefore it is necessary to regularly poll for its interrupted status so that in the event that
+				//"reset" is clicked on the GUI (triggering SwingWorker thread running in the execute stage to issue
+				//an interrupt to the threads running in the F/D stage and WB stage), or in the event of a pipeline
+				// flush (which is also signalled by an interrupt from the execute stage), this thread can return to 
+				//its run() method and terminate naturally without executing further code.
+				
 				System.out.println("IN ACCESS MEMORY METHOD: Fetch Operation");
 				
-				System.out.println("Entering instructionFetch()");
 				//this.fireUpdate("\n** INSTRUCTION FETCH/DECODE STAGE ** \n");
 				//getIR().clear(); //Clear previous instruction from display
 				
@@ -88,14 +124,17 @@ public abstract class Stage implements Runnable {
 					System.out.println("Entering interrupted block 1");
 					fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
 					//pipelineFlush = true;
+					//properLock.unlock();
 					return false;
 				}
 				
 				getMAR().write(getPC().getValue()); //Write address value in PC to MAR.
 				
 				if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
+					System.out.println("Entering interrupted block 2");
 					fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
 					//pipelineFlush = true;
+					//properLock.unlock();
 					return false;
 				}
 				
@@ -108,13 +147,17 @@ public abstract class Stage implements Runnable {
 					e.printStackTrace();
 					active = false;
 					setWaitStatus(false);
+					System.out.println("FD interrupted during wait 1");
+					//properLock.unlock();
 					return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 				}
 				setWaitStatus(false);
 				
 				if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
+					System.out.println("Entering interrupted block 3");
 					fireUpdate("Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
 					//pipelineFlush = true;
+				//	properLock.unlock();
 					return false;
 				}
 				
@@ -123,13 +166,16 @@ public abstract class Stage implements Runnable {
 				if (!successfulTransfer) { 
 					//If SwingWorker is cancelled and thread of execution is interrupted, successfulTransfer will be false and the
 					//method should not execute any further
+				//	properLock.unlock();
 					return false;
 				}
 				//Flushing during system bus operation? 
 				
 				if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
+					System.out.println("Entering interrupted block 4");
 					fireUpdate("Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
 					//pipelineFlush = true;
+				//	properLock.unlock();
 					return false;
 				}
 				
@@ -144,13 +190,16 @@ public abstract class Stage implements Runnable {
 					e.printStackTrace();
 					active = false;
 					setWaitStatus(false);
+				//	properLock.unlock();
 					return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 				}
 				setWaitStatus(false);
 				
 				if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
+					System.out.println("Entering interrupted block 5");
 					fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.");
 					//pipelineFlush = true;
+				//	properLock.unlock();
 					return false;
 				}
 				
@@ -163,12 +212,13 @@ public abstract class Stage implements Runnable {
 				this.fireUpdate("Load contents of MBR into IR \n");
 				
 				if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
+					System.out.println("Entering interrupted block 6");
 					fireUpdate("**Branch taken in execute stage; pipeline flush. Current instruction \nfetch/decode abandoned.\n");
 					//pipelineFlush = true;
+			//		properLock.unlock();
 					return false;
 				}
 				
-				fireUpdate("About to enter wait\n");
 				
 				setWaitStatus(true);
 				try {
@@ -177,6 +227,7 @@ public abstract class Stage implements Runnable {
 					e.printStackTrace();
 					active = false;
 					setWaitStatus(false);
+				//	properLock.unlock();
 					return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 				}
 				setWaitStatus(false);
@@ -193,6 +244,16 @@ public abstract class Stage implements Runnable {
 			 */		
 			else if (isOperandLoad) {
 				//Swing worker needs to be stopped here if cancelled while waiting to get lock on a LOAD
+				
+//				if (!active) {
+//					return false;
+//				}
+				
+				if (Thread.currentThread().isInterrupted()) {
+					fireUpdate("E: LOAD operand interrupted! Thread ID is: " + Thread.currentThread().getId());
+					//Old thread resumes even though there is no longer a reference to it?
+				}
+				
 				fireUpdate("Into isOperandLoad.\n");
 				fireUpdate("Info: IR1 holding: " + ir.read(1).toString());
 				System.out.println("IN ACCESS MEMORY METHOD: LOAD operation");
@@ -211,6 +272,7 @@ public abstract class Stage implements Runnable {
 					e.printStackTrace();
 					active = false;
 					setWaitStatus(false);
+					//properLock.unlock();
 					return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 				}
 				setWaitStatus(false);
@@ -287,6 +349,10 @@ public abstract class Stage implements Runnable {
 			 */
 			else if (isOperandStore) {
 				
+				if (!active) { //Swing worker ignores cancel if blocked on lock object
+					return false;
+				}
+				
 				System.out.println("IN ACCESS MEMORY METHOD: STORE operation.");
 				
 				this.fireUpdate("Executing STORE instruction; destination memory \naddress " + getIR().read(1).getField2() + 
@@ -339,8 +405,11 @@ public abstract class Stage implements Runnable {
 			
 			}
 			fireUpdate("Early lock release\n");
+			
+		//}
+			properLock.unlock();
+		
 			return true;
-		}
 	}
 	
 	
