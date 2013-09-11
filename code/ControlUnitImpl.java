@@ -1,7 +1,5 @@
 package code;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 
@@ -62,11 +60,13 @@ public class ControlUnitImpl implements ControlUnit {
 			fetchDecodeStage = new PipelinedFetchDecodeStage(this.systemBus, ir, pc, genRegisters, statusRegister,
 					this.mbr, mar, fetchToExecuteQueue);
 			
+			writeBackStage = new PipelinedWriteBackStage(this.systemBus, ir, pc, genRegisters, statusRegister,
+					this.mbr, mar, executeToWriteQueue);
+			
 			executeStage = new PipelinedExecuteStage(this.systemBus, ir, pc, genRegisters, statusRegister,
 					this.mbr, mar, fetchToExecuteQueue, executeToWriteQueue, fetchDecodeStage, writeBackStage);
 			
-			writeBackStage = new PipelinedWriteBackStage(this.systemBus, ir, pc, genRegisters, statusRegister,
-					this.mbr, mar, executeToWriteQueue);
+			
 		}
 		
 	}
@@ -86,9 +86,11 @@ public class ControlUnitImpl implements ControlUnit {
 	}
 	
 	private void launch() { //The method that kick starts execution of a program, and manages it
+		System.out.println("In control unit launch, pipelining = " + pipeliningMode);
 		pc.setPC(0); //Initialise PC to 0 for GUI display
 		if (!pipeliningMode) { 
-			while (active) {				
+			while (active) {
+				System.out.println("In active while loop for non pipelined mode");
 				
 				fetchDecodeStage.run();
 				int opcode = fetchDecodeStage.getOpcodeValue();
@@ -117,47 +119,19 @@ public class ControlUnitImpl implements ControlUnit {
 			 * and have that thread spawn worker threads to perform execute and write back. That way, managing
 			 * execution and interrupts and flushing will be much simpler.
 			 */
-			
-//			Thread fetchThread = new Thread(fetchDecodeStage);
-//			fetchThread.start();
-//			
-//			Thread executeThread = new Thread(executeStage);
-//			executeThread.start();
-//			
-//			Thread writeBackThread = new Thread(writeBackStage);
-//			writeBackThread.start();
-			
+
 			
 				
-				executeStage.run(); //This manages the fetch and write back stages
-				
-			
-			
-			
-			
-			//What happens if one stage exits due to an interrupt?
-			
-//			fetchDecodeStage.run();
-//			int opcode = fetchDecodeStage.getOpcodeValue();
-//			if (opcode == -1) { //fetchDecodeStage.getOpcodeValue() returns -1 if interrupted, meaning SwingWorker.cancel()
-//				//has been called from CPUframe. Execution should not continue as a result.
-//				this.active = false;
-//			}
-//			else {
-//				//Get fetchDecodeStage to add opcode to the queue
-//				//execute stage should be activated above so that it is attempting a take
-//				//while (!fetchDecodeStage.forward()); //Keep attempting forward until executeStage takes from queue
-//				boolean forwardSuccessful = fetchDecodeStage.forward();
-//				executeStage.setOpcodeValue(opcode);
-//				executeStage.run();//Note that writeBackStage is called from executeStage if necessary
-//				this.active = executeStage.isActive();
-//			}				
+			executeStage.run(); //This manages the fetch and write back stages
+	
 		}
 	}
 	
+	
+	
 	public void clearRegisters() {
 		pc.setPC(0);
-		ir.loadIR(null);
+		ir.clear();
 		mar.write(-1); // -1 triggers clear
 		mbr.write(null);
 		for (int i = 0; i < 16; i++) {
@@ -166,26 +140,6 @@ public class ControlUnitImpl implements ControlUnit {
 		statusRegister.write(null);		
 	}
 	
-//	public void resetStages() { //Used when restarting an assembly program
-//		if (!pipeliningMode) { //If not pipelined, create standard stages
-//			fetchDecodeStage = new StandardFetchDecodeStage(this.systemBus, mar, this.mbr, ir, pc);
-//			writeBackStage = new StandardWriteBackStage(ir, genRegisters);
-//			executeStage = new StandardExecuteStage(this.systemBus, ir, pc, genRegisters, statusRegister, writeBackStage,
-//					this.mbr, mar);	
-//		}
-//	}
-	
-	
-	
-	
-	
-
-	
-	
-	
-	
-
-		
 	
 	
 	public InstructionRegister getIR() { 

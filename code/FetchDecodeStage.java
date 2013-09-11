@@ -12,7 +12,7 @@ public abstract class FetchDecodeStage extends Stage {
 	
 	private int opcodeValue; //This is accessed by control unit to pass to next stage.
 	
-	private UpdateListener updateListener; //Update event listener
+	//private UpdateListener updateListener; //Update event listener
 	
 	//private boolean isWaiting;
 	
@@ -124,7 +124,7 @@ public abstract class FetchDecodeStage extends Stage {
 //		opcodeValue = this.instructionDecode();
 //	}
 	
-	public abstract void instructionFetch();
+	public abstract boolean instructionFetch();
 	
 	public abstract int instructionDecode();
 	
@@ -137,14 +137,9 @@ public abstract class FetchDecodeStage extends Stage {
 	}
 	
 	@Override
-	protected void fireUpdate(String update) {
-		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, update);
-		updateListener.handleUpDateEvent(updateEvent);		
-	}
+	protected abstract void fireUpdate(String update); 
 	
-	public void registerListener(UpdateListener listener) {
-		this.updateListener = listener;
-	}
+	public abstract void registerListener(UpdateListener listener);
 	
 	
 	/*
@@ -186,8 +181,8 @@ public abstract class FetchDecodeStage extends Stage {
 //		return this.pc;
 //	}
 	
-	public UpdateListener getUpdateListener() {
-		return this.updateListener;
-	}
+//	public UpdateListener getUpdateListener() {
+//		return this.updateListener;
+//	}
 	
 }

@@ -27,7 +27,7 @@ public class ModuleUpdateEvent extends EventObject {
 	}
 	
 	/*
-	 * For general purpose register events (register references the specific general purpose register).
+	 * For general purpose and IR register events (register references the specific general purpose/ IR register).
 	 */
 	public ModuleUpdateEvent(Object source, int register, String update) {
 		super(source);
@@ -56,6 +56,8 @@ public class ModuleUpdateEvent extends EventObject {
 		this.controlLineUpdate = controlLineUpdate;
 		this.update = update;		
 	}
+	
+	
 	
 	public String getUpdate() {
 		return this.update;

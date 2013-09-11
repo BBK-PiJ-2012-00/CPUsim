@@ -42,7 +42,7 @@ public class MBR implements MemoryBufferRegister {
 			mbrDisplay += "";
 		}
 		else {
-			mbrDisplay += "  " + this.registerContents.toString();
+			mbrDisplay += this.registerContents.toString();
 		}
 		return mbrDisplay;
 	}

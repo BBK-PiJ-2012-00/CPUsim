@@ -336,7 +336,8 @@ public class PipelinedExecuteStage extends ExecuteStage {
 			case 10: //A SKZ instruction (skip the next instruction (increment PC by one) if status register holds 0).
 					 if (getCC().read().unwrapInteger() == 0) {
 						 getPC().incrementPC();
-						 fireUpdate("PC set to " + getPC().getValue() + " as result of " + getIR().read(1).getOpcode() + " operation\n");
+						 fireUpdate("PC set to " + getPC().getValue() + " as result of " + getIR().read(1).getOpcode() + 
+								 " operation\n");
 				
 						 pipelineFlush();
 						 
@@ -373,7 +374,8 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					 int genRegRef = getIR().read(1).getField2(); //Reference to register referred to in instruction
 					 if (getCC().read().equals((Operand) getGenRegisters().read(genRegRef))) { //If equal
 						 getPC().setPC(getIR().read(1).getField1()); //Set PC to equal address in field1 of instruction in ir
-						 fireUpdate("PC set to " + getIR().read(1).getField1() + " as result of " + getIR().read(1).getOpcode() + " operation\n");
+						 fireUpdate("PC set to " + getIR().read(1).getField1() + " as result of " + getIR().read(1).getOpcode() 
+								 + " operation\n");
 						
 						 
 						 pipelineFlush();
@@ -391,7 +393,8 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					 
 					 else {  //If not equal, do nothing other than provide activity monitor comment to say branch not taken
 						 fireUpdate("Branch (BRE) not taken as condition code\nvalue does not equal " + 
-								 getGenRegisters().read(getIR().read(1).getField2()) + " (contents of r" + getIR().read(1).getField2() + ")\n");
+								 getGenRegisters().read(getIR().read(1).getField2()) + " (contents of r" + 
+								 getIR().read(1).getField2() + ")\n");
 						 
 						 
 						setWaitStatus(true);
@@ -411,7 +414,8 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					 genRegRef = getIR().read(1).getField2(); //Reference to register referred to in instruction
 					 if (!(getCC().read().equals((Operand) getGenRegisters().read(genRegRef)))) { //If not equal
 						 getPC().setPC(getIR().read(1).getField1()); //Set PC to equal address in field1 of instruction in ir	
-						 fireUpdate("PC set to " + getIR().read(1).getField1() + " as result of " + getIR().read(1).getOpcode() + " operation\n");
+						 fireUpdate("PC set to " + getIR().read(1).getField1() + " as result of " + getIR().read(1).getOpcode() 
+								 + " operation\n");
 						 
 						pipelineFlush();
 						 
@@ -429,7 +433,8 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					 
 					 else { //If equal, do nothing other than provide activity monitor comment to say branch not taken
 						 fireUpdate("Branch (BRNE) not taken as condition code\nvalue equals " + 
-								 getGenRegisters().read(getIR().read(1).getField2()) + " (contents of r" + getIR().read(1).getField2() + ")\n");
+								 getGenRegisters().read(getIR().read(1).getField2()) + " (contents of r" + 
+								 getIR().read(1).getField2() + ")\n");
 						 
 						 setWaitStatus(true);
 						 try {							 
@@ -440,16 +445,13 @@ public class PipelinedExecuteStage extends ExecuteStage {
 							 return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						 }
 						 setWaitStatus(false);			
-//						 
+						 
 					 }
 					 break; 
 					 
 			
 					 
 			case 13: //A HALT instruction (stops instruction cycle). For clarity, resets all registers.
-					 //pc.setPC(0);
-					 //statusRegister.write(null);
-					// ir.loadIR(null);	
 					 System.out.println("HALT encountered.");
 					 fireUpdate("HALT instruction decoded; end of program");
 					 return false; //Signals end of instruction cycle		
@@ -457,9 +459,6 @@ public class PipelinedExecuteStage extends ExecuteStage {
 		return true;
 	}
 	
-//	public WriteBackStage getWriteBackStage() {
-//		return null;
-//	} 
 	
 	
 	/*

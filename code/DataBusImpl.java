@@ -1,5 +1,7 @@
 package code;
 
+import javax.swing.SwingUtilities;
+
 public class DataBusImpl implements DataBus {
 	private Data data;
 	
@@ -8,14 +10,16 @@ public class DataBusImpl implements DataBus {
 	@Override
 	public void put(Data value) {
 		data = value;
-		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, display());
-		updateListener.handleUpDateEvent(updateEvent);
+//		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, display());
+//		updateListener.handleUpDateEvent(updateEvent);
+		fireUpdate(display());
 	}
 
 	@Override
 	public Data read() {
-		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, ""); //Reset data bus display after another module reads from it
-		updateListener.handleUpDateEvent(updateEvent);
+//		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, ""); //Reset data bus display after another module reads from it
+//		updateListener.handleUpDateEvent(updateEvent);
+		fireUpdate("");
 		return data;
 	}
 	
@@ -32,6 +36,18 @@ public class DataBusImpl implements DataBus {
 		}
 		displayString += data.toString();
 		return displayString;
+	}
+	
+	//GUI events should be handled from EDT
+	//This adds the update event to the EDT thread. Need to test this works on the GUI
+	@Override
+	public void fireUpdate(final String update) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+			    ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(DataBusImpl.this, update);
+				DataBusImpl.this.updateListener.handleUpDateEvent(updateEvent);	
+			}
+		});
 	}
 
 

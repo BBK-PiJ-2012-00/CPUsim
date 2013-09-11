@@ -1,5 +1,7 @@
 package code;
 
+import javax.swing.SwingUtilities;
+
 public class ControlLineImpl implements ControlLine {
 	private AddressBus addressBus;
 	private DataBus dataBus;	
@@ -34,17 +36,17 @@ public class ControlLineImpl implements ControlLine {
 				fireActivityUpdate("Operand " + data.toString() + " placed on data bus from \nmemory.\n");
 			}
 			
-//			isWaiting = true;
-//			try {
-//				wait();
-//			} catch (InterruptedException e) {
-//				System.out.println("I'm being interrupted.");
-//				e.printStackTrace();
-//				clear();
-//				isWaiting = false;
-//				return false;
-//			}
-//			isWaiting = false;
+			isWaiting = true;
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				System.out.println("I'm being interrupted.");
+				e.printStackTrace();
+				clear();
+				isWaiting = false;
+				return false;
+			}
+			isWaiting = false;
 			
 			fireOperationUpdate(""); //Clear control line display
 			
@@ -59,16 +61,16 @@ public class ControlLineImpl implements ControlLine {
 			fireActivityUpdate("Address " + address + " placed on address line by MAR, prompting\nthe first stage" +
 					"of a memory read.\n");
 			
-//			isWaiting = true;
-//			try {
-//				wait();
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//				clear();
-//				isWaiting = false;
-//				return false;
-//			}
-//			isWaiting = false;
+			isWaiting = true;
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				clear();
+				isWaiting = false;
+				return false;
+			}
+			isWaiting = false;
 			
 			return this.deliverToMemory(true);
 		}
@@ -87,16 +89,16 @@ public class ControlLineImpl implements ControlLine {
 					data.toString() + " placed on data bus by MBR.\n");
 		}
 		
-//		isWaiting = true;
-//		try {
-//			wait();
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//			clear();
-//			isWaiting = false;
-//			return false;
-//		}
-//		isWaiting = false;
+		isWaiting = true;
+		try {
+			wait();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			clear();
+			isWaiting = false;
+			return false;
+		}
+		isWaiting = false;
 		
 		return this.deliverToMemory(false);	//False -> not a read operation (write operation)	
 	}
@@ -136,18 +138,34 @@ public class ControlLineImpl implements ControlLine {
 		return isWaiting;
 	}
 	
+//	
+//	@Override
+//	public void fireActivityUpdate(String update) {
+//		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, update);
+//		updateListener.handleUpDateEvent(updateEvent);
+//	}
+	
+	
 	
 	@Override
-	public void fireActivityUpdate(String update) {
-		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, update);
-		updateListener.handleUpDateEvent(updateEvent);
+	public void fireOperationUpdate(final String update) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(ControlLineImpl.this, true, update); //True reflects update is to control line display
+				updateListener.handleUpDateEvent(updateEvent);
+			}
+		});
+		
 	}
 	
 	
-	@Override
-	public void fireOperationUpdate(String update) {
-		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, true, update); //True reflects update is to control line display
-		updateListener.handleUpDateEvent(updateEvent);
+	public void fireActivityUpdate(final String update) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+			    ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(ControlLineImpl.this, update);
+				updateListener.handleUpDateEvent(updateEvent);	
+			}
+		});
 	}
 	
 	
@@ -164,6 +182,7 @@ public class ControlLineImpl implements ControlLine {
 	 * To clear system bus lines in event of SwingWorker thread being cancelled (resets GUI display).
 	 */
 	public void clear() {
+		resetWaitStatus();
 		addressBus.put(-1);
 		dataBus.put(null);
 		fireOperationUpdate(""); //Reset control line display

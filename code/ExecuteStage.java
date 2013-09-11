@@ -572,13 +572,17 @@ public abstract class ExecuteStage extends Stage {
 	
 	public abstract boolean forward(Operand result); //For forwarding execution to WriteBackStage
 	
-	protected void fireUpdate(String update) {
-		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, update);
-		updateListener.handleUpDateEvent(updateEvent);
-	}
+//	protected void fireUpdate(String update) {
+//		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, update);
+//		updateListener.handleUpDateEvent(updateEvent);
+//	}
 	
 	public void registerListener(UpdateListener listener) {
 		this.updateListener = listener;
+	}
+	
+	public UpdateListener getUpdateListener() {
+		return this.updateListener;
 	}
 	
 //	public boolean isWaiting() {

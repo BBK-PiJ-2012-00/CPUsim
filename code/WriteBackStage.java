@@ -4,6 +4,7 @@ public abstract class WriteBackStage extends Stage {
 	//private InstructionRegister ir;
 	//private RegisterFile genRegisters;
 	private Operand result;
+	private UpdateListener updateListener;
 	
 	
 	public WriteBackStage(BusController systemBus, InstructionRegister ir, ProgramCounter pc, RegisterFile genRegisters,
@@ -29,4 +30,18 @@ public abstract class WriteBackStage extends Stage {
 		
 	@Override
 	public abstract void run();
+
+	public void registerListener(UpdateListener listener) {
+		this.updateListener = listener;		
+	}
+	
+	public UpdateListener getUpdateListener() {
+		return this.updateListener;
+	}
+	
+	@Override
+	protected void fireUpdate(String update) {
+		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, update);
+		updateListener.handleUpDateEvent(updateEvent);
+	}
 }

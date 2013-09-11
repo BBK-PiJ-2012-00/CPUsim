@@ -34,4 +34,6 @@ public interface DataBus {
 
 	public void registerListener(UpdateListener listener);
 	
+	public void fireUpdate(String update);
+	
 }

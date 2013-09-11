@@ -61,7 +61,6 @@ public class SystemBusController implements BusController {
 	public boolean transferToMemory(int memoryAddress, Data data) {
 		boolean returned = controlLine.writeToBus(memoryAddress, data);
 		//return controlLine.writeToBus(memoryAddress, data);
-		System.out.println("returned = " + returned);
 		return returned;
 	}
 

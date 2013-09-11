@@ -6,11 +6,8 @@ import javax.swing.SwingUtilities;
 
 public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	private BlockingQueue<Instruction> fetchToExecuteQueue;
-	//private boolean active;
-	//private boolean pipelineFlush;
 	
-	private boolean IRshunted;
-
+	private UpdateListener updateListener;
 
 	public PipelinedFetchDecodeStage(BusController systemBus, InstructionRegister ir, ProgramCounter pc,
 			RegisterFile genRegisters, Register statusRegister, MemoryBufferRegister mbr, MemoryAddressRegister mar, 
@@ -25,10 +22,11 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	 * Interrupted status must be polled continuously to check for a pipeline flush originating 
 	 * from execute stage.
 	 */
-	public void instructionFetch() {
+	public boolean instructionFetch() {
 		
-		accessMemory(true, false, false); //Fetch requires access to MAR, MBR and memory; use synchronized block to do this
-										//See Stage super class for details of fetch.
+		boolean successful = accessMemory(true, false, false); //Fetch requires access to MAR, MBR and memory; use 
+											//synchronized block to do this - see Stage super class for details of fetch.
+		return successful;
 		
 	}
 	//Fetch ends with instruction being loaded into IR.
@@ -57,16 +55,16 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 			return -1;
 		}
 		
-//		setWaitStatus(true);
-//		try {
-//			wait();
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//			setWaitStatus(false);
-//			return -1; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called). -1 signals to control
-//			//unit to stop execution.
-//		}
-//		setWaitStatus(false);		
+		setWaitStatus(true);
+		try {
+			wait();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			setWaitStatus(false);
+			return -1; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called). -1 signals to control
+			//unit to stop execution.
+		}
+		setWaitStatus(false);		
 		
 		return opcodeValue;
 		
@@ -74,17 +72,23 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	
 	@Override
 	public synchronized void run() { //Synchronized to enable step execution
-//		if (!executeThread.isAlive()) {
-//			executeThread.start(); //Only start thread if it's not already alive
-//		}
+
 		System.out.println("Starting run() in FDstage");
 		setActive(true);
 		setPipelineFlush(false);
 		while (isActive()) { //Continue fetching instructions		
-			this.instructionFetch();
+			setActive(this.instructionFetch()); //Set to false if interrupted, and execution is cancelled below
+			System.out.println("FD returned from fetch, active = " + isActive());
 			if (!isActive() || isPipelineFlush()) { //This will happen if an interrupt takes places within instructionFetch()
 				System.out.println("PipelineFlush: " + isPipelineFlush());
 				System.out.println("About to call return before getting to decode() from within run()");
+				//Forward a null value to fetchToExecuteQueue to signal interrupt?
+				try {
+					fetchToExecuteQueue.put(null);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				return;
 			}
 			this.setOpcodeValue(this.instructionDecode());
@@ -98,6 +102,7 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 				return;
 			}
 		}
+		return;
 	}
 
 
@@ -111,6 +116,7 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 //			}
 			fetchToExecuteQueue.put(getIR().read(0)); //Waits here until put is successful (executeStage thread must be attempting take()).
 			System.out.println("Put " + getIR().read(0) + " successfully");
+			getIR().clear(0); //Rest IR index 0
 			getPC().incrementPC(); //Increment PCdone here in pipelined mode so that it is ONLY incremented if the just-fetched
 			//instruction is accepted by the execute stage, preventing additional instructions being skipped in SKZ or 
 			//branch instructions.
@@ -158,8 +164,13 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 			    ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(PipelinedFetchDecodeStage.this, update);
-				getUpdateListener().handleUpDateEvent(updateEvent);	
+				updateListener.handleUpDateEvent(updateEvent);	
 			}
 		});
+	}
+	
+	
+	public void registerListener(UpdateListener listener) {
+		this.updateListener = listener;
 	}
 }

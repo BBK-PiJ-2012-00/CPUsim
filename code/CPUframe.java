@@ -1009,7 +1009,16 @@ public class CPUframe extends JFrame {
 
 		@Override
 		protected Void doInBackground() throws Exception {
-			controlUnit.activate();			
+			try {
+				controlUnit.activate();	
+			}
+			catch (NullPointerException e) {
+				JOptionPane.showMessageDialog(null, "Assembly program logic error! Please ensure program logic is sound.");
+			}
+			catch (ClassCastException e) {
+				JOptionPane.showMessageDialog(null, "Assembly program logic error! Please ensure program logic is sound.");
+			}
+				
 			return null;
 		}
 		
@@ -1053,6 +1062,7 @@ public class CPUframe extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			
 			try {
+				System.out.println(executionWorker.getState());
 				executionWorker.cancel(true); //Old worker thread needs terminating
 				executionWorker = null;
 				
@@ -1060,6 +1070,7 @@ public class CPUframe extends JFrame {
 				memory.clearMemory();
 	            activityArea.setText("");
 	            controlUnit.clearRegisters(); 
+	            systemBusController.accessControlLine().clear();
 	            if (pipeliningEnabled) {
 	            	activityArea1.setText("");
 	            	activityArea2.setText("");

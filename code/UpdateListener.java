@@ -11,6 +11,7 @@ public class UpdateListener implements EventListener {
 	}
 		
 	public void handleUpDateEvent(ModuleUpdateEvent e) {
+		
 		if (e.getSource() instanceof ProgramCounter) {
 			frame.getPCfield().setText(e.getUpdate());
 		}
@@ -80,12 +81,13 @@ public class UpdateListener implements EventListener {
 		 * Object instance is used) so this if statement must come last to avoid use by any other instances.
 		 */
 		else if (e.getSource() instanceof Object) { //ALU (static, therefore no object instantiation; dummy object used)
+			
 			if (e.getAluUnit().equals("")) { //indicates reset operation
 				for (int i = 0; i < 12; i ++) {
 					frame.getAllAluFields()[i].setText("");				
 				}
 			}
-			if (e.getAluUnit().equals("add")) { //addition unit update
+			else if (e.getAluUnit().equals("add")) { //addition unit update
 				frame.getAddFields()[0].setText(e.getOp1().toString());
 				frame.getAddFields()[1].setText(e.getOp2().toString());
 				frame.getAddFields()[2].setText(e.getResult().toString());

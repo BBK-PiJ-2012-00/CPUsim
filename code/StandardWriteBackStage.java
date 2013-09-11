@@ -26,11 +26,7 @@ public class StandardWriteBackStage extends WriteBackStage {
 		instructionWriteBack(getResult());
 	}
 
-	@Override
-	protected void fireUpdate(String update) {
-		// TODO Auto-generated method stub
-		
-	}
+	
 	
 
 }
