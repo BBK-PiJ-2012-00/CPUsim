@@ -3,24 +3,19 @@ package code;
 import javax.swing.SwingUtilities;
 
 public class AddressBusImpl implements AddressBus {
-	private int address = -1;
-	
+	private int address = -1;	
 	private UpdateListener updateListener;
 	
 	@Override
 	public void put(int address) {
-		this.address = address; //Fire an update event every time bus is written to
-//		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, this.display());
-//		updateListener.handleUpDateEvent(updateEvent);
-		fireUpdate(this.display());
+		this.address = address;
+		fireUpdate(this.display()); //Fire an update event every time bus is written to
 	}
 	
 	
 	@Override
 	public int read() {
-//		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, ""); //Reset address bus display when read by another module
-//		updateListener.handleUpDateEvent(updateEvent);
-		fireUpdate("");
+		fireUpdate(""); //Reset address bus display when read by another module
 		return this.address;
 	}
 	
@@ -31,8 +26,10 @@ public class AddressBusImpl implements AddressBus {
 	}
 	
 	
-	@Override
-	public String display() {
+	/*
+	 * Returns a String representation of AddressBus contents for GUI display.
+	 */
+	private String display() {
 		String displayString = "";
 		if (this.address == -1) {
 			return displayString; //If address line holds -1, signifies transfer from memory to MBR (no address).
@@ -41,10 +38,10 @@ public class AddressBusImpl implements AddressBus {
 		return displayString;
 	}
 	
-	//GUI events should be handled from EDT
-	//This adds the update event to the EDT thread. Need to test this works on the GUI
-	@Override
-	public void fireUpdate(final String update) {
+	
+	//GUI events should be handled from EDT (Event Dispatch Thread) only.
+	//This adds the update event to the EDT thread.	
+	private void fireUpdate(final String update) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 			    ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(AddressBusImpl.this, update);
