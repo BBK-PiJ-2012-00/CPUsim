@@ -66,7 +66,6 @@ public class AssemblerTest {
 		expected.add("var1");
 		expected.add("r0");
 		
-		//assertEquals(expected.size(), output.size());	//This tests correctly but is not as conclusive as the following
 		for (int i = 0; i < output.size(); i++) {
 			assertEquals(expected.get(i), output.get(i));
 		}
@@ -189,13 +188,13 @@ public class AssemblerTest {
 			
 	}
 	
+	
 	/*
 	 * Test assembly of a full program containing a variety of operands and instructions. This tests
 	 * that labels are correctly removed and also that blank lines are skipped in processing the file
 	 * (there is a blank line containing a tab and space characters between operand and instruction 
 	 * declarations in the test file).
-	 */
-	
+	 */	
 	@Test
 	public void testAssembly() { 
 		assembler.selectFile(testFile2);
@@ -226,7 +225,6 @@ public class AssemblerTest {
 		
 		for (int i = 0; i < outputArray.length; i++) {
 			assertEquals(expectedArray[i], outputArray[i].toString());
-			//System.out.println(outputArray[i]);
 		}
 	}
 	
@@ -265,7 +263,7 @@ public class AssemblerTest {
 	/*
 	 * Tests that invalid operand declarations in an assembly file throw an error and prevent further
 	 * assembly; to allow such a file to be assembled would cause errors in the simulator. The expected
-	 * NumberFormatException is caught by the assembler and displays a pop up to the user alerting them
+	 * Exception is caught by the assembler and displays a pop up to the user alerting them
 	 * to the problem. This test asserts that the assembleCode() method returns false (which it should 
 	 * in the event of an assembly error). In practice, a return value of false prevents the GUI from
 	 * displaying and executing the file, ensuring the user cannot run it.
@@ -396,14 +394,6 @@ public class AssemblerTest {
 		assertFalse(assembler.assembleCode());
 		
 	}
-	
-	
-	
-	
-	
-	
-	
-		
 	
 	
 
