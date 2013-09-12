@@ -8,7 +8,7 @@ public class ControlLineImpl implements ControlLine {
 	private MainMemory memory;	
 	private MemoryBufferRegister mbr;//Reference to CPU's MBR
 	
-	private boolean isWaiting; //So that the SwingWorker thread on the GUI can ascertain if the thread is waiting in this object
+	private boolean isWaiting;//So that the event dispatch thread on the GUI can ascertain if a thread is waiting in this object
 	
 	private UpdateListener updateListener;
 	
@@ -82,7 +82,7 @@ public class ControlLineImpl implements ControlLine {
 				fireActivityUpdate(update, 0); //Update F/D activity monitor
 			}
 			else if (callingStage instanceof PipelinedExecuteStage) {
-				fireActivityUpdate(update, 1); //Update Ex. activity mointor
+				fireActivityUpdate(update, 1); //Update Ex. activity monitor
 			}
 			
 			isWaiting = true;
@@ -99,19 +99,11 @@ public class ControlLineImpl implements ControlLine {
 			return this.deliverToMemory(true);
 		}
 		
-		//Memory write code: address and data supplied
+		//Memory write code: address and data supplied as parameters to this method
 		addressBus.put(address);
 		dataBus.put(data);
 		
 		fireOperationUpdate("Memory write");
-//		if (data instanceof Instruction) { //Is this ever called? Instructions aren't written to memory (only fetched)
-//			fireActivityUpdate("Address " + address + " placed on address bus from MAR \nand instruction " +
-//					data.toString() + " placed on data bus by MBR.\n");
-//		}
-		//else {
-//			fireActivityUpdate("Address " + address + " placed on address bus from MAR \nand operand " +
-//					data.toString() + " placed on data bus by MBR.\n");
-		//}
 		String update = "> Address " + address + " placed on address bus from MAR \nand operand " +
 				data.toString() + " placed on data bus by MBR.\n";
 		if (callingStage == null) { //Standard mode
@@ -147,7 +139,7 @@ public class ControlLineImpl implements ControlLine {
 		if (isRead) {	
 			return memory.notifyRead(addressBus.read());
 		}
-		fireOperationUpdate(""); //Reset control line as data is written into MBR
+		fireOperationUpdate(""); //Reset control line GUI display as data is written into MBR
 		return memory.notifyWrite(addressBus.read(), dataBus.read());
 	}
 	
@@ -171,19 +163,25 @@ public class ControlLineImpl implements ControlLine {
 	}
 	
 	
-	@Override
-	public void fireOperationUpdate(final String update) {
+	/*
+	 * This update method is for control line updates as opposed to activity monitor updates.
+	 */
+	private void fireOperationUpdate(final String update) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(ControlLineImpl.this, true, update); //True reflects update is to control line display
+				ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(ControlLineImpl.this, true, update); 
+				//True reflects update is to control line display
 				updateListener.handleUpDateEvent(updateEvent);
 			}
 		});
 		
 	}
 	
-	//SWITCH TO PRIVATE VISIBILITY
-	public void fireActivityUpdate(final String update) {
+	
+	/*
+	 * Updates for activity monitor in standard execution
+	 */
+	private void fireActivityUpdate(final String update) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 			    ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(ControlLineImpl.this, false, update);
@@ -193,31 +191,33 @@ public class ControlLineImpl implements ControlLine {
 		});
 	}
 	
-	public void fireActivityUpdate(final String update, final int activityMonitorRef) {
+	
+	/*
+	 * Updates for activity monitors in pipelined execution; the activityMonitorRef field is used to
+	 * determine which activity monitor should be updated (either F/D or Ex. Stages; WB doesn't use system bus).
+	 */
+	private void fireActivityUpdate(final String update, final int activityMonitorRef) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 			    ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(ControlLineImpl.this, false, activityMonitorRef, update);
 			    //false signifies its not a control line display update but an activity monitor update
-			    //activityMonitorRef. is an integer referring to which GUI activity monitor the update should be passed in
-			    //pipelined mode.
 				updateListener.handleUpDateEvent(updateEvent);	
 			}
 		});
 	}
+	
 	
 	@Override
 	public void registerListener(UpdateListener listener) {
 		this.updateListener = listener;
 	}
 	
-	public void resetWaitStatus() {
+	
+	private void resetWaitStatus() { //Resets isWaiting to false in event of InterruptedException
 		isWaiting = false;
 	}
 	
-	/*
-	 * To clear system bus lines in event of SwingWorker thread being cancelled (resets GUI display)
-	 * or pipeline flush.
-	 */
+	
 	@Override
 	public void clear() {
 		resetWaitStatus();
