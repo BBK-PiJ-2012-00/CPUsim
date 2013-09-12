@@ -22,6 +22,8 @@ public class ModuleUpdateEvent extends EventObject {
 	private boolean controlLineUpdate; //True if the source intends to set control line GUI display
 	private int activityMonitorReference; //Value 0 or 1 (write back stage doesn't use system bus) to determine which
 				//activity monitor sould display the update on the GUI in pipelined mode.
+	private boolean pipeliningEnabled; //For update from control line, set to true if constructor ModuleUpdateEvent(Object, 
+									//boolean, int, String) is called, indicating pipelined mode.
 
 	public ModuleUpdateEvent(Object source, String update) {
 		super(source);
@@ -68,7 +70,8 @@ public class ModuleUpdateEvent extends EventObject {
 		super(source);
 		this.controlLineUpdate = controlLineUpdate;
 		this.activityMonitorReference = activityMonitorRef;
-		this.update = update;		
+		this.update = update;
+		this.pipeliningEnabled = true;
 	}
 	
 	
@@ -103,6 +106,10 @@ public class ModuleUpdateEvent extends EventObject {
 	
 	public int getActivityMonitorReference() {
 		return this.activityMonitorReference;
+	}
+	
+	public boolean pipeliningEnabled() {
+		return this.pipeliningEnabled;
 	}
 
 }

@@ -53,9 +53,19 @@ public class UpdateListener implements EventListener {
 			if (e.isControlLineUpdate()) { //Boolean to differentiate between control line field update and activity monitor update
 				frame.getControlLineField().setText(e.getUpdate());
 			}
-			else {
+			else if (!e.pipeliningEnabled()) { //Standard execution, only one activity monitor to update
 				frame.getActivityMonitor().append(e.getUpdate()); //Append new update to existing text
 				frame.getActivityMonitor().setCaretPosition(frame.getActivityMonitor().getDocument().getLength());
+			}
+			else if (e.pipeliningEnabled()) {//Pipelined execution, 2 activity monitors to choose from (WB stage never uses bus).
+				if (e.getActivityMonitorReference() == 0) { //F/D stage activity monitor
+					frame.getActivityMonitor().append(e.getUpdate()); 
+					frame.getActivityMonitor().setCaretPosition(frame.getActivityMonitor().getDocument().getLength());					
+				}
+				else if (e.getActivityMonitorReference() == 1) { //Ex. stage activity monitor
+					frame.getActivityMonitor1().append(e.getUpdate());
+					frame.getActivityMonitor1().setCaretPosition(frame.getActivityMonitor1().getDocument().getLength());
+				}
 			}
 		}
 		
