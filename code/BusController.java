@@ -30,7 +30,7 @@ public interface BusController {
 	 boolean transferToCPU(Data data);
 	 
 	 /*
-	  * Allows access to the control line, necessary for when
+	  * Allows access to the control line, necessary for GUI updates and for when
 	  * components are instantiated and references need to be passed.
 	  * 
 	  * @return ControlLine control line reference.
