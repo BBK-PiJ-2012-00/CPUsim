@@ -289,16 +289,6 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					fireUpdate("> PC set to " + getIR().read(1).getField1() + " as result of " + getIR().read(1).getOpcode() + 
 							" operation\n");
 					
-//					setWaitStatus(true);
-//					try {
-//						wait();
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//						setWaitStatus(false);
-//						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-//					}
-//					setWaitStatus(false);
-					
 					
 					pipelineFlush(); //Flush fetch/decode stage if branch is taken
 					
@@ -351,16 +341,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						fireUpdate("> PC set to " + getIR().read(1).getField1() + " as result of " + getIR().read(1).getOpcode() 
 								+ " operation\n");
 						
-//						setWaitStatus(true);
-//						try {
-//							wait();
-//						} catch (InterruptedException e) {
-//							e.printStackTrace();
-//							setWaitStatus(false);
-//							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-//						}
-//						setWaitStatus(false);
-						
+
 						pipelineFlush(); //Flush fetch/decode stage if branch taken
 						
 						setWaitStatus(true);
@@ -423,15 +404,6 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						fireUpdate("> PC set to " + getPC().getValue() + " as result of " + getIR().read(1).getOpcode() + 
 								 " operation\n");
 						 
-//						 setWaitStatus(true);
-//							try {
-//								wait();
-//							} catch (InterruptedException e) {
-//								e.printStackTrace();
-//								setWaitStatus(false);
-//								return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-//							}
-//							setWaitStatus(false);
 				
 						pipelineFlush();
 						 
@@ -499,16 +471,6 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						 fireUpdate("> PC set to " + getIR().read(1).getField1() + " as result of " + getIR().read(1).getOpcode() 
 								 + " operation\n");
 						 
-//						setWaitStatus(true);
-//						try {
-//							wait();
-//						} catch (InterruptedException e) {
-//							e.printStackTrace();
-//							setWaitStatus(false);
-//							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-//						}
-//						setWaitStatus(false);
-						
 						 
 						 pipelineFlush();
 						 
@@ -546,7 +508,23 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					 genRegRef = getIR().read(1).getField2(); //Reference to register referred to in instruction
 					 if (!(getCC().read().equals((Operand) getGenRegisters().read(genRegRef)))) { //If not equal
 						 
-						 setWaitStatus(true);
+						setWaitStatus(true);
+						try {
+							wait();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+							setWaitStatus(false);
+							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+						}
+						setWaitStatus(false);
+						
+						fireUpdate("> Comparing values held in r" + genRegRef + " and rCC; values \nare not equal so the " + 
+								"branch will be taken.\n");
+						
+						//This additional wait() allows for better GUI description of pipeline flush due to branch being
+						//taken; it enables the f/d stage to use the PC value prior to the value set by the branch and begin
+						//fetching the next sequential instruction, and is then flushed before it can get too far.
+						setWaitStatus(true);
 							try {
 								wait();
 							} catch (InterruptedException e) {
@@ -554,38 +532,13 @@ public class PipelinedExecuteStage extends ExecuteStage {
 								setWaitStatus(false);
 								return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 							}
-							setWaitStatus(false);
+						setWaitStatus(false);
 							
-							fireUpdate("> Comparing values held in r" + genRegRef + " and rCC; values \nare not equal so the " + 
-									"branch will be taken.\n");
-							
-							 //This additional wait() allows for better GUI description of pipeline flush due to branch being
-							//taken; it enables the f/d stage to use the PC value prior to the value set by the branch and begin
-							//fetching the next sequential instruction, and is then flushed before it can get too far.
-							setWaitStatus(true);
-								try {
-									wait();
-								} catch (InterruptedException e) {
-									e.printStackTrace();
-									setWaitStatus(false);
-									return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-								}
-								setWaitStatus(false);
-							
-						 getPC().setPC(getIR().read(1).getField1()); //Set PC to equal address in field1 of instruction in ir	
-						 fireUpdate("> PC set to " + getIR().read(1).getField1() + " as result of " + getIR().read(1).getOpcode() 
+						getPC().setPC(getIR().read(1).getField1()); //Set PC to equal address in field1 of instruction in ir	
+						fireUpdate("> PC set to " + getIR().read(1).getField1() + " as result of " + getIR().read(1).getOpcode() 
 								 + " operation\n");
 						 
-//						setWaitStatus(true);
-//						try {
-//							wait();
-//						} catch (InterruptedException e) {
-//							e.printStackTrace();
-//							setWaitStatus(false);
-//							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-//						}
-//						setWaitStatus(false);
-						 
+
 						pipelineFlush();
 						 
 						setWaitStatus(true);

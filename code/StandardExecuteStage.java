@@ -17,7 +17,7 @@ public class StandardExecuteStage extends ExecuteStage {
 		switch (opcode) {
 		
 			case 1: //A LOAD instruction
-					boolean successful = accessMemory(false, true, false);
+					boolean successful = accessMemory(false, true, false, false); //Final false to reflect standard mode
 					if (!successful) {
 						return false;
 					}
@@ -26,7 +26,7 @@ public class StandardExecuteStage extends ExecuteStage {
 					
 					
 			case 2: //A STORE instruction
-					successful = accessMemory(false, false, true);
+					successful = accessMemory(false, false, true, false); //Final false to reflect standard mode
 					if (!successful) {
 						return false;
 					}
@@ -187,8 +187,6 @@ public class StandardExecuteStage extends ExecuteStage {
 					}
 					setWaitStatus(false);
 					
-					//writeBackStage.receive(result);
-					//writeBackStage.run();
 					this.forward(result);
 					
 					fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
@@ -225,9 +223,7 @@ public class StandardExecuteStage extends ExecuteStage {
 						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
 					setWaitStatus(false);
-					
-					//writeBackStage.receive(result);
-					//writeBackStage.run();
+				
 					this.forward(result);
 					
 					fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
@@ -433,7 +429,7 @@ public class StandardExecuteStage extends ExecuteStage {
 
 
 	//GUI events should not be handled from this thread but from EDT or SwingWorker
-			//This adds the update event to the EDT thread. Need to test this works on the GUI
+	//This adds the update event to the EDT thread. Need to test this works on the GUI
 	@Override
 	public void fireUpdate(final String update) {
 		SwingUtilities.invokeLater(new Runnable() {

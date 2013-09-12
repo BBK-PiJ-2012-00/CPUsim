@@ -73,7 +73,6 @@ public class AssemblerImpl implements Assembler {
 	        		else {
 	        			programString.add(line);
 	        			displayProgram.add(line);
-	        			System.out.println("Adding line " + line + " to programString");
 	        		}
 	        	
 	        	}
@@ -86,7 +85,6 @@ public class AssemblerImpl implements Assembler {
 	    finally {
 	    	if (s != null) {
 	    		s.close();
-	    		System.out.println(leadingComments);
 	    	}
 	    }
 	}
@@ -194,7 +192,6 @@ public class AssemblerImpl implements Assembler {
 			 */
 			for (int i = 0; i < instructionArray.size(); i++) {
 				List<String> lineComponents = this.splitCodeLine(instructionArray.get(i));
-				System.out.println(lineComponents);
 				this.mapInstructionLabel(lineComponents, i); 		
 			}			
 	
@@ -497,7 +494,6 @@ public class AssemblerImpl implements Assembler {
 				return null; //Prevent assembly
 			}
 			
-			System.out.println(lookupTable);
 			int destination;
 			
 			try {

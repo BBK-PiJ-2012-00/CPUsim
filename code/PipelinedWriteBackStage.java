@@ -47,6 +47,12 @@ public class PipelinedWriteBackStage extends WriteBackStage {
 		setWaitStatus(false);
 	}
 
+	/*
+	 * The thread running in this stage, like the thread running in the F/D Stage, can
+	 * be interrupted at any point by the SwingWorker thread running in the Ex. Stage.
+	 * An interrupt causes this thread to cease executing meaningful code and to exit
+	 * as quickly as possible, effectively terminating itself.
+	 */
 	@Override
 	public synchronized void run() {
 		setActive(true);

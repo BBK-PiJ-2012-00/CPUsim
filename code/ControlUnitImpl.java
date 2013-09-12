@@ -108,6 +108,7 @@ public class ControlUnitImpl implements ControlUnit {
 			if (((ReentrantLock) Stage.getLock()).isHeldByCurrentThread()) {//If interrupted during accessMemory(), must release lock
 				Stage.getLock().unlock();
 			}
+			
 		}
 		
 		else if (pipeliningMode) {

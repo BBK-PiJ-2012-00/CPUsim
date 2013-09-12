@@ -20,6 +20,8 @@ public class ModuleUpdateEvent extends EventObject {
 	private String aluUnit; //Which unit (i.e. adder) did the event originate from
 	
 	private boolean controlLineUpdate; //True if the source intends to set control line GUI display
+	private int activityMonitorReference; //Value 0 or 1 (write back stage doesn't use system bus) to determine which
+				//activity monitor sould display the update on the GUI in pipelined mode.
 
 	public ModuleUpdateEvent(Object source, String update) {
 		super(source);
@@ -57,6 +59,18 @@ public class ModuleUpdateEvent extends EventObject {
 		this.update = update;		
 	}
 	
+	/*
+	 * In pipelined mode, the activity monitor that should be updated needs to be specified for system
+	 * bus transfers; both the fetch/decode stage and execute stages use the system bus and the system bus
+	 * updates should be directed to display in the monitor belonging to the stage that is using the system bus.
+	 */
+	public ModuleUpdateEvent(Object source, boolean controlLineUpdate, int activityMonitorRef, String update) {
+		super(source);
+		this.controlLineUpdate = controlLineUpdate;
+		this.activityMonitorReference = activityMonitorRef;
+		this.update = update;		
+	}
+	
 	
 	
 	public String getUpdate() {
@@ -85,6 +99,10 @@ public class ModuleUpdateEvent extends EventObject {
 	
 	public boolean isControlLineUpdate() {
 		return this.controlLineUpdate;
+	}
+	
+	public int getActivityMonitorReference() {
+		return this.activityMonitorReference;
 	}
 
 }

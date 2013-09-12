@@ -60,6 +60,7 @@ public abstract class Stage implements Runnable {
 		
 		String operation = "";
 		String stage = "";
+		
 		if (isPipelined) {
 			
 			
@@ -76,7 +77,8 @@ public abstract class Stage implements Runnable {
 				stage = "Ex. Stage";
 			}
 //			if (pc.getValue() != 0) { //Prevent display of update below on first instruction fetch, as no wait will take place
-			if (((ReentrantLock) lock).isLocked()) {	
+			if (((ReentrantLock) lock).isLocked()) {
+				System.out.println(getClass() + " lock is locked, should fire update.");
 				fireUpdate("> Pipeline delay: Waiting to acquire use of MAR, MBR and \nsystem bus to complete " + 
 						operation + " operation.\n" );
 			}
@@ -116,9 +118,12 @@ public abstract class Stage implements Runnable {
 				return false;
 			}
 			
+			System.out.println ("PC value is: " + getPC().getValue() + " before wait 1");
+			
 			if (isPipelined) { //Additional wait for clarity in pipelined mode, as PC incremented at different point
 				setWaitStatus(true);
 				try {
+					System.out.println("wait 1");
 					wait();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -128,6 +133,12 @@ public abstract class Stage implements Runnable {
 				}
 				setWaitStatus(false);
 			}
+			System.out.println("left wait 1");
+			
+			//When branch is taken: FD is held at above wait while PC is set by branch, so when this then leaves the wait
+			//and reads the PC, it's set to the new value when really we'd like it to be set to the old one to better
+			//demonstrate the pipeline flush.... it then is interrupted during wait2, and starts again, effectively repeating
+			//the placing mem addr from pc to mar.
 			
 			getMAR().write(getPC().getValue()); //Write address value in PC to MAR.
 			
@@ -139,6 +150,7 @@ public abstract class Stage implements Runnable {
 			
 			setWaitStatus(true);
 			try {
+				System.out.println("wait 2");
 				wait();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -147,6 +159,7 @@ public abstract class Stage implements Runnable {
 				return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 			}
 			setWaitStatus(false);
+			System.out.println("left wait 2");
 			
 			if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
 				return false;

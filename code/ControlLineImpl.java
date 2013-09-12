@@ -55,10 +55,22 @@ public class ControlLineImpl implements ControlLine {
 		
 		else if (data == null) { //Signifies first phase of a read; MAR places address on address line, prompting memory to
 			//place contents of the address on the address line onto data line for return to MBR.
+			if(Thread.currentThread().isInterrupted()) {
+				System.out.println("SYSBUS interrupt discovered.");
+				clear();
+				return false;
+			}
+			
 			addressBus.put(address);
 			
+			if(Thread.currentThread().isInterrupted()) {
+				System.out.println("SYSBUS interrupt discovered.");
+				clear();
+				return false;
+			}
+			
 			fireOperationUpdate("Memory read");
-			fireActivityUpdate("Address " + address + " placed on address line by MAR, prompting\nthe first stage" +
+			fireActivityUpdate("Address " + address + " placed on address bus by MAR, prompting\nthe first stage" +
 					"of a memory read.\n");
 			
 			isWaiting = true;
@@ -138,14 +150,6 @@ public class ControlLineImpl implements ControlLine {
 		return isWaiting;
 	}
 	
-//	
-//	@Override
-//	public void fireActivityUpdate(String update) {
-//		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, update);
-//		updateListener.handleUpDateEvent(updateEvent);
-//	}
-	
-	
 	
 	@Override
 	public void fireOperationUpdate(final String update) {
@@ -179,7 +183,8 @@ public class ControlLineImpl implements ControlLine {
 	}
 	
 	/*
-	 * To clear system bus lines in event of SwingWorker thread being cancelled (resets GUI display).
+	 * To clear system bus lines in event of SwingWorker thread being cancelled (resets GUI display)
+	 * or pipeline flush.
 	 */
 	public void clear() {
 		resetWaitStatus();

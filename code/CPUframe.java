@@ -222,17 +222,17 @@ public class CPUframe extends JFrame {
 			activityContentPanel.setLayout(new BoxLayout(activityContentPanel, BoxLayout.Y_AXIS));
 			
 			//Activity area for fetch/decode stage
-			activityArea = new JTextArea(6, 32);
+			activityArea = new JTextArea(7, 32);
 			activityArea.setEditable(false);		
 			JScrollPane activityScroller = new JScrollPane(activityArea);
 			
 			//Activity area for execute stage
-			activityArea1 = new JTextArea(6, 32);
+			activityArea1 = new JTextArea(7, 32);
 			activityArea1.setEditable(false);
 			JScrollPane activityScroller1 = new JScrollPane(activityArea1);
 			
-			//Activity area for ewriteBackStage stage
-			activityArea2 = new JTextArea(5, 32);
+			//Activity area for writeBackStage stage
+			activityArea2 = new JTextArea(3, 32);
 			activityArea2.setEditable(false);
 			JScrollPane activityScroller2 = new JScrollPane(activityArea2);
 			
@@ -1115,6 +1115,10 @@ public class CPUframe extends JFrame {
 	            
 		            memory.clearMemory();
 		            activityArea.setText("");
+		            if (pipeliningEnabled) { //Clear additional activity monitors
+		            	activityArea1.setText("");
+		            	activityArea2.setText("");
+		            }
 		            controlUnit.clearRegisters();
 		           
 		            assembler = new AssemblerImpl(loader);
