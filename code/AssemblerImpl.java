@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 
 public class AssemblerImpl implements Assembler {
-	private Data[] programCode; //The assembly language program to be passed to the loader 
+	private Data[] programCode; //The assembly language program as an array to be passed to the loader 
 	
 	private File fileReference; //Reference to the text file containing assembly program
 	
@@ -26,10 +26,10 @@ public class AssemblerImpl implements Assembler {
 	private List<String> instructionArray; //For intermediate stage where programString is split into two, instructions being stored
 	private List<String> operandArray; //in instructionArray, operands being stored in operandArray (as Strings)
 		
-	private Map<String, Integer> lookupTable; //For associating labels with memory addresses	
+	private Map<String, Integer> lookupTable; //For associating labels with actual memory addresses	
 	
-	private int operandAddressPointer;//Used to reference the final instruction line address (usually HALT) so that
-									 //operands can be stored after this point.
+	private int operandAddressPointer;//Used to reference the line containing the final instruction in an assembly program (usually
+								//a HALT instruction) so that operands can be stored in memory after this point.
 	
 	
 	public AssemblerImpl(Loader loader) {
@@ -67,10 +67,10 @@ public class AssemblerImpl implements Assembler {
 	        		}
 	        	}
 	        	if (leadingCommentsFinished) { //Don't add leading comments to programString
-	        		if (line.matches("[\\s]*")) { //Do not add lines consisting of only blank spaces to programString
+	        		if (line.matches("[\\s]*")) { //Detect lines consisting of only blank spaces 
 	        			displayProgram.add(line); //Ok to add blank lines to the list of code for GUI display
 	        		}
-	        		else {
+	        		else { //Do not add lines consisting of only blank spaces to programString
 	        			programString.add(line);
 	        			displayProgram.add(line);
 	        		}
@@ -94,17 +94,24 @@ public class AssemblerImpl implements Assembler {
 	public void separateOperands() {
 		operandArray = new ArrayList<String>();
 		instructionArray = new ArrayList<String>();
+		
 		for (int i = 0; i < programString.size(); i++) { 
+			
 			if (programString.get(i).contains("DATA")) { //Only operand declarations contain this String sequence
 				operandArray.add(programString.get(i));
 			}
+			
 			else if (programString.get(i).trim().startsWith("#")) { //Detect comments embedded between lines of code
 				//Do nothing; don't add comment lines to instruction or operand arrays
 			}
-			else {
-				instructionArray.add(programString.get(i));
+			
+			else { //If the line isn't a comment or operand declaration, add to instructionArray
+				instructionArray.add(programString.get(i)); 														
 			}
+			
 		}
+		
+		//Create array to hold assembled program, deducing size from instruction and operand ArrayList sizes
 		programCode = new Data[instructionArray.size() + operandArray.size()];
 		operandAddressPointer = instructionArray.size(); //Set operand address pointer to a location that will come immediately
 														//after the last instruction (deduced by size of instructionArray).
@@ -115,14 +122,14 @@ public class AssemblerImpl implements Assembler {
 	public Data assembleOperand(List<String> operandParts) {
 		//All operand part arrays will contain 3 parts: label, DATA declaration, and operand value
 		String label = operandParts.get(0).substring(0, operandParts.get(0).length() -1); //Trim semicolon from label
-		lookupTable.put(label, operandAddressPointer); //Map label to address		
+		lookupTable.put(label, operandAddressPointer); //Map label to address (address given by line number)		
 		
 		String operandString = operandParts.get(2); //Operand value as String
 		int operandValue;
 		try {
-			operandValue = Integer.parseInt(operandString); //Attempt to parse String to int
+			operandValue = Integer.parseInt(operandString); //Attempt to parse String to integer
 		}
-		catch (NumberFormatException nfe) {
+		catch (NumberFormatException nfe) { //If the String cannot be parsed to integer (i.e. bad operand value)
 			JOptionPane.showMessageDialog(null, "Assembly program syntax error: Invalid operand declaration \"" + operandString +
 					"\".", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 			return null; //Return null in the event of an error; prevents further parsing of file and flags error to user
@@ -183,13 +190,14 @@ public class AssemblerImpl implements Assembler {
 				if (operand == null) { //Indicates an error in assembling an operand
 					return false; //Signals error to GUI code and prevents loading of invalid assembly file
 				}
+				
 				programCode[operandAddressPointer] = operand; //Add the operand to the data array, at specified address
 				operandAddressPointer++; //Increment so that the next operand will be stored in the next consecutive address
 			}
 			
-			/*
-			 * Instruction labels (if present) must be mapped prior to assembling instructions. 
-			 */
+			
+			//Instruction labels (if present) must be mapped prior to assembling instructions (so that labels can
+			//be resolved when assembling instructions).
 			for (int i = 0; i < instructionArray.size(); i++) {
 				List<String> lineComponents = this.splitCodeLine(instructionArray.get(i));
 				this.mapInstructionLabel(lineComponents, i); 		
@@ -199,11 +207,12 @@ public class AssemblerImpl implements Assembler {
 			for (int i = 0; i < instructionArray.size(); i++) { 	
 				List<String> lineComponents = this.splitCodeLine(instructionArray.get(i)); //Break a line of code into parts
 				
-				Data instruction = this.assembleInstruction(lineComponents); //Create an instruction/operand from the line components
+				//Create an instruction/operand from the line components
+				Data instruction = this.assembleInstruction(lineComponents);
 				if (instruction == null) { //Only happens if an error occurs in instruction parsing
 					return false; //Signals an error to GUI code, prevents loading of assembly file
 				}
-				programCode[i] = instruction; //Add the instruction/operand to an array list, to be later passed into memory
+				programCode[i] = instruction; //Add the instruction to array containing assembled program code
 			}
 			
 			return true;
@@ -221,9 +230,11 @@ public class AssemblerImpl implements Assembler {
 			instructionParts.remove(0); //Remove label (already added to the lookup table)
 		}		
 
-		//This means a memory source and register destination are specified (these opcodes all follow same format)
+		//This means a memory reference and register reference are specified (these opcodes all follow same format)
 		if (instructionParts.get(0).equals("LOAD") || instructionParts.get(0).equals("BRE") ||
 				instructionParts.get(0).equals("BRNE")) { 
+			//instructionParts will be of format (0)OPCODE, (1)MEMORY SOURCE, (2)REGISTER DESTINATION for LOAD instructions,
+			//and (0)OPCODE, (1)BRANCH TARGET, (2)REGISTER DESTINATION for BRE/BRNE instructions
 			
 			String opcode = instructionParts.get(0);
 			String destinationString;
@@ -232,31 +243,32 @@ public class AssemblerImpl implements Assembler {
 			//Ensure the instruction has two fields
 			try {
 				destinationString = instructionParts.get(2).substring(1); //Trim leading 'r' off			
-			}
-			catch (IndexOutOfBoundsException iob) { //Occurs if less than 2 arguments specified
+			}			
+			catch (IndexOutOfBoundsException iob) { //Occurs if less than 2 arguments specified (if more than 2, the rest
+													//are simply ignored).
 				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Ensure that\n" + instructionParts.get(0) +
 						" instructions have two arguments/fields.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 				return null; //Prevent further parsing
 			}
 			
-			if (destinationString.equals("CC")) { //A load instruction may reference condition code/status register
-				destination = 16;
+			if (destinationString.equals("CC")) { //A load instruction may reference condition code register (rCC) destination
+				destination = 16; //rCC represented by 16
 			}
 			
-			else {
+			else { //If not rCC destination reference
 				//Error handling for register destination reference
 				try {
 					destination = Integer.parseInt(destinationString);
 					if (destination < 0 || destination > 16) { //Illegal register reference
 						throw new IllegalStateException("Invalid register reference in " + opcode + " instruction");
 					}
-				}
+				}				
 				catch (NumberFormatException nfe) {
 					JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register\n" +
 							"reference \"" + instructionParts.get(2) + "\" in " + opcode + " instruction!", 
 							"Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 					return null; //Prevent further parsing
-				}
+				}				
 				catch (IllegalStateException ise) {
 					JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register\n" +
 							"reference \"" + instructionParts.get(2) + "\" in " + opcode + " instruction! Register " +
@@ -265,7 +277,8 @@ public class AssemblerImpl implements Assembler {
 					return null; //Prevent further parsing
 				}
 				
-			}				
+			}
+			
 			
 			int source; //Represents branch target in BRE/BRNE, operand source in LOAD (both memory addresses).
 			try {
@@ -273,9 +286,11 @@ public class AssemblerImpl implements Assembler {
 			}
 			catch (NullPointerException npe) {
 				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Label reference \"" + 
-						instructionParts.get(1) + "\" has not been declared.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+						instructionParts.get(1) + "\" has not been declared.", "Assembly Program Error", 
+						JOptionPane.WARNING_MESSAGE);
 				return null; //Prevent further parsing
 			}
+			
 			
 			try {
 				if (opcode.equals("LOAD")) {
@@ -292,9 +307,8 @@ public class AssemblerImpl implements Assembler {
 					data = new BranchInstr(Opcode.BRNE, source, destination);
 					return data;
 				}	
-			}
-			
-			//An unlikely error but large programs may cause overflow if the program size exceeds 100 lines.
+			}			
+			//An unlikely error but large programs may cause overflow if the program code itself exceeds 100 lines.
 			//References to an instruction at an address greater than 100 will cause an error.
 			catch (IllegalStateException ise) { 
 				JOptionPane.showMessageDialog(null, "Assembly program overflow error: " + opcode + " instruction\n refers to " +
@@ -307,46 +321,50 @@ public class AssemblerImpl implements Assembler {
 		
 		
 		else if (instructionParts.get(0).equals("STORE")) { //This means a register source and memory destination are specified
-			int destination;
+			//instructionParts will be of format (0)OPCODE, (1)MEMORY SOURCE, (2) REGISTER DESTINATION
 			
+			int destination;			
 			try {
 				destination = lookupTable.get(instructionParts.get(2)); //Look up symbolic destination
-			}
+			}			
 			catch (NullPointerException npe) {
 				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Label reference \"" + 
-						instructionParts.get(2) + "\" has not been declared.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+						instructionParts.get(2) + "\" has not been declared.", "Assembly Program Error", 
+						JOptionPane.WARNING_MESSAGE);
 				return null; //Prevent further parsing
-			}
+			}			
 			catch (IndexOutOfBoundsException iob) { //Occurs if less than 2 arguments specified
 				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Ensure that\n" + instructionParts.get(0) +
 						" instructions have two arguments/fields.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 				return null; //Prevent further parsing
 			}
+			
 			
 			String sourceString;
 			try {
 				sourceString = instructionParts.get(1).substring(1);//Trim leading 'r' off
-			}
+			}			
 			catch (IndexOutOfBoundsException iob) { //Occurs if less than 2 arguments specified
 				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Ensure that\n" + instructionParts.get(0) +
 						" instructions have two arguments/fields.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 				return null; //Prevent further parsing
 			}
 			
-			int source;
 			
+			int source;			
 			try {
 				source = Integer.parseInt(sourceString);	
 				if (source < 0 || source > 15) { //rCC not included in store instructions, hence 15 is upper bound
 					throw new IllegalStateException("Invalid register reference in STORE instruction");
 				}
-			}
+			}			
 			catch (NumberFormatException nfe) {
 				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register reference\n" +
 						"\"" + instructionParts.get(1) + "\" in STORE instruction!", "Assembly Program Error", 
 						JOptionPane.WARNING_MESSAGE);
 				return null; //Prevent further parsing
 			}
+			
 			catch (IllegalStateException ise) {
 				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register reference\n" +
 						"\"" + instructionParts.get(1) + "\" in STORE instruction! Register references should\nbe between r0 and r15.",
@@ -357,6 +375,7 @@ public class AssemblerImpl implements Assembler {
 			try {
 				data = new TransferInstr(Opcode.STORE, source, destination);
 			}
+			
 			catch (IllegalStateException ise) { //Catch errors when creating instruction
 				JOptionPane.showMessageDialog(null, "Assembly program syntax error: STORE instruction\n declares " +
 						"invalid memory reference.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
@@ -365,14 +384,16 @@ public class AssemblerImpl implements Assembler {
 			return data;
 		}
 		
+		
 		//Register to register operations all follow this block
 		else if (instructionParts.get(0).equals("MOVE") || instructionParts.get(0).equals("ADD") || 
 				instructionParts.get(0).equals("SUB") || instructionParts.get(0).equals("DIV") ||
 				instructionParts.get(0).equals("MUL")) {
 			
+			//instructionParts will be of format (0)OPCODE, (1)REGISTER SOURCE, (2)REGISTER DESTINATION
+			
 			String opcode = instructionParts.get(0);
 			String sourceString;				
-			//Register source, register destination
 			
 			//Ensure instruction has right number of fields
 			try {
@@ -383,33 +404,40 @@ public class AssemblerImpl implements Assembler {
 						" instructions have two arguments/fields.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 				return null; //Prevent further parsing
 			}
-			int source;
 			
-			try {
-				source = Integer.parseInt(sourceString);
-				if (source < 0 || source > 16) { //rCC references allowed in MOVE instruction (ArithmeticInstr catches error)
-					throw new IllegalStateException("Illegal register reference");
+			int source;	
+			
+			if (sourceString.equals("CC")) {//MOVE instruction may reference rCC source (arithmetic instructions catch error later).
+				source = 16;
+			}
+			else { //If not "CC", attempt to parse String to integer
+				try {
+					source = Integer.parseInt(sourceString);
+					if (source < 0 || source > 16) { //rCC references allowed in MOVE instruction (ArithmeticInstr catches error later)
+						throw new IllegalStateException("Illegal register reference");
+					}
+				}
+				catch (NumberFormatException nfe) {
+					JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register\n" +
+							"reference \"" + instructionParts.get(1) + "\" in " + opcode + " instruction!", 
+							"Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+					return null; //Prevent further parsing
+				}
+				catch (IllegalStateException ise) {
+					JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register " +
+							"reference \"" + instructionParts.get(1) + "\" in " + opcode + " instruction! Register \nreferences should " +
+							"be between r0 to r15 (or rCC as the register destination for \nLOAD or MOVE instructions).",
+							"Assembly Program Error", 
+							JOptionPane.WARNING_MESSAGE);
+					return null; //Prevent further parsing
+				}
+				catch (IndexOutOfBoundsException iob) {
+					JOptionPane.showMessageDialog(null, "Assembly program syntax error: Ensure that\n" + instructionParts.get(0) +
+							" instructions have two arguments/fields.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+					return null; //Prevent further parsing
 				}
 			}
-			catch (NumberFormatException nfe) {
-				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register\n" +
-						"reference \"" + instructionParts.get(1) + "\" in " + opcode + " instruction!", 
-						"Assembly Program Error", JOptionPane.WARNING_MESSAGE);
-				return null; //Prevent further parsing
-			}
-			catch (IllegalStateException ise) {
-				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register " +
-						"reference \"" + instructionParts.get(1) + "\" in " + opcode + " instruction! Register \nreferences should " +
-						"be between r0 to r15 (or rCC as the register destination for \nLOAD or MOVE instructions).",
-						"Assembly Program Error", 
-						JOptionPane.WARNING_MESSAGE);
-				return null; //Prevent further parsing
-			}
-			catch (IndexOutOfBoundsException iob) {
-				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Ensure that\n" + instructionParts.get(0) +
-						" instructions have two arguments/fields.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
-				return null; //Prevent further parsing
-			}
+			
 			
 			int destination;
 			String destinationString;
@@ -424,10 +452,10 @@ public class AssemblerImpl implements Assembler {
 				return null; //Prevent further parsing
 			}
 			
-			if (destinationString.equals("CC")) { //A load instruction may reference condition code/status register
-				destination = 16;
-			}
 			
+			if (destinationString.equals("CC")) { //A MOVE instruction may reference condition code (rCC) register source/dest.
+				destination = 16;
+			}			
 			else {
 				try {
 					destination = Integer.parseInt(destinationString);
