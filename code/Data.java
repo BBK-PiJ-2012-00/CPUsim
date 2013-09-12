@@ -1,11 +1,8 @@
 package code;
 
 /*
- * Main memory is implemented as an array of type Data. Instructions implement data, as does anything else
- * that is stored in main memory.
- * 
- * While main memory is an array of type Data, things declared as Operand and Instruction can be stored within (but
- * come out as type Data?)
+ * Main memory is implemented as an array of type Data. Instructions and Operands implement Data, thus
+ * allowing them to be stored in memory.
  */
 public interface Data {
 	
@@ -13,6 +10,9 @@ public interface Data {
 	
 	public boolean isInteger();
 	
+	/*
+	 * Not currently in use but floating point operands could be introduced at some point.
+	 */
 	public boolean isFloatingPoint();
 
 }
