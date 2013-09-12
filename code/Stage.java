@@ -97,10 +97,7 @@ public abstract class Stage implements Runnable {
 			return false;
 		}
 
-//		if (isPipelined) {
-//			fireUpdate("> Exclusive use of MAR, MBR and system bus acquired by\n" + stage + " for " + operation + " operation.\n");
-//		}
-	
+
 		if (isInstructionFetch) {
 			//Instruction fetch code; accessed in pipelined mode by a separate thread running in the F/D stage,
 			//therefore it is necessary to regularly poll for its interrupted status so that in the event that
@@ -120,7 +117,9 @@ public abstract class Stage implements Runnable {
 			
 			System.out.println ("PC value is: " + getPC().getValue() + " before wait 1");
 			
-			if (isPipelined) { //Additional wait for clarity in pipelined mode, as PC incremented at different point
+			//Additional wait for clarity in pipelined mode, as PC incremented at different point (but don't wait on
+			//first instruction fetch as this causes an initial GUI gap).
+			if (isPipelined && pc.getValue() != 0) {
 				setWaitStatus(true);
 				try {
 					System.out.println("wait 1");
