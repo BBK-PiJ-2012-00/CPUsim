@@ -73,6 +73,14 @@ public class SystemBusController implements BusController {
 	public boolean transferToCPU(Data data) { //Called by memory
 		return controlLine.writeToBus(-1, data); //-1 to reflect transfer to CPU (non-existent memory address) -> still necessary!?
 	}
+
+
+
+	@Override
+	public void setCaller(Stage callingStage) {
+		controlLine.setCaller(callingStage);
+		
+	}
 	
 		
 

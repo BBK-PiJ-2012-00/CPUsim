@@ -1,8 +1,8 @@
 package code;
 
 /*
- * An interface for the system bus controller of the simulator. It seems wise to encapsulate the (initially) three bus lines 
- * in a system bus class, meaning that lines must be accessed via this class and not directly, ensuring
+ * An interface for the system bus controller of the simulator. It seems wise to encapsulate the three bus lines 
+ * in a system bus controller class, meaning that lines must be accessed via this class and not directly, ensuring
  * a higher degree of data integrity.  Also allows for later addition of more lines to improve performance without
  * having to alter code elsewhere (i.e. to choose which address line and which data line etc).
  * 
@@ -30,5 +30,7 @@ public interface BusController {
 	 boolean transferToCPU(Data data);
 	 
 	 public ControlLine accessControlLine(); //For GUI updates
+	 
+	 public void setCaller(Stage callingStage);
 
 }
