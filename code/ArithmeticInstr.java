@@ -7,8 +7,9 @@ package code;
  */
 
 public class ArithmeticInstr extends Instruction {
-	private int registerDest; //Register where result of operation should be stored
+	private int registerDest;//Register where input operand is originally stored, and where the result of operation should be stored
 	private int registerInput; //Register where the input operand is stored
+	
 	
 	public ArithmeticInstr(Opcode opcode, int registerDest, int registerInput) {
 		super(opcode);
