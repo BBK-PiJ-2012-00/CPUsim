@@ -267,7 +267,7 @@ public class AssemblerImpl implements Assembler {
 				
 			}				
 			
-			int source;
+			int source; //Represents branch target in BRE/BRNE, operand source in LOAD (both memory addresses).
 			try {
 				source = lookupTable.get(instructionParts.get(1)); //Memory addresses are always symbolic
 			}
@@ -277,20 +277,31 @@ public class AssemblerImpl implements Assembler {
 				return null; //Prevent further parsing
 			}
 			
-			if (opcode.equals("LOAD")) {
-				data = new TransferInstr(Opcode.LOAD, source, destination);
-				return data;
+			try {
+				if (opcode.equals("LOAD")) {
+					data = new TransferInstr(Opcode.LOAD, source, destination);
+					return data;
+				}
+				
+				if (opcode.equals("BRE")) {
+					data = new BranchInstr(Opcode.BRE, source, destination);
+					return data;
+				}
+				
+				if (opcode.equals("BRNE")) {
+					data = new BranchInstr(Opcode.BRNE, source, destination);
+					return data;
+				}	
 			}
 			
-			if (opcode.equals("BRE")) {
-				data = new BranchInstr(Opcode.BRE, source, destination);
-				return data;
+			//An unlikely error but large programs may cause overflow if the program size exceeds 100 lines.
+			//References to an instruction at an address greater than 100 will cause an error.
+			catch (IllegalStateException ise) { 
+				JOptionPane.showMessageDialog(null, "Assembly program overflow error: " + opcode + " instruction\n refers to " +
+						"out of bounds memory reference. Reduce program \nsize or reuse labels to conserve memory space.", 
+						"Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+				return null;
 			}
-			
-			if (opcode.equals("BRNE")) {
-				data = new BranchInstr(Opcode.BRNE, source, destination);
-				return data;
-			}			
 			
 		}
 		
@@ -343,7 +354,14 @@ public class AssemblerImpl implements Assembler {
 				return null; //Prevent further parsing
 			}
 			
-			data = new TransferInstr(Opcode.STORE, source, destination);
+			try {
+				data = new TransferInstr(Opcode.STORE, source, destination);
+			}
+			catch (IllegalStateException ise) { //Catch errors when creating instruction
+				JOptionPane.showMessageDialog(null, "Assembly program syntax error: STORE instruction\n declares " +
+						"invalid memory reference.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+				return null;
+			}
 			return data;
 		}
 		
@@ -511,11 +529,22 @@ public class AssemblerImpl implements Assembler {
 				return null; //Prevent further parsing
 			}
 			
-			if (opcode.equals("BR")) {
-				data = new BranchInstr(Opcode.BR, destination);
+			try {
+				if (opcode.equals("BR")) {
+					data = new BranchInstr(Opcode.BR, destination);
+				}
+				else {
+					data = new BranchInstr(Opcode.BRZ, destination);
+				}
 			}
-			else {
-				data = new BranchInstr(Opcode.BRZ, destination);
+			
+			//An unlikely error but large programs may cause overflow if the program size exceeds 100 lines.
+			//References to an instruction at an address greater than 100 will cause an error.
+			catch (IllegalStateException ise) { 
+				JOptionPane.showMessageDialog(null, "Assembly program overflow error: " + opcode + " instruction\n refers to " +
+						"out of bounds memory reference. Reduce program \nsize or reuse labels to conserve memory space.", 
+						"Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+				return null;
 			}
 			return data;
 		}
