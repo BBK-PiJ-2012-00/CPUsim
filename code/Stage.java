@@ -59,22 +59,21 @@ public abstract class Stage implements Runnable {
 		
 		
 		String operation = "";
-		String stage = "";
 		
 		if (isPipelined) {
 			
 			
 			if (isInstructionFetch) {
 				operation = "instruction fetch";
-				stage = "F/D Stage";
+				//stage = "F/D Stage";
 			}
 			if (isOperandLoad) {
 				operation = "LOAD";
-				stage = "Ex. Stage";
+			//	stage = "Ex. Stage";
 			}
 			if (isOperandStore) {
 				operation = "STORE";
-				stage = "Ex. Stage";
+			//	stage = "Ex. Stage";
 			}
 //			if (pc.getValue() != 0) { //Prevent display of update below on first instruction fetch, as no wait will take place
 			if (((ReentrantLock) lock).isLocked()) {
@@ -165,19 +164,20 @@ public abstract class Stage implements Runnable {
 			}
 			
 			//Transfer address from MAR to system bus, prompting read
+			if (isPipelined) { //Caller only used for pipelined mode
+				getSystemBus().setCaller(this); //Register object reference with system bus to enable updates to relevant 
+				//activity monitor
+			}
 			boolean successfulTransfer = getSystemBus().transferToMemory(getMAR().read(), null); 
+			getSystemBus().setCaller(null); //Reset caller reference when done to avoid interference for next caller.
 			if (!successfulTransfer) { 
 				//If SwingWorker is cancelled and thread of execution is interrupted, successfulTransfer will be false and the
 				//method should not execute any further
 				return false;
 			}
-			//Flushing during system bus operation? 
+ 
 			
 			if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
-				System.out.println("Entering interrupted block 4");
-//				if (pipelineFlush) {
-//					fireUpdate("** PIPELINE FLUSH ** \nFetch/decode of " + ir.read(0).toString() + " abandoned.");
-//				}
 				return false;
 			}
 			
@@ -192,18 +192,12 @@ public abstract class Stage implements Runnable {
 				e.printStackTrace();
 				active = false;
 				setWaitStatus(false);
-//				if (pipelineFlush) {
-//					fireUpdate("** PIPELINE FLUSH ** \nFetch/decode of " + ir.read(0).toString() + " abandoned.");
-//				}
 				return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 			}
 			setWaitStatus(false);
 			
 			if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
 				System.out.println("Entering interrupted block 5");
-//				if (pipelineFlush) {
-//					fireUpdate("** PIPELINE FLUSH ** \nFetch/decode of " + ir.read(0).toString() + " abandoned.");
-//				}
 				return false;
 			}
 			
@@ -277,7 +271,12 @@ public abstract class Stage implements Runnable {
 			
 			System.out.println("Instruction is: " + ir.read(1).toString());
 			System.out.println("Value on MAR at ln46:" + mar.read());
+			if (isPipelined) { //Caller only used for pipelined mode
+				getSystemBus().setCaller(this); //Register object reference with system bus to enable updates to relevant 
+				//activity monitor
+			}
 			boolean successfulTransfer = getSystemBus().transferToMemory(mar.read(), null);
+			getSystemBus().setCaller(null);
 			if (!successfulTransfer) {
 				active = false;
 				return false;
@@ -385,7 +384,16 @@ public abstract class Stage implements Runnable {
 			setWaitStatus(false);
 			
 			//Transfer contents of mbr to address specified in mar
-			getSystemBus().transferToMemory(getMAR().read(), getMBR().read()); 
+			if (isPipelined) { //Caller only used for pipelined mode
+				getSystemBus().setCaller(this); //Register object reference with system bus to enable updates to relevant 
+				//activity monitor
+			}
+			boolean successfulTransfer = getSystemBus().transferToMemory(getMAR().read(), getMBR().read()); 
+			getSystemBus().setCaller(null);
+			if (!successfulTransfer) {
+				active = false;
+				return false;
+			}
 			
 			this.fireUpdate("> Operand " + getGenRegisters().read(getIR().read(1).getField1()) + " stored in memory address " +
 					getIR().read(1).getField2() + "\n");
