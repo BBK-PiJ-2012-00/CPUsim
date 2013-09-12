@@ -345,15 +345,15 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						 fireUpdate("> PC set to " + getPC().getValue() + " as result of " + getIR().read(1).getOpcode() + 
 								 " operation\n");
 						 
-						 setWaitStatus(true);
-							try {
-								wait();
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-								setWaitStatus(false);
-								return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-							}
-							setWaitStatus(false);
+//						 setWaitStatus(true);
+//							try {
+//								wait();
+//							} catch (InterruptedException e) {
+//								e.printStackTrace();
+//								setWaitStatus(false);
+//								return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//							}
+//							setWaitStatus(false);
 				
 						 pipelineFlush();
 						 
@@ -439,19 +439,46 @@ public class PipelinedExecuteStage extends ExecuteStage {
 			case 12: //A BRNE instruction (branch if status reg. contents != contents of register ref. in instruction)
 					 genRegRef = getIR().read(1).getField2(); //Reference to register referred to in instruction
 					 if (!(getCC().read().equals((Operand) getGenRegisters().read(genRegRef)))) { //If not equal
+						 
+						 setWaitStatus(true);
+							try {
+								wait();
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+								setWaitStatus(false);
+								return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+							}
+							setWaitStatus(false);
+							
+							fireUpdate("> Comparing values held in r" + genRegRef + " and rCC; values \nare not equal so the " + 
+									"branch will be taken.\n");
+							
+							 //This additional wait() allows for better GUI description of pipeline flush due to branch being
+							//taken; it enables the f/d stage to use the PC value prior to the value set by the branch and begin
+							//fetching the next sequential instruction, and is then flushed before it can get too far.
+							setWaitStatus(true);
+								try {
+									wait();
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+									setWaitStatus(false);
+									return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+								}
+								setWaitStatus(false);
+							
 						 getPC().setPC(getIR().read(1).getField1()); //Set PC to equal address in field1 of instruction in ir	
 						 fireUpdate("> PC set to " + getIR().read(1).getField1() + " as result of " + getIR().read(1).getOpcode() 
 								 + " operation\n");
 						 
-						setWaitStatus(true);
-						try {
-							wait();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-							setWaitStatus(false);
-							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-						}
-						setWaitStatus(false);
+//						setWaitStatus(true);
+//						try {
+//							wait();
+//						} catch (InterruptedException e) {
+//							e.printStackTrace();
+//							setWaitStatus(false);
+//							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+//						}
+//						setWaitStatus(false);
 						 
 						pipelineFlush();
 						 
@@ -522,7 +549,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 				
 				((IRfile) getIR()).loadIR(1, instr);
 				int opcodeValue = instr.getOpcode().getValue();
-				fireUpdate("> Beginning execution of instruction " + instr.toString() + "received \nfrom F/D stage.\n");
+				fireUpdate("> Beginning execution of instruction " + instr.toString() + " received \nfrom F/D stage.\n");
 				
 				//System.out.println("Just taken " + instr + " from queue");
 				//System.out.println("IR at 1 " + getIR().read(1));
@@ -574,7 +601,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 		((PipelinedFetchDecodeStage) fetchDecodeStage).setPipelineFlush(true); //Allows for differentiation between reset and flush
 		fetchDecodeThread.interrupt(); //Poll Thread.isInterrupted() at crucial points, incl. System Bus
 		getIR().clear(0); //Clear f/d and ex. IR registers (wb stage may be using third IR index).
-		getIR().clear(1);
+		//getIR().clear(1);
 		while (fetchDecodeThread.isAlive()); //Wait for f/d thread to terminate
 		fetchDecodeThread = new Thread(fetchDecodeStage); //Must create new thread, as old one cannot be restarted
 		fetchDecodeThread.start(); //Restart f/d thread, which will fetch from new PC address value
