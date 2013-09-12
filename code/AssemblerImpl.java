@@ -271,9 +271,9 @@ public class AssemblerImpl implements Assembler {
 				}				
 				catch (IllegalStateException ise) {
 					JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register\n" +
-							"reference \"" + instructionParts.get(2) + "\" in " + opcode + " instruction! Register " +
-							"references should\n be between r0 to r15 (or rCC as the destination register of LOAD or MOVE instructions).",
-							"Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+						"reference \"" + instructionParts.get(2) + "\" in " + opcode + " instruction! Register references " +
+						"should \nbe between r0 to r15 (or rCC as the destination register of LOAD or MOVE instructions).",
+						"Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 					return null; //Prevent further parsing
 				}
 				
@@ -311,7 +311,7 @@ public class AssemblerImpl implements Assembler {
 			//An unlikely error but large programs may cause overflow if the program code itself exceeds 100 lines.
 			//References to an instruction at an address greater than 100 will cause an error.
 			catch (IllegalStateException ise) { 
-				JOptionPane.showMessageDialog(null, "Assembly program overflow error: " + opcode + " instruction\n refers to " +
+				JOptionPane.showMessageDialog(null, "Assembly program overflow error: " + opcode + " instruction \nrefers to " +
 						"out of bounds memory reference. Reduce program \nsize or reuse labels to conserve memory space.", 
 						"Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 				return null;
@@ -367,8 +367,8 @@ public class AssemblerImpl implements Assembler {
 			
 			catch (IllegalStateException ise) {
 				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register reference\n" +
-						"\"" + instructionParts.get(1) + "\" in STORE instruction! Register references should\nbe between r0 and r15.",
-						"Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+					"\"" + instructionParts.get(1) + "\" in STORE instruction! Register references should\nbe between r0 and r15.",
+					"Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 				return null; //Prevent further parsing
 			}
 			
@@ -377,7 +377,7 @@ public class AssemblerImpl implements Assembler {
 			}
 			
 			catch (IllegalStateException ise) { //Catch errors when creating instruction
-				JOptionPane.showMessageDialog(null, "Assembly program syntax error: STORE instruction\n declares " +
+				JOptionPane.showMessageDialog(null, "Assembly program syntax error: STORE instruction \ndeclares " +
 						"invalid memory reference.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 				return null;
 			}
@@ -407,13 +407,15 @@ public class AssemblerImpl implements Assembler {
 			
 			int source;	
 			
-			if (sourceString.equals("CC")) {//MOVE instruction may reference rCC source (arithmetic instructions catch error later).
+			//MOVE instruction may reference rCC source (arithmetic instructions catch error later).
+			if (sourceString.equals("CC")) {
 				source = 16;
 			}
 			else { //If not "CC", attempt to parse String to integer
 				try {
 					source = Integer.parseInt(sourceString);
-					if (source < 0 || source > 16) { //rCC references allowed in MOVE instruction (ArithmeticInstr catches error later)
+					//rCC references allowed in MOVE instruction (ArithmeticInstr catches error later)
+					if (source < 0 || source > 16) { 
 						throw new IllegalStateException("Illegal register reference");
 					}
 				}
@@ -425,8 +427,8 @@ public class AssemblerImpl implements Assembler {
 				}
 				catch (IllegalStateException ise) {
 					JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register " +
-							"reference \"" + instructionParts.get(1) + "\" in " + opcode + " instruction! Register \nreferences should " +
-							"be between r0 to r15 (or rCC as the register destination for \nLOAD or MOVE instructions).",
+							"reference \"" + instructionParts.get(1) + "\" in " + opcode + " instruction! Register \nreferences " +
+							"should be between r0 to r15 (or rCC as the register destination for \nLOAD or MOVE instructions).",
 							"Assembly Program Error", 
 							JOptionPane.WARNING_MESSAGE);
 					return null; //Prevent further parsing
@@ -453,7 +455,7 @@ public class AssemblerImpl implements Assembler {
 			}
 			
 			
-			if (destinationString.equals("CC")) { //A MOVE instruction may reference condition code (rCC) register source/dest.
+			if (destinationString.equals("CC")) { //A MOVE instruction may reference condition code (rCC) register dest.
 				destination = 16;
 			}			
 			else {
@@ -471,13 +473,15 @@ public class AssemblerImpl implements Assembler {
 				}
 				catch (IllegalStateException ise) {
 					JOptionPane.showMessageDialog(null, "Assembly program syntax error: Illegal register " +
-							"reference \"" + instructionParts.get(2) + "\" in " + opcode + " instruction! Register \nreferences should " +
-							"be between r0 to r15 (or rCC as the register destination for \nLOAD or MOVE instructions).",
+							"reference \"" + instructionParts.get(2) + "\" in " + opcode + " instruction! Register \nreferences " +
+							"should be between r0 to r15 (or rCC as the register destination for \nLOAD or MOVE instructions).",
 							"Assembly Program Error", 
 							JOptionPane.WARNING_MESSAGE);
 					return null; //Prevent further parsing
 				}
 			}	
+			
+			//Create instructions
 			
 			if (opcode.equals("MOVE")) {
 				data = new TransferInstr(Opcode.MOVE, source, destination);
@@ -530,18 +534,21 @@ public class AssemblerImpl implements Assembler {
 			}				
 		}
 		
+		
 		//These opcodes have the same instruction format; just a symbolic memory address
 		else if (instructionParts.get(0).equals("BR") || instructionParts.get(0).equals("BRZ")) {
+			//instructionParts will be of format (0)OPCODE, (1)BRANCH TARGET (MEMORY REFERENCE)
+			
 			String opcode = instructionParts.get(0);
 			
+			//If there are more fields than just the branch target
 			if (instructionParts.size() > 2) {
 				JOptionPane.showMessageDialog(null, "Assembly program syntax error: " + opcode + " insructions \n" +
 						" should have one target field.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 				return null; //Prevent assembly
 			}
 			
-			int destination;
-			
+			int destination;			
 			try {
 				destination = lookupTable.get(instructionParts.get(1)); //Get value for symbolic memory address ref.
 			}
@@ -551,7 +558,7 @@ public class AssemblerImpl implements Assembler {
 						"Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 				return null; //Prevent further parsing
 			}
-			catch (IndexOutOfBoundsException iob) { //Occurs if less than 2 arguments specified
+			catch (IndexOutOfBoundsException iob) { //Occurs if less than 2 arguments (incl. opcode) specified
 				JOptionPane.showMessageDialog(null, "Assembly program syntax error: Ensure that\n" + instructionParts.get(0) +
 						" instructions have a target field.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 				return null; //Prevent further parsing
@@ -577,7 +584,10 @@ public class AssemblerImpl implements Assembler {
 			return data;
 		}
 		
+		
+		//SKZ and HALT instructions are of same format
 		else if (instructionParts.get(0).equals("SKZ") || instructionParts.get(0).equals("HALT")) {
+			//instructionParts will be of format (0)OPCODE
 			
 			String opcode = instructionParts.get(0);
 			
@@ -607,21 +617,25 @@ public class AssemblerImpl implements Assembler {
 		return data;
 	}
 	
+	
 	@Override
 	public void loadToLoader() {
 		loader.clear(); //Has the effect of resetting the loader each time, ensuring no remnant data from the last use
 		loader.load(this.programCode);
 	}
 	
+	
 	@Override
 	public List<String> getProgramString() {
 		return this.programString;
 	}
 	
+	
 	@Override
 	public List<String> getOperandArray() {
 		return this.operandArray;
 	}
+	
 	
 	@Override
 	public List<String> getInstructionArray() {
@@ -633,6 +647,7 @@ public class AssemblerImpl implements Assembler {
 	public Map<String, Integer> getLookupTable() {
 		return this.lookupTable;
 	}
+	
 	
 	@Override
 	public Data[] getProgramCode() {
