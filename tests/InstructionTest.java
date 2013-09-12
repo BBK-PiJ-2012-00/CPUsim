@@ -262,6 +262,36 @@ public class InstructionTest {
 		assertEquals(expected, output);
 	}
 	
+	
+	@Test
+	public void branchInstrInvalidFormatSKZ() { //Tests SKZ won't accept fields
+		try { 
+			instr = new BranchInstr(Opcode.SKZ, 70);
+		}
+		catch (IllegalStateException e) {
+			System.out.println(e.getMessage());
+		}
+		assertNull(instr); //Instruction should not be instantiated with invalid arguments
+	}
+	
+	
+	@Test
+	public void branchInstrGetField1Test_SKZ() { //Check SKZ field1 holds -1 (as field is unused).
+		instr = new BranchInstr(Opcode.SKZ);
+		int output = instr.getField1();
+		int expected = -1;
+		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void branchInstrGetField2Test_SKZ() { //Check SKZ field2 holds -1 (as field is unused).
+		instr = new BranchInstr(Opcode.SKZ);
+		int output = instr.getField2();
+		int expected = -1; 
+		assertEquals(expected, output);
+	}
+	
+	
 	@Test
 	public void haltInstrTest() {
 		instr = new HaltInstr(Opcode.HALT);
@@ -281,6 +311,7 @@ public class InstructionTest {
 	
 	@Test
 	public void haltInstrGetField1Test() { //HALT instructions have no fields, so getters should return the default -1
+		
 		instr = new HaltInstr(Opcode.HALT);
 		int expected = -1;
 		int output = instr.getField1();
