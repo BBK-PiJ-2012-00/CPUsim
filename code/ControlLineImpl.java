@@ -12,6 +12,9 @@ public class ControlLineImpl implements ControlLine {
 	
 	private UpdateListener updateListener;
 	
+	private Stage callingStage; //A reference to the stage using the system bus; for pipelined mode updates, so that GUI
+								//updates can be directed to the relevant activity monitor display.
+	
 	
 	public ControlLineImpl(MemoryBufferRegister mbr) {
 		this.mbr = mbr;
@@ -24,16 +27,28 @@ public class ControlLineImpl implements ControlLine {
 	}	
 	
 	
-	
+	//Synchronized to allow notify() operation on wait(); notifying thread must hold lock.
 	public synchronized boolean writeToBus(int address, Data data) { 
 		if (address == -1) { //Indicates transfer from memory to CPU (2nd phase of memory read; delivery from memory to MBR)
 			dataBus.put(data); 
 			
-			if (data instanceof Instruction) { //Activity monitor commentary
-				fireActivityUpdate("Instruction " + data.toString() + " placed on data bus from \nmemory.\n");
+			if (data instanceof Instruction) { //Activity monitor commentary (pipelined mode f/d activity monitor)
+				String update = "> Instruction " + data.toString() + " placed on data bus from \nmemory.\n";
+				if (callingStage == null) { //callingStage will be null for standard execution (won't be set)
+					fireActivityUpdate(update);
+				}
+				else {//Instructions are only transferred to CPU in F/D stage
+					fireActivityUpdate(update, 0); //0 refers to F/D activity monitor in pipelined mode.
+				}
 			}
-			else {
-				fireActivityUpdate("Operand " + data.toString() + " placed on data bus from \nmemory.\n");
+			else { //Operands are transferred to CPU from memory only in Ex. Stage LOAD instructions
+				String update = "> Operand " + data.toString() + " placed on data bus from \nmemory.\n";
+				if (callingStage == null) { //Standard execution, update single activity monitor as usual
+					fireActivityUpdate(update);
+				}
+				else { //Pipelined mode, callingStage will not be null
+					fireActivityUpdate(update, 1); //Update Ex. Stage activity monitor in pipelined mode.
+				}
 			}
 			
 			isWaiting = true;
@@ -55,23 +70,20 @@ public class ControlLineImpl implements ControlLine {
 		
 		else if (data == null) { //Signifies first phase of a read; MAR places address on address line, prompting memory to
 			//place contents of the address on the address line onto data line for return to MBR.
-			if(Thread.currentThread().isInterrupted()) {
-				System.out.println("SYSBUS interrupt discovered.");
-				clear();
-				return false;
-			}
-			
-			addressBus.put(address);
-			
-			if(Thread.currentThread().isInterrupted()) {
-				System.out.println("SYSBUS interrupt discovered.");
-				clear();
-				return false;
-			}
-			
+			addressBus.put(address);			
 			fireOperationUpdate("Memory read");
-			fireActivityUpdate("Address " + address + " placed on address bus by MAR, prompting\nthe first stage" +
-					"of a memory read.\n");
+			
+			String update = "> Address " + address + " placed on address bus from MAR, prompting\nthe first stage" +
+					"of a memory read.\n";
+			if (callingStage == null) { //Standard mode, update single activity monitor
+				fireActivityUpdate(update);
+			}
+			else if (callingStage instanceof PipelinedFetchDecodeStage) {
+				fireActivityUpdate(update, 0); //Update F/D activity monitor
+			}
+			else if (callingStage instanceof PipelinedExecuteStage) {
+				fireActivityUpdate(update, 1); //Update Ex. activity mointor
+			}
 			
 			isWaiting = true;
 			try {
@@ -87,18 +99,26 @@ public class ControlLineImpl implements ControlLine {
 			return this.deliverToMemory(true);
 		}
 		
-		//Memory write code:
+		//Memory write code: address and data supplied
 		addressBus.put(address);
 		dataBus.put(data);
 		
 		fireOperationUpdate("Memory write");
-		if (data instanceof Instruction) {
-			fireActivityUpdate("Address " + address + " placed on address bus by MAR \nand instruction " +
-					data.toString() + " placed on data bus by MBR.\n");
+//		if (data instanceof Instruction) { //Is this ever called? Instructions aren't written to memory (only fetched)
+//			fireActivityUpdate("Address " + address + " placed on address bus from MAR \nand instruction " +
+//					data.toString() + " placed on data bus by MBR.\n");
+//		}
+		//else {
+//			fireActivityUpdate("Address " + address + " placed on address bus from MAR \nand operand " +
+//					data.toString() + " placed on data bus by MBR.\n");
+		//}
+		String update = "> Address " + address + " placed on address bus from MAR \nand operand " +
+				data.toString() + " placed on data bus by MBR.\n";
+		if (callingStage == null) { //Standard mode
+			fireActivityUpdate(update);			
 		}
-		else {
-			fireActivityUpdate("Address " + address + " placed on address bus by MAR \nand operand " +
-					data.toString() + " placed on data bus by MBR.\n");
+		else { //Memory writes only called by Ex. stage, so implicitly update Ex. stage activity monitor
+			fireActivityUpdate(update, 1);
 		}
 		
 		isWaiting = true;
@@ -162,16 +182,28 @@ public class ControlLineImpl implements ControlLine {
 		
 	}
 	
-	
+	//SWITCH TO PRIVATE VISIBILITY
 	public void fireActivityUpdate(final String update) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-			    ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(ControlLineImpl.this, update);
+			    ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(ControlLineImpl.this, false, update);
+			    //False parameter indicates activity monitor update as opposed to control line update
 				updateListener.handleUpDateEvent(updateEvent);	
 			}
 		});
 	}
 	
+	public void fireActivityUpdate(final String update, final int activityMonitorRef) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+			    ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(ControlLineImpl.this, false, activityMonitorRef, update);
+			    //false signifies its not a control line display update but an activity monitor update
+			    //activityMonitorRef. is an integer referring to which GUI activity monitor the update should be passed in
+			    //pipelined mode.
+				updateListener.handleUpDateEvent(updateEvent);	
+			}
+		});
+	}
 	
 	@Override
 	public void registerListener(UpdateListener listener) {
@@ -186,11 +218,17 @@ public class ControlLineImpl implements ControlLine {
 	 * To clear system bus lines in event of SwingWorker thread being cancelled (resets GUI display)
 	 * or pipeline flush.
 	 */
+	@Override
 	public void clear() {
 		resetWaitStatus();
 		addressBus.put(-1);
 		dataBus.put(null);
 		fireOperationUpdate(""); //Reset control line display
+	}
+	
+	@Override
+	public void setCaller(Stage caller) {
+		this.callingStage = caller;		
 	}
 	
 	
