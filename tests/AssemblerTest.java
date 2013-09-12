@@ -393,8 +393,7 @@ public class AssemblerTest {
 		assembler.selectFile(new File("src/testAssemblyPrograms/noFieldBR.txt"));
 		assertFalse(assembler.assembleCode());
 		
-	}
-	
+	}	
 	
 
 }
