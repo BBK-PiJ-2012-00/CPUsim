@@ -9,6 +9,9 @@ package code;
  * Opcodes occupy the first 4 bits of an instruction, permitting no more than 16 opcodes for the instruction set.
  * Whilst the simulator would work fine if instruction fields were allowed to overflow their bit allocation, it would not
  * be very realistic.  The same applies to other fields within an instruction. 
+ * 
+ * While the assembler implements a lot of error handling with regard to instruction instantiation, error handling
+ * is also implemented in the Instruction subclasses.
  */
 
 public abstract class Instruction implements Data {	
