@@ -14,7 +14,7 @@ public class HaltInstr extends Instruction {
 	}
 
 	@Override
-	public int getField1() {
+	public int getField1() { //HALT instructions have no fields.
 		return -1;
 	}
 
