@@ -71,7 +71,7 @@ public class InstructionTest {
 	
 	@Test
 	public void transferInstrGetField1Test() {
-		instr = new TransferInstr(Opcode.LOAD, 50, 70);
+		instr = new TransferInstr(Opcode.LOAD, 50, 7);
 		int output = instr.getField1();
 		int expected = 50;
 		assertEquals(expected, output);
@@ -79,10 +79,76 @@ public class InstructionTest {
 	
 	@Test
 	public void transferInstrGetField2Test() {
-		instr = new TransferInstr(Opcode.STORE, 50, 70);
+		instr = new TransferInstr(Opcode.STORE, 5, 70);
 		int output = instr.getField2();
 		int expected = 70;
 		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void transferInstrLOAD_testInvalidRegisterRef() { //Checks LOAD instruction not created with invalid register ref.
+		try {
+			instr = new TransferInstr(Opcode.LOAD, 50, 70);
+		}
+		catch (IllegalStateException e) {
+			System.out.println(e.getMessage());
+		}
+		assertNull(instr);
+	}
+	
+	@Test
+	public void transferInstrLOAD_testInvalidMemoryRef() { //Checks LOAD instruction not created with invalid memory ref.
+		try {
+			instr = new TransferInstr(Opcode.LOAD, 500, 7);
+		}
+		catch (IllegalStateException e) {
+			System.out.println(e.getMessage());
+		}
+		assertNull(instr);
+	}
+	
+	@Test
+	public void transferInstrSTORE_testInvalidRegisterRef() { //Checks STORE instruction not created with invalid register ref.
+		try {
+			instr = new TransferInstr(Opcode.STORE, 50, 17);
+		}
+		catch (IllegalStateException e) {
+			System.out.println(e.getMessage());
+		}
+		assertNull(instr);
+	}
+	
+	@Test
+	public void transferInstrSTORE_testInvalidMemoryRef() { //Checks STORE instruction not created with invalid memory ref.
+		try {
+			instr = new TransferInstr(Opcode.STORE, 100, 1);
+		}
+		catch (IllegalStateException e) {
+			System.out.println(e.getMessage());
+		}
+		assertNull(instr);
+	}
+	
+	@Test
+	public void transferInstrMOVE_testInvalidSourceRegisterRef() { //Checks MOVE instruction not created with invalid register ref.
+		try {
+			instr = new TransferInstr(Opcode.MOVE, 50, 3);
+		}
+		catch (IllegalStateException e) {
+			System.out.println(e.getMessage());
+		}
+		assertNull(instr);
+	}
+	
+	@Test
+	public void transferInstrMOVE_testInvalidDestinationRegisterRef() { //Checks MOVE instr. not created with invalid register ref.
+		try {
+			instr = new TransferInstr(Opcode.MOVE, 5, -1);
+		}
+		catch (IllegalStateException e) {
+			System.out.println(e.getMessage());
+		}
+		assertNull(instr);
 	}
 	
 	@Test
@@ -285,6 +351,8 @@ public class InstructionTest {
 	
 	@Test
 	public void branchInstrGetField2Test_SKZ() { //Check SKZ field2 holds -1 (as field is unused).
+		
+		
 		instr = new BranchInstr(Opcode.SKZ);
 		int output = instr.getField2();
 		int expected = -1; 
