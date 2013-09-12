@@ -15,13 +15,14 @@ public class InstructionTest {
 	Instruction instr;
 
 	@Test
-	public void transferInstructionTest() {
+	public void transferInstructionTest() { //Validates getOpcode() method
 		instr = new TransferInstr(Opcode.MOVE, 0, 0);
 		Opcode expected = Opcode.MOVE;
-		Opcode output = instr.getOpcode(); //validates getOpcode() method
+		Opcode output = instr.getOpcode(); 
 		assertEquals(expected, output);
 		
 	}
+	
 	
 	@Test 
 	public void transferInstructionOpcodeTest() { //To test instruction is not created with illegal opcode for format
@@ -31,8 +32,9 @@ public class InstructionTest {
 		catch (IllegalStateException e) {
 			System.out.println(e.getMessage());
 		}
-		assertNull(instr); //instr should still be null if creation has failed, which it should because of invalid opcode		
+		assertNull(instr);//instr should be null if creation has failed, which it should because of invalid opcode		
 	}
+	
 	
 	@Test
 	public void transferInstrMachineStringTest() {
@@ -278,7 +280,7 @@ public class InstructionTest {
 	}
 	
 	@Test
-	public void haltInstrGetField1Test() {
+	public void haltInstrGetField1Test() { //HALT instructions have no fields, so getters should return the default -1
 		instr = new HaltInstr(Opcode.HALT);
 		int expected = -1;
 		int output = instr.getField1();
