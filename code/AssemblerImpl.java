@@ -593,7 +593,7 @@ public class AssemblerImpl implements Assembler {
 			
 			if (instructionParts.size() > 1) {
 				JOptionPane.showMessageDialog(null, "Assembly program syntax error: " + opcode + " insructions \n" +
-						" should not have any reference/target fields.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
+						"should not have any reference/target fields.", "Assembly Program Error", JOptionPane.WARNING_MESSAGE);
 				return null; //Prevent assembly
 			}
 			
