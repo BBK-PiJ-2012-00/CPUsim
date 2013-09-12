@@ -4,6 +4,10 @@ import java.io.File;
 
 import javax.swing.filechooser.FileFilter;
 
+/*
+ * This class is used to limit the choice of files that can be selected to run on
+ * the simulator to text files.
+ */
 public class TextFileFilter extends FileFilter {
 	
 	
@@ -20,7 +24,7 @@ public class TextFileFilter extends FileFilter {
 	}
 
 	@Override
-	public String getDescription() { //To enable description in bar at the bottom of file chooser
+	public String getDescription() { //To enable description at the bottom of file chooser
 		return "Text Files";
 	}
 	
