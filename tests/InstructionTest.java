@@ -212,6 +212,29 @@ public class InstructionTest {
 	}
 	
 	@Test
+	public void arithmeticInstr_testInvalidDestinationRegisterRef() { //Checks instr. not created with invalid register ref.
+		try {
+			instr = new ArithmeticInstr(Opcode.ADD, 5, 25);
+		}
+		catch (IllegalStateException e) {
+			System.out.println(e.getMessage());
+		}
+		assertNull(instr);
+	}
+	
+	@Test
+	public void arithmeticInstr_testInvalidDestinationSourceRef() { //Checks instr. not created with invalid register ref.
+		try {
+			instr = new ArithmeticInstr(Opcode.DIV, 75, 2);
+		}
+		catch (IllegalStateException e) {
+			System.out.println(e.getMessage());
+			
+		}
+		assertNull(instr);
+	}
+	
+	@Test
 	public void branchInstrTest() { //Tests creation of branch instruction
 		instr = new BranchInstr(Opcode.BR, 0);
 		assertNotNull(instr);
@@ -285,6 +308,40 @@ public class InstructionTest {
 		System.out.println(e.getMessage());
 		}
 		assertNull(instr); //instr should be null if creation has failed, which it should because of invalid opcode
+	}
+	
+	//BR/BRNE use same error handling block so no need to test all scenarios individually
+	@Test
+	public void branchInstr_testInvalidRegisterRef() { //Checks instr. not created with invalid register ref.
+		try {
+			instr = new BranchInstr(Opcode.BRNE, 19, 25);
+		}
+		catch (IllegalStateException e) {
+			System.out.println(e.getMessage());
+		}
+		assertNull(instr);
+	}
+	
+	@Test
+	public void branchInstr_testInvalidTargetRef() { //Checks instr. not created with invalid memory ref.
+		try {
+			instr = new BranchInstr(Opcode.BRE, 102, 9);
+		}
+		catch (IllegalStateException e) {
+			System.out.println(e.getMessage());
+		}
+		assertNull(instr);
+	}
+	
+	@Test
+	public void branchInstrBR_testInvalidTargetRef() { //Checks instr. not created with invalid memory ref.
+		try {
+			instr = new BranchInstr(Opcode.BRE, 100);
+		}
+		catch (IllegalStateException e) {
+			System.out.println(e.getMessage());
+		}
+		assertNull(instr);
 	}
 	
 		
