@@ -19,10 +19,17 @@ public class SystemBusControllerTest {
 		builder = new CPUbuilder(false);
 		sysBusController = builder.getBusController();
 		memory = builder.getMemoryModule();
-		memory.registerListener(new UpdateListener(new TestFrame())); //To prevent null pointer exceptions
-		mbr = builder.getControlUnit().getMBR(); //Get MBR reference
-		mbr.registerListener(new UpdateListener(new TestFrame())); //To prevent null pointer exception
+		mbr = builder.getControlUnit().getMBR(); //Get MBR reference		
+		
+		//Register dummy listeners to prevent null pointer exceptions during testing
+		memory.registerListener(new UpdateListener(new TestFrame())); 
+		mbr.registerListener(new UpdateListener(new TestFrame()));
+		sysBusController.accessControlLine().registerListener(new UpdateListener(new TestFrame()));
+		sysBusController.accessControlLine().getAddressBus().registerListener(new UpdateListener(new TestFrame()));
+		sysBusController.accessControlLine().getDataBus().registerListener(new UpdateListener(new TestFrame()));
+		
 		testInstr = new BranchInstr(Opcode.BR, 0);
+		
 	}
 	
 	
@@ -54,6 +61,8 @@ public class SystemBusControllerTest {
 		
 		
 	}
+	
+	//The GUI updates are tested using the GUI, as this makes more sense than unit testing this functionality
 	
 	
 		
