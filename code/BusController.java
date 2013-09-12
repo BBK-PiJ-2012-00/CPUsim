@@ -29,8 +29,33 @@ public interface BusController {
 	 */	 
 	 boolean transferToCPU(Data data);
 	 
+	 /*
+	  * Allows access to the control line, necessary for when
+	  * components are instantiated and references need to be passed.
+	  * 
+	  * @return ControlLine control line reference.
+	  */
 	 public ControlLine accessControlLine(); //For GUI updates
 	 
+	 /*
+	  * For pipelined execution; on the pipelined GUI there are three activity
+	  * monitor displays and it is necessary to deliver the system bus GUI updates
+	  * to the relevant one. For example, if the system bus is used to fetch an
+	  * instruction, the update should show on the F/D Stage's activity monitor.
+	  * If an operand is fetched or written to/from memory via the system bus, this
+	  * should show up on the Execution Stage's activity monitor. By identifying the
+	  * calling class, the updates can be channelled accordingly. After finishing 
+	  * with the system bus, the caller class should pass a null reference to this
+	  * method to avoid any interference when used by another Stage object.
+	  * 
+	  * This method isn't used in standard execution mode as there is no need (only
+	  * one activity monitor display).
+	  * 
+	  * The method passes the Stage reference to the control line, as that is where
+	  * GUI updates for the system bus originate from.
+	  * 
+	  * @param Stage callingStage a reference to the object using the system bus.
+	  */
 	 public void setCaller(Stage callingStage);
 
 }
