@@ -14,7 +14,7 @@ public abstract class Stage implements Runnable {
 	private InstructionRegister ir;
 	private ProgramCounter pc;
 	private RegisterFile genRegisters;
-	private Register statusRegister;
+	private Register rCC;
 
 	private static Lock lock;
 	
@@ -24,7 +24,7 @@ public abstract class Stage implements Runnable {
 	
 
 	public Stage(BusController systemBus, InstructionRegister ir, ProgramCounter pc, RegisterFile genRegisters,
-			Register statusRegister, MemoryBufferRegister mbr, MemoryAddressRegister mar) {
+			Register rCC, MemoryBufferRegister mbr, MemoryAddressRegister mar) {
 		
 		this.systemBus = systemBus;
 		
@@ -34,7 +34,7 @@ public abstract class Stage implements Runnable {
 		this.ir = ir;
 		this.pc = pc;
 		this.genRegisters = genRegisters;
-		this.statusRegister = statusRegister;
+		this.rCC = rCC;
 		
 		lock = new ReentrantLock();
 		
@@ -492,7 +492,7 @@ public abstract class Stage implements Runnable {
 	}
 	
 	public Register getCC() {
-		return this.statusRegister;
+		return this.rCC;
 	}
 
 }

@@ -14,7 +14,7 @@ public class ControlUnitImpl implements ControlUnit {
 	private MemoryBufferRegister mbr;
 	private MemoryAddressRegister mar;	
 	private RegisterFile genRegisters;
-	private Register statusRegister;
+	private Register rCC;
 	
 	private BusController systemBus;
 	
@@ -34,14 +34,14 @@ public class ControlUnitImpl implements ControlUnit {
 		mar = new MAR();
 		genRegisters = new RegisterFile16();
 		pc = new PC();
-		statusRegister = new StatusRegister();
+		rCC = new ConditionCodeRegister();
 		
 		if (!pipeliningMode) { //If not pipelined, create standard stages
 			ir = new IR();
 
-			fetchDecodeStage = new StandardFetchDecodeStage(this.systemBus, ir, pc, genRegisters, statusRegister, this.mbr, mar);
-			writeBackStage = new StandardWriteBackStage(this.systemBus, ir, pc, genRegisters, statusRegister, this.mbr, mar);
-			executeStage = new StandardExecuteStage(this.systemBus, ir, pc, genRegisters, statusRegister,
+			fetchDecodeStage = new StandardFetchDecodeStage(this.systemBus, ir, pc, genRegisters, rCC, this.mbr, mar);
+			writeBackStage = new StandardWriteBackStage(this.systemBus, ir, pc, genRegisters, rCC, this.mbr, mar);
+			executeStage = new StandardExecuteStage(this.systemBus, ir, pc, genRegisters, rCC,
 					this.mbr, mar, writeBackStage);	
 		}
 		
@@ -54,13 +54,13 @@ public class ControlUnitImpl implements ControlUnit {
 			fetchToExecuteQueue = new SynchronousQueue<Instruction>();
 			executeToWriteQueue = new SynchronousQueue<Instruction>();
 			
-			fetchDecodeStage = new PipelinedFetchDecodeStage(this.systemBus, ir, pc, genRegisters, statusRegister,
+			fetchDecodeStage = new PipelinedFetchDecodeStage(this.systemBus, ir, pc, genRegisters, rCC,
 					this.mbr, mar, fetchToExecuteQueue);
 			
-			writeBackStage = new PipelinedWriteBackStage(this.systemBus, ir, pc, genRegisters, statusRegister,
+			writeBackStage = new PipelinedWriteBackStage(this.systemBus, ir, pc, genRegisters, rCC,
 					this.mbr, mar, executeToWriteQueue);
 			
-			executeStage = new PipelinedExecuteStage(this.systemBus, ir, pc, genRegisters, statusRegister,
+			executeStage = new PipelinedExecuteStage(this.systemBus, ir, pc, genRegisters, rCC,
 					this.mbr, mar, fetchToExecuteQueue, executeToWriteQueue, fetchDecodeStage, writeBackStage);
 			
 		}
@@ -128,7 +128,7 @@ public class ControlUnitImpl implements ControlUnit {
 		for (int i = 0; i < 16; i++) {
 			genRegisters.write(i, null); //Set each general purpose register to null		
 		}
-		statusRegister.write(null);		
+		rCC.write(null);		
 	}
 	
 	
@@ -148,8 +148,8 @@ public class ControlUnitImpl implements ControlUnit {
 	}
 	
 	@Override
-	public Register getStatusRegister() {
-		return this.statusRegister;
+	public Register getConditionCodeRegister() {
+		return this.rCC;
 	}
 
 	@Override

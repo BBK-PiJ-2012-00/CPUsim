@@ -3,9 +3,9 @@ package code;
 public class StandardWriteBackStage extends WriteBackStage {
 
 	public StandardWriteBackStage(BusController systemBus, InstructionRegister ir, ProgramCounter pc, RegisterFile genRegisters,
-			Register statusRegister, MemoryBufferRegister mbr, MemoryAddressRegister mar) {
+			Register rCC, MemoryBufferRegister mbr, MemoryAddressRegister mar) {
 		
-		super(systemBus, ir, pc, genRegisters, statusRegister, mbr, mar);
+		super(systemBus, ir, pc, genRegisters, rCC, mbr, mar);
 	}
 
 	@Override

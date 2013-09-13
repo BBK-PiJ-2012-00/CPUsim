@@ -32,7 +32,7 @@ public class PipelinedWriteBackStage extends WriteBackStage {
 		//referenced in the first field of the instruction after the opcode (field1)
 		getGenRegisters().write(getIR().read(2).getField1(), result);
 		
-		fireUpdate("Result operand " + result + " written to r" + getIR().read(2).getField1() + " from ALU\n");
+		fireUpdate("> Result operand " + result + " written to r" + getIR().read(2).getField1() + " from ALU\n");
 		
 		setWaitStatus(true);
 		try {

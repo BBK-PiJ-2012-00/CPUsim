@@ -6,7 +6,7 @@ import java.util.Map;
 
 /*
  * A class to represent an assembler.  It reads a text file containing assembly language, assembles 
- * the code and passes it the the loader module.
+ * the code and passes it the the loader module for delivery to main memory.
  */
 
 public interface Assembler {

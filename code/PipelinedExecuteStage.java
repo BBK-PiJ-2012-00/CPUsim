@@ -17,11 +17,11 @@ public class PipelinedExecuteStage extends ExecuteStage {
 	
 	
 	public PipelinedExecuteStage(BusController systemBus, InstructionRegister ir, ProgramCounter pc, RegisterFile genRegisters,
-			Register statusRegister, MemoryBufferRegister mbr, MemoryAddressRegister mar,
+			Register rCC, MemoryBufferRegister mbr, MemoryAddressRegister mar,
 			BlockingQueue<Instruction> fetchToExecuteQueue, BlockingQueue<Instruction> executeToWriteQueue, FetchDecodeStage fdStage,
 			WriteBackStage wbStage) {
 		
-		super(systemBus, ir, pc, genRegisters, statusRegister, mbr, mar, wbStage);
+		super(systemBus, ir, pc, genRegisters, rCC, mbr, mar, wbStage);
 		
 		this.fetchToExecuteQueue = fetchToExecuteQueue;
 		this.executeToWriteQueue = executeToWriteQueue;
@@ -337,7 +337,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 							}
 						setWaitStatus(false);
 						
-						getPC().setPC(getIR().read(1).getField1()); //If statusRegister holds 0, set PC to new address held in instruction
+						getPC().setPC(getIR().read(1).getField1()); //If rCC holds 0, set PC to new address held in instruction
 						fireUpdate("> PC set to " + getIR().read(1).getField1() + " as result of " + getIR().read(1).getOpcode() 
 								+ " operation\n");
 						

@@ -37,8 +37,8 @@ public class UpdateListener implements EventListener {
 			frame.getGenPurposeRegister(e.getRegisterReference()).setText(e.getUpdate());
 		}
 		
-		else if (e.getSource() instanceof StatusRegister) {
-			frame.getStatusRegisterField().setText(e.getUpdate());
+		else if (e.getSource() instanceof ConditionCodeRegister) {
+			frame.getConditionCodeField().setText(e.getUpdate());
 		}
 		
 		else if (e.getSource() instanceof AddressBus) {

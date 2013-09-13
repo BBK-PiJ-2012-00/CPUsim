@@ -18,9 +18,9 @@ public abstract class FetchDecodeStage extends Stage {
 	
 	
 	public FetchDecodeStage(BusController systemBus, InstructionRegister ir, ProgramCounter pc, RegisterFile genRegisters,
-			Register statusRegister, MemoryBufferRegister mbr, MemoryAddressRegister mar) {
+			Register rCC, MemoryBufferRegister mbr, MemoryAddressRegister mar) {
 		
-		super(systemBus, ir, pc, genRegisters, statusRegister, mbr, mar);
+		super(systemBus, ir, pc, genRegisters, rCC, mbr, mar);
 		
 //		this.systemBus = systemBus;
 //		

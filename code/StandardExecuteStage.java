@@ -5,9 +5,9 @@ import javax.swing.SwingUtilities;
 public class StandardExecuteStage extends ExecuteStage {
 
 	public StandardExecuteStage(BusController systemBus, InstructionRegister ir, ProgramCounter pc,	RegisterFile genRegisters,
-			Register statusRegister, MemoryBufferRegister mbr, MemoryAddressRegister mar, WriteBackStage writeBackStage) {
+			Register rCC, MemoryBufferRegister mbr, MemoryAddressRegister mar, WriteBackStage writeBackStage) {
 		
-		super(systemBus, ir, pc, genRegisters, statusRegister, mbr, mar, writeBackStage);
+		super(systemBus, ir, pc, genRegisters, rCC, mbr, mar, writeBackStage);
 	}
 	
 	
@@ -265,7 +265,7 @@ public class StandardExecuteStage extends ExecuteStage {
 				
 			case 9: //A BRZ instruction (branch if value in status register is zero).
 					if (getCC().read().unwrapInteger() == 0) {
-						getPC().setPC(getIR().read().getField1());//If statusRegister holds 0 set PC to new address held in instruction
+						getPC().setPC(getIR().read().getField1());//If rCC holds 0 set PC to new address held in instruction
 						fireUpdate("> PC set to " + getIR().read().getField1() + " as result of " + getIR().read().getOpcode() + 
 								" operation\n");
 						
@@ -411,7 +411,7 @@ public class StandardExecuteStage extends ExecuteStage {
 					 
 			case 13: //A HALT instruction (stops instruction cycle). For clarity, resets all registers.
 					 //pc.setPC(0);
-					 //statusRegister.write(null);
+					 //rCC.write(null);
 					// ir.loadIR(null);	
 					 
 					 fireUpdate("> HALT instruction decoded; end of program");

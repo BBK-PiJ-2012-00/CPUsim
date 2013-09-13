@@ -6,19 +6,13 @@ package code;
 
 public interface ControlUnit {
 	
-	
-	//Stages of the instruction cycle are now represented by the Stage classes, removing the need for these
-	//methods to be present in the control unit itself.
-	
-	//public void instructionFetch(); 
-		//Code for instruction fetch stage
-	
-	//public int instructionDecode(); //Returns opcode value (numeric)
-	
-	//public void instructionExecute(int opcode); //int opcode is decoded opcode passed from decode()
-	
-	//public void instructionWriteBack(Operand result); //Only required for arithemtic instructions; store the result
-	
+	/*
+	 * This method is called from CPUframe when the user clicks "Execute Program".
+	 * It initiates the instruction cycle in both pipelined and standard mode, and 
+	 * manages the cycle in standard mode (i.e. exits when a HALT instruction is executed,
+	 * bringing the cycle to an end, and quits early should an interrupt be detected in one
+	 * of the stages (the result of "reset" being clicked on the GUI). 
+	 */
 	public void activate(); //Initiate instruction cycle execution
 	
 	public InstructionRegister getIR();//To access IR; for updating GUI display
@@ -27,7 +21,7 @@ public interface ControlUnit {
 	
 	public RegisterFile getRegisters(); //To access general purpose registers, for updating GUI display.
 	
-	public Register getStatusRegister(); //To access status register, updating GUI display.
+	public Register getConditionCodeRegister(); //To access status register, updating GUI display.
 	
 	public MemoryBufferRegister getMBR(); //Access MBR for updating GUI display
 	
@@ -40,15 +34,7 @@ public interface ControlUnit {
 	public WriteBackStage getWriteBackStage();
 	
 	public void clearRegisters();
-	
-	//public void resetStages();
 
-		
-	
-
-	
-	
-	
 	
 
 }

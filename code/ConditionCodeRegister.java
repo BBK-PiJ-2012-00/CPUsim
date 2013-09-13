@@ -9,7 +9,7 @@ import javax.swing.SwingUtilities;
  * This register may automatically be set as the result of certain operations? Easier to set it manually with explicit
  * LOAD instruction.  Can be incremented/decremented using arithmetic operations.
  */
-public class StatusRegister implements Register {
+public class ConditionCodeRegister implements Register {
 	private Operand contents;
 	private UpdateListener updateListener;
 
@@ -48,8 +48,8 @@ public class StatusRegister implements Register {
 	public void fireUpdate(final String update) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-			    ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(StatusRegister.this, update);
-				StatusRegister.this.updateListener.handleUpDateEvent(updateEvent);	
+			    ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(ConditionCodeRegister.this, update);
+				ConditionCodeRegister.this.updateListener.handleUpDateEvent(updateEvent);	
 			}
 		});
 	}

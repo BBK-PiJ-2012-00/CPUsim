@@ -1,27 +1,20 @@
 package code;
-import java.awt.BorderLayout;
+
 import java.awt.Color;
-import java.awt.Component;
+
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.Thread.State;
-import java.util.EventListener;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -30,19 +23,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingWorker;
-import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.JTextComponent;
 
 
-
-
+@SuppressWarnings("serial")
 public class CPUframe extends JFrame {
 	
 	private ControlUnit controlUnit;
@@ -75,7 +61,7 @@ public class CPUframe extends JFrame {
 	
 	private JTextField pcField;
 	private JTextField[] irRegisters; //Index 0 used for standard IR, all three for IRfile in pipelined mode.
-	private JTextField statusField;
+	private JTextField conditionField;
 	private JTextField marField;
 	private JTextField mbrField;
 	
@@ -400,20 +386,20 @@ public class CPUframe extends JFrame {
 		mbrPanel.setBorder(BorderFactory.createTitledBorder(magentaLine, " MBR "));
 		controlUnit.getMBR().registerListener(new UpdateListener(this));
 		
-		statusField = new JTextField(8);
-		statusField.setEditable(false);
-		JPanel statusPanel = new JPanel();
-		statusPanel.setMaximumSize(new Dimension(150, 60));
-		//statusPanel.setSize(5, 5);
-		statusPanel.add(statusField);
-		statusPanel.setBorder(BorderFactory.createTitledBorder(" CC "));
+		conditionField = new JTextField(8);
+		conditionField.setEditable(false);
+		JPanel conditionPanel = new JPanel();
+		conditionPanel.setMaximumSize(new Dimension(150, 60));
+		//conditionPanel.setSize(5, 5);
+		conditionPanel.add(conditionField);
+		conditionPanel.setBorder(BorderFactory.createTitledBorder(" CC "));
 		
-		controlUnit.getStatusRegister().registerListener(new UpdateListener(this));
+		controlUnit.getConditionCodeRegister().registerListener(new UpdateListener(this));
 		
 		controlRegistersPanel2.add(marPanel);
 		controlRegistersPanel2.add(mbrPanel);
 		//controlRegistersPanel2.add(irPanel);
-		controlRegistersPanel2.add(statusPanel);
+		controlRegistersPanel2.add(conditionPanel);
 		controlRegistersPanel2.setBorder(BorderFactory.createEmptyBorder(0, 15, 30, 0));
 		
 		topRegisterPanel.add(controlRegistersPanel1);
@@ -789,18 +775,12 @@ public class CPUframe extends JFrame {
 	public void drawPanel3() {
 		panel3 = new JPanel();
 		
-		System.out.println("Drawing panel 3");
-		
 		JPanel systemBusPanel = new JPanel();
 		systemBusPanel.setLayout(new BoxLayout(systemBusPanel, BoxLayout.Y_AXIS));//Add bus panels vertically
 		
 		JPanel addressBusPanel = new JPanel();
 		addressBusPanel.setPreferredSize(new Dimension(175, 60));
-		//addressBusPanel.setBackground(Color.blue);
-		//Border cyanLine = BorderFactory.createLineBorder(Color.cyan);	
 		addressBusPanel.setBorder(BorderFactory.createTitledBorder(cyanLine, "Address Bus"));
-		//Border addressBusBorder = BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Address Bus");
-		//addressBusPanel.setBorder(addressBusBorder);
 		addressBusField = new JTextField(8);
 		addressBusField.setEditable(false);
 		addressBusPanel.add(addressBusField);
@@ -810,11 +790,6 @@ public class CPUframe extends JFrame {
 		
 		JPanel dataBusPanel = new JPanel();
 		dataBusPanel.setPreferredSize(new Dimension(175, 60));
-		//dataBusPanel.setBackground(Color.magenta);
-		//Border magentaLine = BorderFactory.createLineBorder(Color.magenta);
-		//Border navyLine = BorderFactory.createLineBorder(new Color(3, 12, 103));
-		//Border blueLine = BorderFactory.createLineBorder(Color.green);
-		//dataBusPanel.setBorder(BorderFactory.createTitledBorder(magentaLine, "Data Bus"));
 		dataBusPanel.setBorder(BorderFactory.createTitledBorder(magentaLine, "Data Bus"));
 		dataBusField = new JTextField(8);
 		dataBusField.setEditable(false);
@@ -1318,8 +1293,8 @@ public class CPUframe extends JFrame {
 		return this.genRegisters[index];
 	}
 	
-	public JTextField getStatusRegisterField() {
-		return this.statusField;
+	public JTextField getConditionCodeField() {
+		return this.conditionField;
 	}
 	
 	/*
