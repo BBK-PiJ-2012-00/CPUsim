@@ -10,7 +10,6 @@ import code.Operand;
 import code.OperandImpl;
 import code.RegisterFile;
 import code.RegisterFile16;
-import code.ControlUnitImpl;
 import code.UpdateListener;
 
 public class RegisterFile16Test {

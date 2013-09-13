@@ -43,7 +43,7 @@ public class ControlUnitTest {
 		controlUnit.getRegisters().registerListener(new UpdateListener(new TestFrame()));
 		controlUnit.getMBR().registerListener(new UpdateListener(new TestFrame()));
 		controlUnit.getMAR().registerListener(new UpdateListener(new TestFrame()));
-		controlUnit.getStatusRegister().registerListener(new UpdateListener(new TestFrame()));
+		controlUnit.getConditionCodeRegister().registerListener(new UpdateListener(new TestFrame()));
 		
 		controlUnit.getFetchDecodeStage().registerListener(new UpdateListener(new TestFrame()));
 		controlUnit.getExecuteStage().registerListener(new UpdateListener(new TestFrame()));
@@ -70,7 +70,7 @@ public class ControlUnitTest {
 		pControlUnit.getRegisters().registerListener(new UpdateListener(new TestFrame()));
 		pControlUnit.getMBR().registerListener(new UpdateListener(new TestFrame()));
 		pControlUnit.getMAR().registerListener(new UpdateListener(new TestFrame()));
-		pControlUnit.getStatusRegister().registerListener(new UpdateListener(new TestFrame()));
+		pControlUnit.getConditionCodeRegister().registerListener(new UpdateListener(new TestFrame()));
 		
 		pControlUnit.getFetchDecodeStage().registerListener(new UpdateListener(new TestFrame()));
 		pControlUnit.getExecuteStage().registerListener(new UpdateListener(new TestFrame()));
@@ -173,7 +173,7 @@ public class ControlUnitTest {
 		
 		controlUnit.activate();
 		
-		int result = ((Operand) controlUnit.getStatusRegister().read()).unwrapInteger();
+		int result = ((Operand) controlUnit.getConditionCodeRegister().read()).unwrapInteger();
 		
 		assertEquals(0, result);
 	}
@@ -203,7 +203,8 @@ public class ControlUnitTest {
 		
 		controlUnit.activate();
 		
-		Data dataResult = memory.accessAddress(assembler.getLookupTable().get("storePoint"));
+		Data dataResult = memory.accessAddress(assembler.getLookupTable().get("storePoint")); //Use assembler's lookupTable to
+																			//obtain real memory address
 		int result = ((Operand) dataResult).unwrapInteger();
 		
 		assertEquals(4, result);
@@ -285,7 +286,7 @@ public class ControlUnitTest {
 		
 		pControlUnit.activate();
 		
-		int result = ((Operand) pControlUnit.getStatusRegister().read()).unwrapInteger();
+		int result = ((Operand) pControlUnit.getConditionCodeRegister().read()).unwrapInteger();
 		
 		assertEquals(0, result);
 	}

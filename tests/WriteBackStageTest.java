@@ -34,10 +34,8 @@ import code.ProgramCounter;
 import code.Register;
 import code.RegisterFile;
 import code.RegisterFile16;
-import code.StandardExecuteStage;
-import code.StandardFetchDecodeStage;
 import code.StandardWriteBackStage;
-import code.StatusRegister;
+import code.ConditionCodeRegister;
 import code.UpdateListener;
 import code.WriteBackStage;
 
@@ -56,7 +54,6 @@ public class WriteBackStageTest {
 	private Instruction testInstrADD;
 	private Instruction testInstrSUB;
 	private Instruction testInstrDIV;
-	private Instruction testInstrMUL;
 		
 
 	@Before
@@ -87,7 +84,7 @@ public class WriteBackStageTest {
 		ProgramCounter pc = new PC();
 		pc.registerListener(new UpdateListener(new TestFrame()));
 		
-		Register statusRegister = new StatusRegister();
+		Register statusRegister = new ConditionCodeRegister();
 		statusRegister.registerListener(new UpdateListener(new TestFrame()));	
 		
 		memory = builder.getMemoryModule();
@@ -120,7 +117,6 @@ public class WriteBackStageTest {
 		testInstrADD = new ArithmeticInstr(Opcode.ADD, 2, 4); //Add contents of r2 and r4, storing in r2
 		testInstrSUB = new ArithmeticInstr(Opcode.SUB, 9, 10); //Sub contents of r10 from r9, storing in r9
 		testInstrDIV = new ArithmeticInstr(Opcode.DIV, 3, 12); //Divide contents of r3 by contents of r12, storing in r3
-		testInstrMUL = new ArithmeticInstr(Opcode.MUL, 5, 8); //Multiply contents of r5 by contents of r8, storing in r5
 		
 		assembler = new AssemblerImpl(builder.getLoader());
 		

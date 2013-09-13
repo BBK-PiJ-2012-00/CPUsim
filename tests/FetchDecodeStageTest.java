@@ -7,39 +7,29 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import code.ArithmeticInstr;
 import code.Assembler;
 import code.AssemblerImpl;
 import code.BranchInstr;
-import code.BusController;
 import code.CPUbuilder;
-import code.ControlUnit;
-import code.ControlUnitImpl;
 import code.FetchDecodeStage;
 import code.HaltInstr;
-import code.IR;
 import code.IRfile;
 import code.Instruction;
 import code.InstructionRegister;
-import code.MAR;
-import code.MBR;
 import code.MainMemory;
 import code.MemoryAddressRegister;
 import code.MemoryBufferRegister;
-import code.MemoryModule;
 import code.Opcode;
-import code.OperandImpl;
-import code.PC;
 import code.PipelinedFetchDecodeStage;
 import code.ProgramCounter;
 import code.Register;
 import code.RegisterFile;
 import code.RegisterFile16;
 import code.StandardFetchDecodeStage;
-import code.StatusRegister;
+import code.ConditionCodeRegister;
 import code.TransferInstr;
 import code.UpdateListener;
 
@@ -85,7 +75,7 @@ public class FetchDecodeStageTest {
 		mbr.registerListener(new UpdateListener(new TestFrame()));
 		genRegisters = new RegisterFile16();
 		genRegisters.registerListener(new UpdateListener(new TestFrame()));
-		statusRegister = new StatusRegister();
+		statusRegister = new ConditionCodeRegister();
 		statusRegister.registerListener(new UpdateListener(new TestFrame()));
 		
 		builder.getBusController().accessControlLine().getAddressBus().registerListener(new UpdateListener(new TestFrame()));

@@ -11,14 +11,11 @@ import java.util.concurrent.SynchronousQueue;
 import org.junit.Before;
 import org.junit.Test;
 
-import code.ALU;
 import code.ArithmeticInstr;
 import code.Assembler;
 import code.AssemblerImpl;
 import code.BranchInstr;
-import code.BusController;
 import code.CPUbuilder;
-import code.CPUframe;
 import code.ControlUnit;
 import code.Data;
 import code.ExecuteStage;
@@ -31,13 +28,13 @@ import code.InstructionRegister;
 import code.MainMemory;
 import code.MemoryAddressRegister;
 import code.MemoryBufferRegister;
-import code.MemoryModule;
 import code.Opcode;
 import code.Operand;
 import code.OperandImpl;
 import code.PC;
 import code.PipelinedExecuteStage;
 import code.PipelinedFetchDecodeStage;
+import code.PipelinedWriteBackStage;
 import code.ProgramCounter;
 import code.Register;
 import code.RegisterFile;
@@ -45,7 +42,7 @@ import code.RegisterFile16;
 import code.StandardExecuteStage;
 import code.StandardFetchDecodeStage;
 import code.StandardWriteBackStage;
-import code.StatusRegister;
+import code.ConditionCodeRegister;
 import code.TransferInstr;
 import code.UpdateListener;
 import code.WriteBackStage;
@@ -62,8 +59,9 @@ public class ExecuteStageTest {
 	
 	private FetchDecodeStage pipelinedFetchDecodeStage;
 	private ExecuteStage pipelinedExecuteStage;
+	private WriteBackStage pipelinedWriteBackStage;
 	private BlockingQueue<Instruction> testFetchToExecuteQueue;
-	private BlockingQueue<Operand> testExecuteToWriteQueue;
+	private BlockingQueue<Instruction> testExecuteToWriteQueue;
 	
 	
 	private InstructionRegister ir;
@@ -124,14 +122,14 @@ public class ExecuteStageTest {
 		genRegisters = new RegisterFile16();
 		genRegisters.registerListener(new UpdateListener(new TestFrame()));
 		
-		statusRegister = new StatusRegister();
+		statusRegister = new ConditionCodeRegister();
 		statusRegister.registerListener(new UpdateListener(new TestFrame()));
 		
 		
 		fetchDecodeStage = new StandardFetchDecodeStage(builder.getBusController(), ir, pc, genRegisters, statusRegister,
 				mbr, mar);
 		fetchDecodeStage.registerListener(new UpdateListener(new TestFrame()));
-		writeBackStage = new StandardWriteBackStage(ir, genRegisters);
+		writeBackStage = new StandardWriteBackStage(builder.getBusController(), ir, pc, genRegisters, statusRegister, mbr, mar);
 		executeStage = new StandardExecuteStage(builder.getBusController(),ir, pc, genRegisters,
 				statusRegister, mbr, mar, writeBackStage);
 		executeStage.registerListener(new UpdateListener(new TestFrame()));
@@ -141,13 +139,20 @@ public class ExecuteStageTest {
 		
 		
 		InstructionRegister irFile = new IRfile();
+		irFile.registerListener(new UpdateListener(new TestFrame()));
+		
 		testFetchToExecuteQueue = new SynchronousQueue<Instruction>();
+		testExecuteToWriteQueue = new SynchronousQueue<Instruction>(); //Prevents null pointer exception
+		
 		pipelinedFetchDecodeStage = new PipelinedFetchDecodeStage(builder.getBusController(), irFile, pc, genRegisters, 
 				statusRegister, mbr, mar, testFetchToExecuteQueue);
 		pipelinedFetchDecodeStage.registerListener(new UpdateListener(new TestFrame()));
 		
+		pipelinedWriteBackStage = new PipelinedWriteBackStage(builder.getBusController(), irFile, pc, genRegisters, 
+				statusRegister, mbr, mar, testExecuteToWriteQueue);
+		
 		pipelinedExecuteStage = new PipelinedExecuteStage(builder.getBusController(), irFile, pc, genRegisters, statusRegister, 
-				writeBackStage,	mbr, mar, testFetchToExecuteQueue, testExecuteToWriteQueue, pipelinedFetchDecodeStage);
+				mbr, mar, testFetchToExecuteQueue, testExecuteToWriteQueue, pipelinedFetchDecodeStage, pipelinedWriteBackStage);
 		pipelinedExecuteStage.registerListener(new UpdateListener(new TestFrame()));
 		
 		testInstrSTORE = new TransferInstr(Opcode.STORE, 0, 99); //source r0, destination address 99
@@ -562,7 +567,7 @@ public class ExecuteStageTest {
 		pipelinedExecuteStage.run(); 		
 		Data genRegistersR1 = pipelinedExecuteStage.getGenRegisters().read(1); //Retrieve contents of r1
 		Operand r1Contents = (Operand) genRegistersR1; //Cast to operand
-		assertNull(r1Contents); //r1 contents should be null, as the BR instruction should ensure the operand value 33
+		assertNull(r1Contents); //r1 contents should be null, as the BRZ instruction should ensure the operand value 33
 								//is never loaded into r1 via LOAD instruction 	
 		
 	}
@@ -592,7 +597,7 @@ public class ExecuteStageTest {
 		pipelinedExecuteStage.run(); 		
 		Data genRegistersR4 = pipelinedExecuteStage.getGenRegisters().read(4); //Retrieve contents of r1
 		Operand r4Contents = (Operand) genRegistersR4; //Cast to operand
-		assertNull(r4Contents); //r4 contents should be null, as the BR instruction should ensure the operand value #55
+		assertNull(r4Contents); //r4 contents should be null, as the SKZ instruction should ensure the operand value #55
 								//is never loaded into r4 via LOAD instruction 	
 		
 	}
@@ -674,6 +679,11 @@ public class ExecuteStageTest {
 		assertEquals(88, r11Contents.unwrapInteger()); //Check r11 contains #88
 		
 	}
+	
+	//Note that a test file incorporating all kinds of instruction is tested in the control unit test class
+	//to ensure that all stages work together properly.
+	//Also, the same code is used in both pipelined and standard version to execute instruction types, so
+	//re-testing these individually is not necessary.
 
 
 

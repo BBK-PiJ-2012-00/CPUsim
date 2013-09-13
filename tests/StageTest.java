@@ -15,7 +15,6 @@ import code.CPUbuilder;
 import code.ControlUnit;
 import code.ExecuteStage;
 import code.FetchDecodeStage;
-import code.IR;
 import code.IRfile;
 import code.Instruction;
 import code.InstructionRegister;
@@ -30,10 +29,7 @@ import code.ProgramCounter;
 import code.Register;
 import code.RegisterFile;
 import code.RegisterFile16;
-import code.StandardExecuteStage;
-import code.StandardFetchDecodeStage;
-import code.StandardWriteBackStage;
-import code.StatusRegister;
+import code.ConditionCodeRegister;
 import code.UpdateListener;
 import code.WriteBackStage;
 
@@ -97,21 +93,22 @@ public class StageTest {
 		genRegisters = new RegisterFile16();
 		genRegisters.registerListener(new UpdateListener(new TestFrame()));
 		
-		Register statusRegister = new StatusRegister();
+		Register statusRegister = new ConditionCodeRegister();
 		statusRegister.registerListener(new UpdateListener(new TestFrame()));
 		
 		memory = builder.getMemoryModule();
 		memory.registerListener(new UpdateListener(new TestFrame()));
 		
 		BlockingQueue<Instruction> testFetchToExecuteQueue = new SynchronousQueue<Instruction>();
-		BlockingQueue<Operand> testExecuteToWriteQueue = new SynchronousQueue<Operand>();
+		BlockingQueue<Instruction
+		> testExecuteToWriteQueue = new SynchronousQueue<Instruction>();
 		
 		fdStage = new PipelinedFetchDecodeStage(builder.getBusController(), irFile, pc, genRegisters, 
 				statusRegister, mbr, mar, testFetchToExecuteQueue);
 		fdStage.registerListener(new UpdateListener(new TestFrame()));
 		
-		exStage = new PipelinedExecuteStage(builder.getBusController(), irFile, pc, genRegisters, statusRegister, 
-				wbStage, mbr, mar, testFetchToExecuteQueue, testExecuteToWriteQueue, fdStage);
+		exStage = new PipelinedExecuteStage(builder.getBusController(), irFile, pc, genRegisters, statusRegister
+				, mbr, mar, testFetchToExecuteQueue, testExecuteToWriteQueue, fdStage, wbStage);
 		exStage.registerListener(new UpdateListener(new TestFrame()));
 
 		

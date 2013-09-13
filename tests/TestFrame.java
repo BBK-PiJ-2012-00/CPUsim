@@ -2,6 +2,7 @@ package tests;
 
 import code.CPUframe;
 
+@SuppressWarnings("serial")
 public class TestFrame extends CPUframe {
 	
 	public TestFrame() {

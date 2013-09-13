@@ -2,6 +2,7 @@ package tests;
 
 import static org.junit.Assert.*;
 
+import org.junit.Before;
 import org.junit.Test;
 
 
@@ -9,9 +10,16 @@ import code.DataBus;
 import code.DataBusImpl;
 import code.Operand;
 import code.OperandImpl;
+import code.UpdateListener;
 
 public class DataBusTest {
-	private DataBus dBus = new DataBusImpl();
+	private DataBus dBus;
+	
+	@Before
+	public void setUp() {
+		dBus = new DataBusImpl();
+		dBus.registerListener(new UpdateListener(new TestFrame())); //To avoid null pointer exception
+	}
 
 	@Test
 	public void testReadNull() { //Upon initial instantiation, data field should be null
