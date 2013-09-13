@@ -3,11 +3,9 @@ package code;
 import javax.swing.SwingUtilities;
 
 /*
- * A class to represent a status register, generally for use with conditional branch instructions. User-visible,
- * can be referenced as r16 in assembly code.
- * 
- * This register may automatically be set as the result of certain operations? Easier to set it manually with explicit
- * LOAD instruction.  Can be incremented/decremented using arithmetic operations.
+ * A class to represent a condition code register, generally for use with conditional branch instructions. User-visible,
+ * can be referenced as r16 in assembly code. Operands can be moved to, moved from, and loaded into the condition code
+ * register (often abbreviated to rCC).
  */
 public class ConditionCodeRegister implements Register {
 	private Operand contents;
@@ -21,8 +19,6 @@ public class ConditionCodeRegister implements Register {
 	@Override
 	public void write(Operand operand) {
 		this.contents = operand;
-//		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, this.display());
-//		updateListener.handleUpDateEvent(updateEvent);
 		fireUpdate(display());
 	}
 
@@ -42,8 +38,8 @@ public class ConditionCodeRegister implements Register {
 		return displayString;
 	}
 	
-	//GUI events should be handled from EDT
-	//This adds the update event to the EDT thread. Need to test this works on the GUI
+	//GUI events should be handled from EDT only.
+	//This adds the update event to the EDT thread. 
 	@Override
 	public void fireUpdate(final String update) {
 		SwingUtilities.invokeLater(new Runnable() {
