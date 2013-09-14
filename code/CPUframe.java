@@ -1046,6 +1046,7 @@ public class CPUframe extends JFrame {
 	            activityArea.setText("");
 	            controlUnit.clearRegisters(); 
 	            systemBusController.accessControlLine().clear();
+	            ALU.clearFields();
 	            if (pipeliningEnabled) {
 	            	activityArea1.setText("");
 	            	activityArea2.setText("");
