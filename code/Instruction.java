@@ -1,7 +1,7 @@
 package code;
 
 /*
- * All instructions extend the abstract Instruction class. This allows for code reuse, reduces redundant code that would be
+ * All instructions extend this abstract Instruction class. This allows for code reuse, reduces redundant code that would be
  * brought about were Instruction implemented as an interface, and ensures all instructions implement the same key methods.
  * 
  * Instructions are 32 bits in length.  Representation is primarily in decimal for the purposes of this simulator,
@@ -33,6 +33,9 @@ public abstract class Instruction implements Data {
 		return false;
 	}
 
+	/*
+	 * Not currently in use.
+	 */
 	@Override
 	public boolean isFloatingPoint() {
 		return false;
