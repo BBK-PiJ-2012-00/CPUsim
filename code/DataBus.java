@@ -1,19 +1,10 @@
 package code;
 
 /*
- * 
- * DataLine changed to DataBus; typically, a data line in a parallel channel carries one bit,
- * and a data bus width of 32 lines is used to transmit a 32-bit word. Collectively these lines are called
- * a data bus.  DataBus would more accurately describe the function of this class; the DataBus class
- * can be interpreted as containing 32 data lines, enabling it to carry 32-bit words of data.  Thus, the data
- * field of this class representing the contents of the data bus is limited to a maximum value of 2^32.
- * 
- * An interface to represent a System Bus data line. Data lines carry data of type Data between main memory and 
- * the CPU. Type Data is required because data lines will carry both Instructions as well as other formats, such as
- * integers and possibly floating point in the future.
+ * An interface to represent the data bus of the system bus.  The data bus carries data of type Data between
+ * main memory and the CPU, coordinated by the control line.  Type Data is required because data lines will carry 
+ * both Instructions and operands.
  */
-
-
 public interface DataBus {
 
 	/*
@@ -30,10 +21,15 @@ public interface DataBus {
 	 */
 	public Data read();
 
-	public String display();
-
-	public void registerListener(UpdateListener listener);
 	
-	public void fireUpdate(String update);
+	/*
+	 * A method for registering an event listener object with the data bus,
+	 * for GUI display purposes. Every time the contents of the data bus is updated,
+	 * an update event is created and handled by the listener to change the GUI
+	 * display accordingly.
+	 * 
+	 * @param UpdateListener listener the listener object to handle update events.
+	 */
+	public void registerListener(UpdateListener listener);
 	
 }
