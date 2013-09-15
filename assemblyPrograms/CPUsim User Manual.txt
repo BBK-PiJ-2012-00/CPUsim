@@ -3,9 +3,13 @@
 *** CPUsim User Manual ***
 
 
+When the program starts, the standard interface for non-pipelined execution will appears on the screen.  To switch to pipelined mode at any time, click on the "Pipelined Mode" button in the control panel located below the system bus display.  Note that switching modes midway through executing an assembly program will discard any progress and the assembly file must be reloaded (a confirmation window will appear to check that you are sure you wish to switch modes).
+
+
+
 1) SELECTING AND EXECUTING AN ASSEMBLY FILE
 
-Click on the "Select Assembly File" button in the control panel in the upper left quadrant.  Assembly language files supplied with the program are all in text file format (.txt).  Once a file has been selected it will automatically be displayed in the Assembly Program window of the GUI, as well as in the Main Memory display on the right hand side.
+Click on the "Select Assembly File" button in the control panel situated below the system bus.  Assembly language files supplied with the program are all in text file format (.txt).  Once a file has been selected it will automatically be displayed in the Assembly Program window of the GUI, with the assembled instructions and operands being shown in the Main Memory display on the right hand side.
 
 To begin execution, click "Execute Program".  This will prompt the first step of execution.  Commentary on the CPU's behaviour can be viewed in the Activity Monitor window, below the assembly program code.  To prompt the program to execute the next step, click on the "Step" button in the control panel.  As the simulator is designed to assist students in understanding the instruction cycle it will not simply cycle through an assembly program automatically; it is necessary to press "Step" to prompt the next step of execution until the assembly program has finished (a HALT instruction is encountered).  
 
@@ -20,25 +24,45 @@ Assembly Program
 This area is for the display of a selected assembly language program. Line numbers are on the left hand side for clarity.
 
 Activity Monitor 
-This area displays a running commentary on the activities carried out by the CPU and updates with every step of the chosen program's execution.
+This area displays a running commentary on the activities carried out by the CPU and updates with every step of the chosen program's execution.  In pipelined mode, the activity monitor display is split into three areas: Fetch/Decode Stage Activity, Execute Stage Activity and Write Back Stage Activity.  Commentary on the activities of each of these stages is displayed in their respective display areas (including system bus commentary).  The Activity Monitor display area(s) allow the user to scroll back up to view previous updates.
 
 CPU  
 The CPU consists of the following control registers:
 
 PC - Program Counter, which holds the address of the next instruction to be fetched from memory via the system bus. This is incremented by 1 at the end of the fetch/decode stage, or is set as a result of a branch instruction.
 
-IR - Instruction Register, which holds the instruction just fetched from memory while it is decoded and executed. Pipelined execution makes use of a register file.
+IR - Instruction Register, which holds the instruction just fetched from memory while it is decoded and executed. Pipelined execution makes use of a register file, with the first index (F/D) holding the instruction just fetched and being decoded by the fetch/decode stage, the second index (Ex.) holding the instruction currently undergoing execution, and the third index (WB) holding the instruction in the write back stage, if there is one.  Note that in pipeline delay slots, it is not unusual to witness gaps in the register file. 
 
 CC - Condition Code register, referred to in instructions as rCC. This is a register for storing condition codes used with conditional branch instructions.
 
-MAR - Memory Address Register
+MAR - Memory Address Register, which passes addresses to the address bus of the system bus.
+
+MBR - Memory Buffer Register, which passes and receives instructions and operands to and from the data bus of the system bus.
+
+General Purpose Registers - there are sixteen of these (r0 - r15), and are used for storing operands that will likely be used in arithmetic operations or for the BRE/BRNE branch instructions (described in section 4).
+
+ALU - Arithmetic and Logic Unit, used for performing arithmetic operations.  Two operands are supplied from the general purpose registers as input, and the result of arithmetic operations is written back to a general purpose register in the write back stage.
+
+
+The System Bus
+The system bus consists of a control line, address bus and data bus.  The control line display shows whether the bus operation is a memory read or memory write, and the contents of the address and data buses are shown on their respective displays.
+For read operations, an address is placed on the address bus by the MAR, and delivered to memory.  The operand or instruction at the address specified by the address bus is then loaded from memory onto the data bus and passed to the CPU's MBR register.
+For write operations, an address is placed on the address bus by the MAR and an operand from a general purpose register is placed in the MBR.  This information is then transferred to the address and data buses respectively, with the operand on the data bus being written to the memory address specified on the address line.
+
+In pipelined mode it is important to note that system bus operations are a cause of delays in the pipeline; to avoid data conflicts, one stage must wait for another to finish using the bus before it can acquire use of it (only the fetch/decode and execute stages use the system bus).  
+
+
+Main Memory
+Main memory consists of 100 slots, from 0 to 99, and holds instructions and operands.
+
+ 
 
 
 3) ASSEMBLY LANGUAGE, INSTRUCTIONS AND OPERANDS  
 
-Assembly language is of the format <label>: <instruction/operand declaration> #<comment>.
-Labels are optional and are used to provide symbolic memory addressing, removing the need
-for physical memory address references. When used in combination with instruction declarations, labels allow for the memory location where that instruction is stored to be referenced by branch instructions.  
+Assembly language is of the format <label>: <instruction/operand declaration> #<comment>
+
+Labels are optional and are used to provide symbolic memory addressing, removing the need for physical memory address references.  They can be any sequence of letters and numbers, with no spaces, and when declared should be followed directly by a colon.  When used in combination with instruction declarations, labels allow for the memory location where that instruction is stored to be referenced by branch instructions.  
 
 	L1: ADD r7, r8
 	    BR L1
@@ -52,30 +76,82 @@ The label "operand4" is used in place of a physical memory address reference. Th
 	LOAD operand4, r3
 	STORE r9, operand4
 
-When executing the LOAD instruction, whatever is held at the memory address referenced by the label "operand4" will be loaded (via the MBR) into r3.  The STORE instruction will cause the value held in r9 to be stored in the location referred to by the label "operand 4".  For this reason, it is necessary to declare an operand if a storage location in memory is required so that that location may be referenced by STORE instructions.  For example:
+When executing the LOAD instruction, whatever is held at the memory address referenced by the label "operand4" will be loaded (via the MBR) into r3.  The STORE instruction will cause the value held in r9 to be stored in the location referred to by the label "operand 4".  For this reason, it is necessary to declare a "placeholder" operand of arbitrary value if a storage location in memory is required so that that location may be referenced by STORE instructions.  For example:
 
 	STORE r9, locationX
 
 	locationX: DATA 0
 
-Declaring locationX and storing an arbitrary operand there allows the STORE instruction to reference a memory location, from which the stored operand could later be fetched back into the CPU's registers if desired.    
+Declaring locationX and storing an arbitrary operand there allows the STORE instruction to reference a memory location, from which the stored operand could later be fetched back into the CPU's registers if desired.
+
+Don't forget to declare operands and their labels somewhere in the program, as references to undeclared labels will result in the assembly file being unable to be loaded until the declaration is added.
+
+Note that assembly files may declare operands and instructions in any order, while in the main memory display all instructions will be listed before operands.
+
+
+
+3) INSTRUCTION SET
+
+
+Transfer Instructions:
+
+LOAD var1, r4  #Load the operand held at the memory address referenced by var1 into r4. The CC register may also be referenced as a register destination.
+
+STORE r7, var2  #Store the operand held in r7 to the memory address referenced by var2 
+
+MOVE r3, r11  #Move the contents of r3 to r11.  The CC register may also be referenced as a move source/destination.
+
+
+Arithmetic Instructions:
+
+ADD r0, r5  #Add the contents of r5 to the contents of r0, storing the result in r0.
+
+SUB r12, r6  #Subtract the contents of r6 from r12, storing the result in r12.
+
+DIV r10, r14  #Divide the contents of r10 by the contents of r14, storing the result in r10.
+
+MUL r3, r8  #Multiply the contents of r3 by the contents of r8, storing the result in r3.
+
+
+Branch Instructions:
+Note that the execution of a branch instruction involves setting the PC to the physical address given by the label contained in the branch instruction.
+
+BR label1  #Branch to the instruction held at the memory address referred to by label1 (the PC is set to the physical address given by label1).
+
+BRZ anotherLabel  #Branch to the instruction held at the memory address referred to by anotherLabel, if and only if the CC register holds a value of 0.
+
+BRE label3, r15  #Branch to the instruction held at the memory address referred to by label3, if and only if the contents of r15 equals the contents of the CC register.
+
+BRNE label4, r13   #Branch to the instruction held at the memory address referred to by label4, if and only if the contents of r13 does not equal the contents of the CC register.
+
+SKZ   #Skip the next sequential instruction (achieved by incrementing the PC by 1).
+
+
+Halt Instruction:
+HALT  #When executed, halts in the instruction cycle and the program is finished.
+   
 
 	 
-
-
 3) WRITING CUSTOM ASSEMBLY PROGRAMS
 
-While the simulator is not designed to assist with the writing of new assembly programs, anyone can in theory add to the set of programs included with the application. However, care needs to be taken over the formatting of a custom assembly file.
+While the simulator is not strictly designed to assist with the writing of new assembly programs, anyone can in theory add to the set of programs included with the application. However, care needs to be taken over the formatting of a custom assembly file.
 
 New assembly files should be created as plain text files, with a .txt extension. If this extension is hidden, the file will not be recognised by the simulator.
 
-Line numbers and the header row are added by the assembler to text files, so there is no need to write these yourself. The first line of the file should be the first instruction (blank lines are ignored by the assembler, so you can use as many of these as you like). Data declarations should be included after all of the instructions have been declared (with the last instruction being a HALT instruction).
+Line numbers and the header row are added by the assembler to text files, so there is no need to write these yourself.  The first line of a file should be either a comment (or several lines of comments, with each line being preceded with a #), instruction declaration or operand declaration.  Instructions and operands may be declared in any order.  Blank lines and multiple spaces are ignored by the assembler in terms of assembling the instructions and operands, but they are not ignored by the assembly program display on the interface; you should space out labels, instructions and comments on a line as you would like them to appear in the simulator assembly program display, but take care not to make lines too long or you will need to scroll across in the display to read everything.  You can use the assembly files included with the simulator as a guide for formatting.
 
-Labels can be any combination of letters and number but must be followed by a colon.  Comments are preceded by a #.  Operands should not be preceded by a # in the assembly language file, despite that they appear this way in memory.
+The last instruction declaration should ideally be a HALT instruction.  
 
-You should space out labels, instructions and comments on a line as you would like them to appear in the simulator assembly program display.
+Labels can be any combination of letters and number but must be followed by a colon.  Operands should not be preceded by a # in the assembly language file or they will be interpreted as a comment (despite that they appear this way in memory).  Also, a line beginning with a # will be interpreted as a comment entirely, and will be missed out of the assembly process.
 
-The files packaged with the simulator can be viewed in a text editor for reference when writing custom assembly programs.
+While the assembly program format is relatively strict, some assistance is provided when you attempt to load a file into the simulator; error messages will be displayed on screen with hints on how to correct the program syntax.  The program logic, however, is up to you!
 
-Format is <Label>  <Instruction/Operand>  <Comment>
-This format is relatively strict, with labels and comments being optional.
+
+
+
+
+
+© A.V. Taylor, 2013
+
+
+
