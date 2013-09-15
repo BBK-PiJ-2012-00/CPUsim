@@ -79,7 +79,6 @@ public class ControlUnitImpl implements ControlUnit {
 		pc.setPC(0); //Initialise PC to 0 for GUI display
 		if (!pipeliningMode) { 
 			while (active) {
-				System.out.println("In active while loop for non pipelined mode");
 				
 				fetchDecodeStage.run();
 				int opcode = fetchDecodeStage.getOpcodeValue();
