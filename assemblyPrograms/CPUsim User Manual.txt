@@ -3,13 +3,13 @@
 *** CPUsim User Manual ***
 
 
-When the program starts, the standard interface for non-pipelined execution will appears on the screen.  To switch to pipelined mode at any time, click on the "Pipelined Mode" button in the control panel located below the system bus display.  Note that switching modes midway through executing an assembly program will discard any progress and the assembly file must be reloaded (a confirmation window will appear to check that you are sure you wish to switch modes).
+When the program starts, the standard interface for non-pipelined execution appears on the screen.  To switch to pipelined mode at any time, click on the "Pipelined Mode" button in the control panel located below the system bus display.  Note that switching modes midway through executing an assembly program will discard any progress and the assembly file must be reloaded (a confirmation window will appear to check that you are sure you wish to switch modes).
 
 
 
 1) SELECTING AND EXECUTING AN ASSEMBLY FILE
 
-Click on the "Select Assembly File" button in the control panel situated below the system bus.  Assembly language files supplied with the program are all in text file format (.txt).  Once a file has been selected it will automatically be displayed in the Assembly Program window of the GUI, with the assembled instructions and operands being shown in the Main Memory display on the right hand side.
+Click on the "Select Assembly File" button in the control panel situated below the system bus.  Assembly language files supplied with the program are all in text file format (.txt).  Once a file has been selected it will automatically be displayed in the Assembly Program window of the interface, with the assembled instructions and operands being shown in the Main Memory display on the right hand side.
 
 To begin execution, click "Execute Program".  This will prompt the first step of execution.  Commentary on the CPU's behaviour can be viewed in the Activity Monitor window, below the assembly program code.  To prompt the program to execute the next step, click on the "Step" button in the control panel.  As the simulator is designed to assist students in understanding the instruction cycle it will not simply cycle through an assembly program automatically; it is necessary to press "Step" to prompt the next step of execution until the assembly program has finished (a HALT instruction is encountered).  
 
@@ -18,16 +18,17 @@ It is possible to load a different assembly program at any point during the exec
 While there is no back button feature to return to the previous step, it is possible to restart the program by either selecting it afresh, or by clicking "Reset". To begin executing the program once more, press "Execute Program" and then "Step" to step through the execution.
 
 
+
 2) THE INTERFACE
 
-Assembly Program 
+Assembly Program: 
 This area is for the display of a selected assembly language program. Line numbers are on the left hand side for clarity.
 
-Activity Monitor 
+Activity Monitor: 
 This area displays a running commentary on the activities carried out by the CPU and updates with every step of the chosen program's execution.  In pipelined mode, the activity monitor display is split into three areas: Fetch/Decode Stage Activity, Execute Stage Activity and Write Back Stage Activity.  Commentary on the activities of each of these stages is displayed in their respective display areas (including system bus commentary).  The Activity Monitor display area(s) allow the user to scroll back up to view previous updates.
 
-CPU  
-The CPU consists of the following control registers:
+CPU: 
+The CPU consists of the following components:
 
 PC - Program Counter, which holds the address of the next instruction to be fetched from memory via the system bus. This is incremented by 1 at the end of the fetch/decode stage, or is set as a result of a branch instruction.
 
@@ -44,7 +45,7 @@ General Purpose Registers - there are sixteen of these (r0 - r15), and are used 
 ALU - Arithmetic and Logic Unit, used for performing arithmetic operations.  Two operands are supplied from the general purpose registers as input, and the result of arithmetic operations is written back to a general purpose register in the write back stage.
 
 
-The System Bus
+The System Bus:
 The system bus consists of a control line, address bus and data bus.  The control line display shows whether the bus operation is a memory read or memory write, and the contents of the address and data buses are shown on their respective displays.
 For read operations, an address is placed on the address bus by the MAR, and delivered to memory.  The operand or instruction at the address specified by the address bus is then loaded from memory onto the data bus and passed to the CPU's MBR register.
 For write operations, an address is placed on the address bus by the MAR and an operand from a general purpose register is placed in the MBR.  This information is then transferred to the address and data buses respectively, with the operand on the data bus being written to the memory address specified on the address line.
@@ -52,7 +53,7 @@ For write operations, an address is placed on the address bus by the MAR and an 
 In pipelined mode it is important to note that system bus operations are a cause of delays in the pipeline; to avoid data conflicts, one stage must wait for another to finish using the bus before it can acquire use of it (only the fetch/decode and execute stages use the system bus).  
 
 
-Main Memory
+Main Memory:
 Main memory consists of 100 slots, from 0 to 99, and holds instructions and operands.
 
  
@@ -90,7 +91,7 @@ Note that assembly files may declare operands and instructions in any order, whi
 
 
 
-3) INSTRUCTION SET
+4) INSTRUCTION SET
 
 
 Transfer Instructions:
@@ -132,7 +133,7 @@ HALT  #When executed, halts in the instruction cycle and the program is finished
    
 
 	 
-3) WRITING CUSTOM ASSEMBLY PROGRAMS
+5) WRITING CUSTOM ASSEMBLY PROGRAMS
 
 While the simulator is not strictly designed to assist with the writing of new assembly programs, anyone can in theory add to the set of programs included with the application. However, care needs to be taken over the formatting of a custom assembly file.
 
