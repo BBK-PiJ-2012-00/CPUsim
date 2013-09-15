@@ -1,8 +1,8 @@
 package code;
 
 /*
- * CPU components can be instantiated ONLY via this class; could keep a static counter to ensure
- * no accidental duplicates!
+ * CPU components can be instantiated ONLY via this class, which enables references those components to which several
+ * other components hold references to be injected.
  */
 public class CPUbuilder {
 	private MainMemory memory;
@@ -16,9 +16,11 @@ public class CPUbuilder {
 	
 	private Loader loader; //Needs to be here as this holds a memory reference; important to pass around the ONE reference!
 	
+	
 	public CPUbuilder(boolean pipelined) {
 		createComponents(pipelined);
 	}
+	
 	
 	public void createComponents(boolean pipelined) {
 		
@@ -40,22 +42,25 @@ public class CPUbuilder {
 		}	
 		
 		loader = new LoaderImpl(memory);
-
 		
 	}
+	
 	
 	
 	public MainMemory getMemoryModule() {
 		return this.memory;
 	}
 	
+	
 	public BusController getBusController() {
 		return this.systemBusController;
 	}
 	
+	
 	public Loader getLoader() {
 		return this.loader;
 	}
+	
 	
 	public ControlUnit getControlUnit() {
 		return this.controlUnit;
