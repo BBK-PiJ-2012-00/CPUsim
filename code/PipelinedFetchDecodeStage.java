@@ -11,22 +11,15 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	private UpdateListener updateListener;
 
 	public PipelinedFetchDecodeStage(BusController systemBus, InstructionRegister ir, ProgramCounter pc,
-			RegisterFile genRegisters, Register statusRegister, MemoryBufferRegister mbr, MemoryAddressRegister mar, 
+			RegisterFile genRegisters, Register rCC, MemoryBufferRegister mbr, MemoryAddressRegister mar, 
 			BlockingQueue<Instruction> fetchToExecuteQueue) {
 		
-		super(systemBus, ir, pc, genRegisters, statusRegister, mbr, mar);
+		super(systemBus, ir, pc, genRegisters, rCC, mbr, mar);
 		this.fetchToExecuteQueue = fetchToExecuteQueue;	
 
 	}
 	
-	/*
-	 * Interrupted status must be polled continuously to check for an interrupt originating 
-	 * from execute stage, which occurs if the pipelined is flushed or the user clicks "reset"
-	 * on the GUI. Although it is far more likely that the thread will be interrupted at
-	 * a wait() statement, it is still possible that it will receive an interrupt before it hits
-	 * a wait() statement, which will not cause an InterruptedException to be thrown, only its interrupted
-	 * flag to bet set to true.
-	 */
+	
 	/*
 	 * This thread will be interrupted by the SwingWorker thread running in the Ex. Stage in the event of
 	 * a pipeline flush brought on by a branch instruction, or in the event that the user clicks "reset"
@@ -34,6 +27,9 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	 * it to cease fetching/decoding instructions, return to the run() method and finally exit that method,
 	 * effectively terminating this thread (which can then be restarted by the SwingWorker in the event of a
 	 * pipeline flush, or if the user decides to restart execution after clicking "reset").
+	 * 
+	 * Interrupted status must be polled continuously to check for an interrupt originating 
+	 * from execute stage when wait() statements are absent (during testing).
 	 */
 	public boolean instructionFetch() {
 		
@@ -51,7 +47,6 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	 */
 	public int instructionDecode() { //Returns int value of opcode
 		Instruction instr = getIR().read();
-		System.out.println("Instruction fetched and about to be decoded is: " + instr.toString());
 		int opcodeValue = instr.getOpcode().getValue(); //Gets instruction opcode as int value
 		
 		if (Thread.currentThread().isInterrupted()) { 
@@ -82,29 +77,15 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	@Override
 	public synchronized void run() { //Synchronized to enable step execution
 
-		System.out.println("Starting run() in FDstage");
 		setActive(true);
-		setPipelineFlush(false);
-		System.out.println("FD: about to enter while loop.");
+		setPipelineFlush(false); //If set to true in an earlier cycle, needs resetting
+		
 		while (isActive()) { //Continue fetching instructions		
 			setActive(this.instructionFetch()); //Set to false if interrupted, and execution is cancelled below
-			System.out.println("FD returned from fetch, active = " + isActive());
+			
 			if (!isActive() || isPipelineFlush()) { //This will happen if an interrupt takes places within instructionFetch()
 				if (isPipelineFlush()) {
-					fireUpdate("** PIPELINE FLUSH ** \nFetch/decode of next sequential instruction abandoned.\n");
-					
-					//One of these waits() is causing a blank spot in execution; must be another one right after it
-					
-					//Wait here so that user has a chance to see this update and think about it.
-//					setWaitStatus(true);
-//					try {
-//						wait();
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//						setWaitStatus(false);
-//						return; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called)
-//					}
-//					setWaitStatus(false);						
+					fireUpdate("** PIPELINE FLUSH ** \nFetch/decode of next sequential instruction abandoned.\n");		
 				}
 				
 				if (((ReentrantLock) getLock()).isHeldByCurrentThread()) {//If interrupted during accessMemory(), must release lock
@@ -113,40 +94,18 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 				return;
 			}
 			this.setOpcodeValue(this.instructionDecode());
-			if (this.getOpcodeValue() == -1) { //Signals interrupted wait(); execution should be cancelled
+			if (this.getOpcodeValue() == -1) { //Signals interrupted wait() or pipeline flush; execution should be cancelled
 				if (isPipelineFlush()) {
 					fireUpdate("** PIPELINE FLUSH ** \nFetch/decode of next sequential instruction at address abandoned.\n");
 					
-					//Wait here so that user has a chance to see this update and think about it.
-//					setWaitStatus(true);
-//					try {
-//						wait();
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//						setWaitStatus(false);
-//						return; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called)
-//					}
-//					setWaitStatus(false);				
-					
 				}
 				setActive(false);
-				return; //Additional boolean may need to be set so controlUnit knows what's going on
+				return; //Terminates this thread
 			}
 			boolean forwardSuccessful = this.forward();
-			if (!forwardSuccessful) { //Interrupt meaning reset clicked or HALT decoded; cancel execution of THIS stage.
+			if (!forwardSuccessful) { //Interrupt detected, meaning reset clicked or HALT decoded; cancel execution of THIS stage.
 				if (isPipelineFlush()) {
-					fireUpdate("** PIPELINE FLUSH ** \nFetch/decode of next sequential instruction abandoned.\n");
-					
-					//Wait here so that user has a chance to see this update and think about it.
-//					setWaitStatus(true);
-//					try {
-//						wait();
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//						setWaitStatus(false);
-//						return; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called)
-//					}
-//					setWaitStatus(false);				
+					fireUpdate("** PIPELINE FLUSH ** \nFetch/decode of next sequential instruction abandoned.\n");		
 				}
 				setActive(false);
 				return;
@@ -154,49 +113,33 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 		}
 		return;
 	}
+	
 
-
+	/*
+	 * A method for forwarding the fetched and decoded instruction to the execute stage.
+	 * 
+	 * @return boolean false if interrupted by a reset, pipeline flush, or if HALT is decoded
+	 */
 	public boolean forward() {
 		Integer opcode = this.getOpcodeValue(); //Get opcode value from superclass to pass to queue
 		try {
-			System.out.println("FD: Thread ID " + Thread.currentThread().getId() + " about to put instrucion: " + getIR().read(0));
-//			if (isPipelineFlush()) {
-//				//Don't offer to queue; will possibly result in execution of instruction that should be skipped
-//				return false;
-//			}
 			getPC().incrementPC();
 			this.fireUpdate("> PC incremented by 1 (ready for next instruction fetch) \n");
 			
 			this.fireUpdate("> Waiting for Ex. Stage to take instruction " + getIR().read(0) + ".\n");
 			
-			fetchToExecuteQueue.put(getIR().read(0)); //Waits here until put is successful (executeStage thread must be attempting take()).
+			//Waits here until put is successful (executeStage thread must be attempting take()).
+			fetchToExecuteQueue.put(getIR().read(0)); 
 			
-			System.out.println("Put " + getIR().read(0) + " successfully");
 			getIR().clear(0); //Rest IR index 0
-			//getPC().incrementPC(); //Increment PCdone here in pipelined mode so that it is ONLY incremented if the just-fetched
-			//instruction is accepted by the execute stage, preventing additional instructions being skipped in SKZ or 
-			//branch instructions.
-			//this.fireUpdate("> PC incremented by 1 (ready for next instruction fetch) \n");
 			
-//			setWaitStatus(true);
-//			try {
-//				wait();
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//				setActive(false);
-//				setWaitStatus(false);
-//				return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
-//			}
-//			setWaitStatus(false);
-			
-			if (opcode == 13) { //Don't attempt to fetch another instruction after HALT fetched. Execute stage won't send signal in time.
-				System.out.println("HALT, so no more fetching");
+			//Don't attempt to fetch another instruction after HALT fetched. Execute stage won't send signal in time.
+			if (opcode == 13) {
 				return false;
 			}
 			return true;
 		} catch (InterruptedException e) {
-			System.out.println("FD: interrupted in forward, while waiting to put.");
-			e.printStackTrace();
+			//e.printStackTrace();
 			setActive(false);
 			return false;
 		}
@@ -206,17 +149,9 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	
 
 	
-	/*
-	 * There must be a way to differentiate between interrupts generated by pipelining flushing
-	 * and those generated by the user clicking reset; in the former case, execution must continue,
-	 * with the fetch/decode stage simply resetting itself, in the latter case execution should terminate
-	 * altogether.
-	 * 
-	 */
-
 	
-	//GUI events should not be handled from this thread but from EDT or SwingWorker
-	//This adds the update event to the EDT thread. Need to test this works on the GUI
+	//GUI events should not be handled from this thread but from EDT
+	//This adds the update event to the EDT thread. 
 	@Override
 	public void fireUpdate(final String update) {
 		SwingUtilities.invokeLater(new Runnable() {
@@ -228,6 +163,7 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	}
 	
 	
+	@Override
 	public void registerListener(UpdateListener listener) {
 		this.updateListener = listener;
 	}
