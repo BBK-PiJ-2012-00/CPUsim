@@ -24,7 +24,7 @@ public class IRtest {
 		ir = new IR();
 		irFile = new IRfile();
 		ir.registerListener(new UpdateListener(new TestFrame())); //To prevent null pointer exception
-		irFile.registerListener(new UpdateListener(new TestFrame()));
+		irFile.registerListener(new UpdateListener(new TestFrame(true)));
 		testInstr = new TransferInstr(Opcode.STORE, 0, 0);
 	}	
 	
