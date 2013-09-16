@@ -3,26 +3,10 @@ package code;
 /*
  * Interface for general purpose registers.  General purpose registers are implemented as 
  * an array of type Data. General purpose registers are true general purpose; they are not
- * restricted to hold only data or only addresses, allowing more flexibility and simplicity.
+ * restricted to hold only Operands, allowing more flexibility.
  */
 
 public interface RegisterFile {
-	
-	/*
-	 * A design consideration is whether to implement true general purpose registers: any general
-	 * purpose register can contain the operand for any opcode.
-	 * Or whether general purpose registers should be separated into data registers and address registers.
-	 * Data registers can hold only data, address registers addresses.  
-	 * Simpler to have true-general purpose, especially mostly register-register operations take place.  More
-	 * flexibility.
-	 * 
-	 * Condition code registers: set as result of operations. Some of these would be necessary: 2 to begin with,
-	 * can increase if necessary.  Often a control register (as opposed to user-visible; not alterable by
-	 * programmer).  
-	 * PSW not necessary; simulator does not implement interrupts or switch modes.  
-	 * If method calls are incorporated into assembly language, may need a control register/stack pointer to point to block
-	 * to memory location where PC is to be reset to after method call (CA: 511).  
-	 */
 	
 	/*
 	 * A method for writing to a general purpose register.
@@ -33,6 +17,7 @@ public interface RegisterFile {
 	 */
 	public void write(int index, Data data);
 	
+	
 	/*
 	 * A method for reading the contents of a general purpose register.
 	 * 
@@ -40,9 +25,18 @@ public interface RegisterFile {
 	 */
 	public Data read(int index);
 	
+	
+	/*
+	 * A method for registering an event listener object with the RegisterFile,
+	 * for GUI display purposes. Every time the contents of a RegisterFile index is updated,
+	 * an update event is created and handled by the listener to change the GUI
+	 * display accordingly.
+	 * 
+	 * @param UpdateListener listener the listener object to handle update events.
+	 */
 	public void registerListener(UpdateListener listener);
 	
-	public void fireUpdate(int index, String update);
+	
 	
 
 
