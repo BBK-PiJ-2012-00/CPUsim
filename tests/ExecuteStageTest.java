@@ -50,6 +50,8 @@ import code.WriteBackStage;
 /*
  * In order to be able to test ExecuteStage, the wait() statements need to be commented-out of
  * the class code. Wait() is required to implement step by step execution in the GUI.
+ * Also, the fireUpdate() methods for event handling should be commented out to make
+ * testing simpler (this functionality is tested on the GUI).
  */
 
 public class ExecuteStageTest {

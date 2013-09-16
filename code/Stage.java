@@ -81,7 +81,6 @@ public abstract class Stage implements Runnable {
 
 			}
 			if (((ReentrantLock) lock).isLocked()) {
-				System.out.println(getClass() + " lock is locked, should fire update.");
 				fireUpdate("> Pipeline delay: Waiting to acquire use of MAR, MBR and \nsystem bus to complete " + 
 						operation + " operation.\n" );
 			}
@@ -118,7 +117,6 @@ public abstract class Stage implements Runnable {
 				return false;
 			}
 			
-			System.out.println ("PC value is: " + getPC().getValue() + " before wait 1");
 			
 			//Additional wait for clarity in pipelined mode, as PC incremented at different point to pipelined mode
 			if (isPipelined && pc.getValue() != 0) { //Don't wait on first instruction fetch (causes gap)

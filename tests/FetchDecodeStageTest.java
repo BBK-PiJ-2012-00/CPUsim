@@ -37,6 +37,8 @@ import code.UpdateListener;
  * Note that the wait() statements present at certain intervals in the FetchDecodeStage code are commented
  * out for testing (these facilitate the step by step execution on the GUI). Leaving them in would make testing
  * unnecessarily complicated and they can be tested using the GUI.
+ * Also, the fireUpdate() methods for event handling should be commented out to make
+ * testing simpler (this functionality is tested on the GUI).
  */
 
 public class FetchDecodeStageTest {

@@ -39,6 +39,11 @@ import code.ConditionCodeRegister;
 import code.UpdateListener;
 import code.WriteBackStage;
 
+/*
+ * Note that any wait() statements should be commented out/removed prior to retesting.
+ * Also, the fireUpdate() methods for event handling should be commented out to make
+ * testing simpler (this functionality is tested on the GUI).
+ */
 public class WriteBackStageTest {
 	private WriteBackStage writeBackStage;
 	private WriteBackStage pipelinedWriteBackStage;

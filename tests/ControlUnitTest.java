@@ -4,7 +4,8 @@ package tests;
  * This tests that the stages (both pipelined and standard) work as expected when used via the 
  * control unit class, as will be the case in the finished simulator. Note that the wait() statements
  * must be commented out/removed from all Stage classes and the system bus classes in order to run
- * these tests.
+ * these tests.  Also, the fireUpdate() methods for event handling should be commented out to make
+ * testing simpler (this functionality is tested on the GUI).
  */
 
 import static org.junit.Assert.*;

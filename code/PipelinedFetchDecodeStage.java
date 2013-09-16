@@ -58,7 +58,6 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 			return -1;
 		}
 		
-		//Is this wait required???
 		setWaitStatus(true);
 		try {
 			wait();
@@ -123,7 +122,8 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	public boolean forward() {
 		Integer opcode = this.getOpcodeValue(); //Get opcode value from superclass to pass to queue
 		try {
-			getPC().incrementPC();
+			getPC().incrementPC();//For testing, as wait() statements are removed, this needs to be placed after queue.put()
+									//in order to prevent missing branch targets.
 			this.fireUpdate("> PC incremented by 1 (ready for next instruction fetch) \n");
 			
 			this.fireUpdate("> Waiting for Ex. Stage to take instruction " + getIR().read(0) + ".\n");
