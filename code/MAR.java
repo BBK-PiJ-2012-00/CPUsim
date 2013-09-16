@@ -3,12 +3,10 @@ package code;
 import javax.swing.SwingUtilities;
 
 /*
- * Class to represent Memory Address Register. This is a singleton to ensure only one instance.  See MBR
- * class for motivation.
+ * Class to represent Memory Address Register
  */
 public class MAR implements MemoryAddressRegister {
-	private UpdateListener updateListener;
-	
+	private UpdateListener updateListener;	
 	private int registerContents;
 	
 	
@@ -16,29 +14,25 @@ public class MAR implements MemoryAddressRegister {
 		this.updateListener = listener;
 	}
 	
-	/*
-	 * 	 * (non-Javadoc)
-	 * @see code.MemoryAddressRegister#write(int)
-	 * Writing to MAR should prompt one of two things: transfer of the contents to PC,
-	 * or activation of system bus -> control unit can have micro-methods which handle
-	 * data flow. These can then be incorporated major methods representing stages.
-	 * Control unit is responsible for coordination.
-	 */
+	
+	
 	@Override
 	public void write(int address) {
 		registerContents = address;
-//		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, display());
-//		updateListener.handleUpDateEvent(updateEvent);
-		fireUpdate(display());
-		
+		fireUpdate(display());		
 	}
+	
 	
 	@Override
 	public int read() {
 		return registerContents;
 	}
 	
-	public String display() {
+	
+	/*
+	 * Converts value on MAR to String format for GUI display.
+	 */
+	private String display() {
 		String marDisplay = "";
 		if (registerContents == -1) {
 			marDisplay += "";
@@ -51,10 +45,9 @@ public class MAR implements MemoryAddressRegister {
 
 
 
-	//GUI events should be handled from EDT
-	//This adds the update event to the EDT thread. Need to test this works on the GUI
-	@Override
-	public void fireUpdate(final String update) {
+	//GUI events should be handled from EDT only.
+	//This adds the update event to the EDT thread
+	private void fireUpdate(final String update) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 			    ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(MAR.this, update);
