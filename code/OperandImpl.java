@@ -1,53 +1,40 @@
 package code;
 
 public class OperandImpl implements Operand {
-	private int intOperand;
-	private double floatingPointOperand;
+	private int intOperand; //Stores integer value
+	private double floatingPointOperand; //Stores floating-point value
 	private boolean isInteger;
 	private boolean isFloatingPoint;
 	
+	
 	public OperandImpl(int intOperand) {
-		//Restrict size 2,147,483,647 and -2,147,483,648
-		this.intOperand = intOperand;
+		this.intOperand = intOperand; //If integer passed as parameter, set isInteger to true and isFloatingPoint to false
 		isInteger = true;
 		isFloatingPoint = false;		
 	}
 	
-	public OperandImpl(double floatingPointOperand) {
+	public OperandImpl(double floatingPointOperand) {//If double passed as parameter, set isFloating point to true, isInteger to false
 		this.floatingPointOperand = floatingPointOperand;
 		isInteger = false;
 		isFloatingPoint = true;
 	}
 	
-	public int unwrapInteger() {
-		try {
-			if (!isInteger) {
-				throw new IllegalStateException("Warning: The wrapped operand is not an integer."); //Not really illegal state...
-			}
-			return intOperand;
+	
+	public int unwrapInteger() {		
+		if (!isInteger) { //If not integer, return floatingPointOperand cast to int (fraction part lost)
+			int castIntOperand = (int) floatingPointOperand; //Create temporary value so as not to overwrite true value
+			return castIntOperand;
 		}
-		catch (IllegalStateException e) {
-			e.getMessage();
-		}
-		//return 0; //If this method is called on a non-integer operand, returns 0
-		intOperand = (int) floatingPointOperand;
-		return intOperand; //returns floatingPointOperand as an integer (fraction part lost).
+		return intOperand;		
 	}
 	
-	public double unwrapFloatingPoint() {
-		try {
-			if (!isFloatingPoint) {
-				throw new IllegalStateException("Warning: The wrapped operand is not a floating point value.");
-			}
-			return floatingPointOperand;
+	
+	public double unwrapFloatingPoint() {		
+		if (!isFloatingPoint) { //If not floating point, return intOperand as floating point value (fraction will be 0).
+			double castFloatingPointOperand = (double) intOperand;
+			return castFloatingPointOperand;		
 		}
-		catch (IllegalStateException e) {
-			e.getMessage();
-		}
-		//return 0.0;
-		floatingPointOperand = (double) intOperand;
-		return floatingPointOperand; //returns intOperand as a floating point value (fraction part will equal 0).
-		
+		return floatingPointOperand;
 	}
 	
 
@@ -66,6 +53,7 @@ public class OperandImpl implements Operand {
 		return isFloatingPoint;
 	}
 	
+	
 	@Override
 	public boolean equals(Object o) {
 		if (o == null) {
@@ -81,11 +69,13 @@ public class OperandImpl implements Operand {
 		return false;
 	}
 	
+	
 	@Override
 	public int hashCode() { //Operand is just a wrapper class for integers, so it makes sense to return the same hashCode
 		Integer i = (Integer) this.unwrapInteger();
 		return i.hashCode();
 	}
+	
 	
 	
 	@Override
