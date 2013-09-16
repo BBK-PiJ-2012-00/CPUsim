@@ -323,10 +323,7 @@ public abstract class Stage implements Runnable {
 		 * STORE instruction execution.
 		 */
 		else if (isOperandStore) {
-			
-//			if (!active) {
-//				return false;
-//			}
+
 						
 			this.fireUpdate("> Executing STORE instruction; destination memory \naddress " + getIR().read(1).getField2() + 
 				" placed into MAR \n");
