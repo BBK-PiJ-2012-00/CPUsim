@@ -18,7 +18,6 @@ public class SystemBusController implements BusController {
 	@Override
 	public boolean transferToMemory(int memoryAddress, Data data) {
 		boolean returned = controlLine.writeToBus(memoryAddress, data);
-		//return controlLine.writeToBus(memoryAddress, data);
 		return returned;
 	}
 
