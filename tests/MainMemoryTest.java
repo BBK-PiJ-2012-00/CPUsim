@@ -18,12 +18,15 @@ public class MainMemoryTest {
 		 * Listeners are added to all classes that use a listener to prevent null exceptions 
 		 * during testing (serve no functional purpose here).
 		 */	
-		memory = new MemoryModule(); 
+		CPUbuilder builder = new CPUbuilder(false);
+		memory = builder.getMemoryModule();
+		mbr = builder.getControlUnit().getMBR();		
 		
-		mbr = new MBR();
 		mbr.registerListener(new UpdateListener(new TestFrame()));
+		builder.getBusController().accessControlLine().registerListener(new UpdateListener(new TestFrame()));
+		builder.getBusController().accessControlLine().getAddressBus().registerListener(new UpdateListener(new TestFrame()));
+		builder.getBusController().accessControlLine().getDataBus().registerListener(new UpdateListener(new TestFrame()));
 		
-		memory.registerBusController(new SystemBusController(new ControlLineImpl(mbr)));
 		memory.registerListener(new UpdateListener(new TestFrame()));
 		
 		testInstr = new TransferInstr(Opcode.STORE, 0, 0);
@@ -64,6 +67,20 @@ public class MainMemoryTest {
 		assertFalse(memory.notifyRead(100)); //100 is invalid address
 	}
 	
-	//Test load!!
+	
+	@Test
+	public void testLoadMemory() {
+		Data[] testArray = new Data[2];
+		testArray[0] = testInstr;
+		Instruction testInstr2 = new BranchInstr(Opcode.BRZ, 5);
+		testArray[1] = testInstr2;
+		
+		memory.loadMemory(testArray);
+		
+		for (int i = 0; i < 2; i++) {
+			assertEquals(testArray[i], memory.accessAddress(i));
+		}
+		
+	}
 
 }
