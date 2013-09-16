@@ -53,6 +53,7 @@ public class MemoryModule implements MainMemory {
 	}
 	
 	
+	
 	@Override
 	public Data accessAddress(int index) { //Primarily for testing purposes
 		return MEMORY[index];
@@ -60,37 +61,24 @@ public class MemoryModule implements MainMemory {
 	
 
 	
-	/*
-	 * Absolute addressing may be clearer pedagogically; will there ever be a need to start a program from a 
-	 * memory address other than 0? Even if data variables are declared first in the assembly language, it can
-	 * be assembled in such away that instructions are loaded first, with data following, thus execution will
-	 * always start from address 0 (array can be made of variables, then of instructions, and then the two can
-	 * be put together into one large array to be passed to this method). 
-	 */
+	
 	@Override
 	public void loadMemory(Data[] programCode) {
 		for (Data line : programCode) {
 			MEMORY[pointer] = line; //Load pointer location with line of program code
-			//System.out.println(MEMORY[pointer].toString());
 			pointer++;
 		}
-//		ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, display());
-//		updateListener.handleUpDateEvent(updateEvent);
 		fireUpdate(display());
 	}
 	
-	public void setPC() { //Method to send start address of program code via system bus to set PC before execution begins
-		
-	}
+	
 	
 	
 	@Override
 	public boolean notifyWrite(int address, Data data) { //Method to prompt memory to receive data from system bus (write)
-		//No checking of address being empty or not; up to programmer
+		//No checking of address being empty or not; up to assembly programmer
 		if (address < 100 && address >= 0) {
 			MEMORY[address] = data;
-//			ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(this, display());
-//			updateListener.handleUpDateEvent(updateEvent);
 			fireUpdate(display());
 			return true;
 		}
@@ -148,10 +136,10 @@ public class MemoryModule implements MainMemory {
 		this.updateListener = listener;
 	}
 	
-	//GUI events should be handled from EDT
-	//This adds the update event to the EDT thread. Need to test this works on the GUI
-	@Override
-	public void fireUpdate(final String update) {
+	
+	//GUI events should be handled from EDT only.
+	//This adds the update event to the EDT thread. 
+	private void fireUpdate(final String update) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 			    ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(MemoryModule.this, update);
