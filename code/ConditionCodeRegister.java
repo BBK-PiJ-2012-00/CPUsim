@@ -11,25 +11,28 @@ public class ConditionCodeRegister implements Register {
 	private Operand contents;
 	private UpdateListener updateListener;
 
+	
 	@Override
 	public Operand read() {
 		return this.contents;
 	}
 
+	
 	@Override
 	public void write(Operand operand) {
 		this.contents = operand;
 		fireUpdate(display());
 	}
 
+	
 	@Override
 	public void registerListener(UpdateListener listener) {
 		this.updateListener = listener;
 		
 	}
 
-	@Override
-	public String display() {
+
+	private String display() {
 		String displayString = "";
 		if (this.contents == null) {
 			return displayString; //Will update display with blank string if contents is empty
@@ -38,10 +41,10 @@ public class ConditionCodeRegister implements Register {
 		return displayString;
 	}
 	
+	
 	//GUI events should be handled from EDT only.
-	//This adds the update event to the EDT thread. 
-	@Override
-	public void fireUpdate(final String update) {
+	//This adds the update event to the EDT thread.
+	private void fireUpdate(final String update) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 			    ModuleUpdateEvent updateEvent = new ModuleUpdateEvent(ConditionCodeRegister.this, update);
