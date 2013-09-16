@@ -24,11 +24,16 @@ public interface MemoryBufferRegister {
 	 */
 	public Data read();
 	
-	public String display();
 	
+	/*
+	 * A method for registering an event listener object with the MBR,
+	 * for GUI display purposes. Every time the contents of the MBR is updated,
+	 * an update event is created and handled by the listener to change the GUI
+	 * display accordingly.
+	 * 
+	 * @param UpdateListener listener the listener object to handle update events.
+	 */
 	public void registerListener(UpdateListener listener);
-	
-	public void fireUpdate(String update);
 
 	
 }
