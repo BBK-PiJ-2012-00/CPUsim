@@ -3,6 +3,9 @@ package code;
 import java.util.EventListener;
 
 
+/*
+ * An event listener class to handle GUI update events.
+ */
 public class UpdateListener implements EventListener {
 	private CPUframe frame; //Reference to main window frame object
 	
@@ -10,6 +13,10 @@ public class UpdateListener implements EventListener {
 		this.frame = frame;
 	}
 		
+	/*
+	 * The event handling code; sets fields on the CPUframe window in response to
+	 * ModuleUpdateEvents being created by simulator components.
+	 */
 	public void handleUpDateEvent(ModuleUpdateEvent e) {
 		
 		if (e.getSource() instanceof ProgramCounter) {
@@ -87,8 +94,8 @@ public class UpdateListener implements EventListener {
 		}
 		
 		/*
-		 * As a dummy object is used for ALU updates (ALU uses static methods and cannot be instantiated, so a dummy
-		 * Object instance is used) so this if statement must come last to avoid use by any other instances.
+		 * As a dummy object is used for ALU updates (ALU uses static methods and cannot be instantiated) so this if 
+		 * statement must come last to avoid use by any other instances.
 		 */
 		else if (e.getSource() instanceof Object) { //ALU (static, therefore no object instantiation; dummy object used)
 			
