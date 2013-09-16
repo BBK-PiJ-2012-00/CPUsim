@@ -46,7 +46,7 @@ public class LoaderTest {
 
 	
 	@Test
-	public void testLoadToMemory() {
+	public void testLoadToMemory() { //Test assembled code is loaded to memory
 		loader.load(testProgram);
 		loader.loadToMemory();
 		
@@ -55,7 +55,13 @@ public class LoaderTest {
 		}
 	}
 	
-	//Test clear!!
+	
+	@Test
+	public void testClear() {
+		loader.load(testProgram);
+		loader.clear();
+		assertNull(loader.getProgramCode()); //Should be null after a clear()
+	}
 	
 }
 	
