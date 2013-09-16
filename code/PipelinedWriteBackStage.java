@@ -59,7 +59,6 @@ public class PipelinedWriteBackStage extends WriteBackStage {
 		while (isActive()) {
 			try {
 				fireUpdate("> Waiting to receive operand from Ex. Stage.\n");
-				System.out.println("Attempting take...");
 				Instruction instr = executeToWriteQueue.take();
 				fireUpdate("> Received operand " + getResult() + " from Ex. Stage.\n");
 				

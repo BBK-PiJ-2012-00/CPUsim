@@ -933,12 +933,11 @@ public class CPUframe extends JFrame {
 				
 				if (executionWorker == null) { //Only create worker thread if the current one is null (to avoid several threads).;
 					executionWorker = new ExecutionWorker();
-					System.out.println("Created new thread with ID, ready to exectute.");
 					executionWorker.execute();
 					
 				}
 				else {
-					System.out.println("Execution worker isn't null, so nothing created.");
+				//	System.out.println("Execution worker isn't null, so nothing created.");
 				}
 				
 			}
@@ -957,7 +956,6 @@ public class CPUframe extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			
 			try {
-				System.out.println(executionWorker.getState());
 				executionWorker.cancel(true); //Old worker thread needs terminating
 				executionWorker = null;
 				

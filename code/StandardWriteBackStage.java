@@ -14,7 +14,7 @@ public class StandardWriteBackStage extends WriteBackStage {
 	}
 	
 	@Override
-	public void instructionWriteBack(Operand result) { //Not required in every cycle
+	public void instructionWriteBack(Operand result) { 
 		//It is implicit in the nature of arithmetic instructions that the result is stored in the register
 		//referenced in the first field of the instruction after the opcode (field1)
 		getGenRegisters().write(getIR().read().getField1(), result);

@@ -33,8 +33,8 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 	 */
 	public boolean instructionFetch() {
 		
-		boolean successful = accessMemory(true, false, false, true); //Fetch requires access to MAR, MBR and memory; use 
-											//synchronized block to do this - see Stage super class for details of fetch.
+		//Fetch requires access to MAR, MBR and memory;see Stage super class for details of fetch.
+		boolean successful = accessMemory(true, false, false, true); 
 		return successful;
 		
 	}
@@ -63,7 +63,7 @@ public class PipelinedFetchDecodeStage extends FetchDecodeStage {
 		try {
 			wait();
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+		//	e.printStackTrace();
 			setWaitStatus(false);
 			return -1; //Do not continue execution if interrupted by Ex. stage running the SwingWorker thread; this means
 			//reset has been clicked on GUI. -1 signals this thread return from run() method (which called this method).

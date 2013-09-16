@@ -33,6 +33,7 @@ public abstract class Instruction implements Data {
 		return false;
 	}
 
+	
 	/*
 	 * Not currently in use.
 	 */

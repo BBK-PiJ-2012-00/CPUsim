@@ -9,6 +9,8 @@ import java.util.EventObject;
  * that the relevant components of the GUI can be updated accordingly.
  */
 public class ModuleUpdateEvent extends EventObject {	
+	private static final long serialVersionUID = 8973739476145164274L; //Eclipse generated
+	
 	private String update; //The String with the update value
 	private int register; //For general purpose registers; register index reference
 	
