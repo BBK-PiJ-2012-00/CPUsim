@@ -48,7 +48,7 @@ public class StandardExecuteStage extends ExecuteStage {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+						//	e.printStackTrace();
 							setWaitStatus(false);
 							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
@@ -68,7 +68,7 @@ public class StandardExecuteStage extends ExecuteStage {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+						//	e.printStackTrace();
 							setWaitStatus(false);
 							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
@@ -82,7 +82,7 @@ public class StandardExecuteStage extends ExecuteStage {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+					//	e.printStackTrace();
 						setWaitStatus(false);
 						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
@@ -103,15 +103,13 @@ public class StandardExecuteStage extends ExecuteStage {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+					//	e.printStackTrace();
 						setWaitStatus(false);
 						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
 					setWaitStatus(false);
 					
-					//writeBackStage.receive(result); //Call write back stage to store result of addition
-					//writeBackStage.run();
-					this.forward(result);
+					this.forward(result); //Forward to WB stage
 					
 					fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
 					fireUpdate("> Result operand " + result + " written to r" + getIR().read().getField1() + " from ALU\n");
@@ -120,7 +118,7 @@ public class StandardExecuteStage extends ExecuteStage {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+					//	e.printStackTrace();
 						setWaitStatus(false);
 						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
@@ -142,15 +140,14 @@ public class StandardExecuteStage extends ExecuteStage {
 					try {
 						wait(); //Makes more sense to place wait here than to complicate writeBack stage.
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+				//		e.printStackTrace();
 						setWaitStatus(false);
 						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
 					setWaitStatus(false);
 					
-					//writeBackStage.receive(result);
-					//writeBackStage.run();
-					this.forward(result);
+			
+					this.forward(result); //Forward result to WB stage
 					
 					fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
 					fireUpdate("> Result operand " + result + " written to r" + getIR().read().getField1() + " from ALU\n");
@@ -159,7 +156,7 @@ public class StandardExecuteStage extends ExecuteStage {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+				//		e.printStackTrace();
 						setWaitStatus(false);
 						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
@@ -181,7 +178,7 @@ public class StandardExecuteStage extends ExecuteStage {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+				//		e.printStackTrace();
 						setWaitStatus(false);
 						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
@@ -196,7 +193,7 @@ public class StandardExecuteStage extends ExecuteStage {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+				//		e.printStackTrace();
 						setWaitStatus(false);
 						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
@@ -218,13 +215,13 @@ public class StandardExecuteStage extends ExecuteStage {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+				//		e.printStackTrace();
 						setWaitStatus(false);
 						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
 					setWaitStatus(false);
 				
-					this.forward(result);
+					this.forward(result); //Forward resut to WB stage
 					
 					fireUpdate("\n** WRITE BACK STAGE **\n");//Simpler to place this here than within writeBackStage object
 					fireUpdate("> Result operand " + result + " written to r" + getIR().read().getField1() + " from ALU\n");
@@ -233,7 +230,7 @@ public class StandardExecuteStage extends ExecuteStage {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+				//		e.printStackTrace();
 						setWaitStatus(false);
 						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
@@ -254,7 +251,7 @@ public class StandardExecuteStage extends ExecuteStage {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+					//	e.printStackTrace();
 						setWaitStatus(false);
 						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
@@ -273,7 +270,7 @@ public class StandardExecuteStage extends ExecuteStage {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+					//		e.printStackTrace();
 							setWaitStatus(false);
 							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
@@ -287,7 +284,7 @@ public class StandardExecuteStage extends ExecuteStage {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+					//		e.printStackTrace();
 							setWaitStatus(false);
 							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
@@ -307,7 +304,7 @@ public class StandardExecuteStage extends ExecuteStage {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+					//		e.printStackTrace();
 							setWaitStatus(false);
 							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					  	}
@@ -323,7 +320,7 @@ public class StandardExecuteStage extends ExecuteStage {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+						//	e.printStackTrace();
 							setWaitStatus(false);
 							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
@@ -335,6 +332,7 @@ public class StandardExecuteStage extends ExecuteStage {
 					 
 			case 11: //A BRE instruction (branch if status reg. contents = contents of register ref. in instruction)
 					 int genRegRef = getIR().read().getField2(); //Reference to register referred to in instruction
+					
 					 if (getCC().read().equals((Operand) getGenRegisters().read(genRegRef))) { //If equal
 						 getPC().setPC(getIR().read().getField1()); //Set PC to equal address in field1 of instruction in ir
 						 fireUpdate("> PC set to " + getIR().read().getField1() + " as result of " + getIR().read().getOpcode() + 
@@ -344,7 +342,7 @@ public class StandardExecuteStage extends ExecuteStage {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+					//		e.printStackTrace();
 							setWaitStatus(false);
 							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
@@ -360,7 +358,7 @@ public class StandardExecuteStage extends ExecuteStage {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+					//		e.printStackTrace();
 							setWaitStatus(false);
 							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
@@ -371,6 +369,7 @@ public class StandardExecuteStage extends ExecuteStage {
 					 
 			case 12: //A BRNE instruction (branch if status reg. contents != contents of register ref. in instruction)
 					 genRegRef = getIR().read().getField2(); //Reference to register referred to in instruction
+					
 					 if (!(getCC().read().equals((Operand) getGenRegisters().read(genRegRef)))) { //If not equal
 						 getPC().setPC(getIR().read().getField1()); //Set PC to equal address in field1 of instruction in ir	
 						 fireUpdate("> PC set to " + getIR().read().getField1() + " as result of " + getIR().read().getOpcode() + 
@@ -381,7 +380,7 @@ public class StandardExecuteStage extends ExecuteStage {
 						 try {
 							 wait();
 						 } catch (InterruptedException e) {
-							 e.printStackTrace();
+					//		 e.printStackTrace();
 							 setWaitStatus(false);
 							 return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						 }
@@ -398,7 +397,7 @@ public class StandardExecuteStage extends ExecuteStage {
 						 try {							 
 							wait();
 						 } catch (InterruptedException e) {
-							 e.printStackTrace();
+					//		 e.printStackTrace();
 							 setWaitStatus(false);
 							 return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						 }
@@ -410,10 +409,6 @@ public class StandardExecuteStage extends ExecuteStage {
 			
 					 
 			case 13: //A HALT instruction (stops instruction cycle). For clarity, resets all registers.
-					 //pc.setPC(0);
-					 //rCC.write(null);
-					// ir.loadIR(null);	
-					 
 					 fireUpdate("> HALT instruction decoded; end of program");
 					 return false; //Signals end of instruction cycle		
 		}
@@ -423,7 +418,7 @@ public class StandardExecuteStage extends ExecuteStage {
 	
 	@Override
 	public synchronized void run() {
-		setActive(this.instructionExecute(getOpcodeValue()));
+		setActive(this.instructionExecute(getOpcodeValue())); //Control unit checks status of active; if false, exits instr. cycle.
 	}
 	
 
@@ -436,8 +431,8 @@ public class StandardExecuteStage extends ExecuteStage {
 	}
 
 
-	//GUI events should not be handled from this thread but from EDT or SwingWorker
-	//This adds the update event to the EDT thread. Need to test this works on the GUI
+	//GUI events should not be handled from this thread but from EDT only.
+	//This adds the update event to the EDT thread. 
 	@Override
 	public void fireUpdate(final String update) {
 		SwingUtilities.invokeLater(new Runnable() {
@@ -447,7 +442,6 @@ public class StandardExecuteStage extends ExecuteStage {
 			}
 		});
 	}
-
 
 	
 
