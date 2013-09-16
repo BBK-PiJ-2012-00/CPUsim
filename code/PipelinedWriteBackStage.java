@@ -6,8 +6,7 @@ import javax.swing.SwingUtilities;
 
 public class PipelinedWriteBackStage extends WriteBackStage {
 	
-	private BlockingQueue<Instruction> executeToWriteQueue;
-	
+	private BlockingQueue<Instruction> executeToWriteQueue; //This queue referenced by execute stage, too
 
 
 	public PipelinedWriteBackStage(BusController systemBus, InstructionRegister ir, ProgramCounter pc, RegisterFile genRegisters,
@@ -21,7 +20,7 @@ public class PipelinedWriteBackStage extends WriteBackStage {
 	
 	
 	@Override
-	public void receive(Operand result) { //Called by execute stage to supply operand for writeback
+	public void receive(Operand result) { //Called by execute stage to supply operand for write back
 		setResult(result); //Set result field of WriteBackStage super class
 
 	}
@@ -39,13 +38,14 @@ public class PipelinedWriteBackStage extends WriteBackStage {
 			wait();
 		}
 		catch (InterruptedException e) { //If reset is clicked on GUI, swing worker thread in ex. stage will trigger interrupt
-			e.printStackTrace();		//and stop this thread from running
+			//e.printStackTrace();	
 			setWaitStatus(false);
-			Thread.currentThread().interrupt(); 
+			Thread.currentThread().interrupt();  //Interrupts itself, prompting eventual termination
 			return; 
 		}
 		setWaitStatus(false);
 	}
+	
 
 	/*
 	 * The thread running in this stage, like the thread running in the F/D Stage, can
@@ -64,15 +64,14 @@ public class PipelinedWriteBackStage extends WriteBackStage {
 				fireUpdate("> Received operand " + getResult() + " from Ex. Stage.\n");
 				
 				
-				if (Thread.currentThread().isInterrupted()) {
+				if (Thread.currentThread().isInterrupted()) { //Polling is for use without wait() statements (for testing)
 					setActive(false);
 					return;
 				}
 				
 				getIR().loadIR(2, instr); //Load instruction into last IR index
-				System.out.println("IR 2: " + getIR().read(2).toString());
 				
-				if (Thread.currentThread().isInterrupted()) {
+				if (Thread.currentThread().isInterrupted()) { //Polling is for use without wait() statements (for testing)
 					setActive(false);
 					return;
 				}
@@ -83,16 +82,16 @@ public class PipelinedWriteBackStage extends WriteBackStage {
 					return;
 				}
 				getIR().clear(2); //Reset IR once write back operation complete.
-				System.out.println("Cleared.");
 			} catch (InterruptedException e) {
 				setActive(false);
-				e.printStackTrace();
+				//e.printStackTrace();
 				return; //Stop executing if interrupted (signals a reset or HALT).
 			}
 		}
 		return;
 
 	}
+	
 	
 	@Override
 	public void fireUpdate(final String update) {
@@ -103,11 +102,6 @@ public class PipelinedWriteBackStage extends WriteBackStage {
 			}
 		});
 	}
-
-
-
-
-	
 	
 
 }
