@@ -1000,7 +1000,8 @@ public class CPUframe extends JFrame {
 		    	//Restricts file chooser to accepting text files and directories only
 		    	fileChooser.setAcceptAllFileFilterUsed(false);
 		    	FileFilter txtFilter = new TextFileFilter();
-		    	fileChooser.setFileFilter(txtFilter);		    	
+		    	fileChooser.setFileFilter(txtFilter);	
+		    	fileChooser.setCurrentDirectory(new File("./assemblyPrograms"));
 		    	
 		        int returnVal = fileChooser.showOpenDialog(fileOpenButton);
 
@@ -1086,7 +1087,8 @@ public class CPUframe extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			try {
-		         FileReader fileReader = new FileReader("src/assemblyPrograms/CPUsim User Manual.txt");
+//		         FileReader fileReader = new FileReader("src/assemblyPrograms/CPUsim User Manual.txt");
+				FileReader fileReader = new FileReader("./assemblyPrograms/CPUsim User Manual.txt");
 		         JTextArea helpPane = new JTextArea();
 		         helpPane.setEditable(false);
 		         helpPane.setLineWrap(true); //Wrap lines to fit display area
