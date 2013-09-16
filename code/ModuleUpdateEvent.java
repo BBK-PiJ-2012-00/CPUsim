@@ -3,16 +3,14 @@ package code;
 import java.util.EventObject;
 
 /*
- * A class to represent events within the back end program code of the simulator.  These events
- * are passed to the relevant event listener so that the GUI can be updated in line with the activity
- * of the back end simulator program code. The fields are used to store information about the events so 
+ * A class to represent events within the component code of the simulator.  These events
+ * are passed to and UpdateEvent listener so that the GUI can be updated in line with the activity
+ * of the simulator components. The fields are used to store information about the events so 
  * that the relevant components of the GUI can be updated accordingly.
  */
-public class ModuleUpdateEvent extends EventObject {
-	private static final long serialVersionUID = 663648502104832825L; //For serialization (unused)
-	
+public class ModuleUpdateEvent extends EventObject {	
 	private String update; //The String with the update value
-	private int register; //For general purpose registers
+	private int register; //For general purpose registers; register index reference
 	
 	private Operand op1; //op1 is the first ALU operand (to be sent for display on GUI)
 	private Operand op2; //op2 is the second ALU operand
@@ -21,10 +19,11 @@ public class ModuleUpdateEvent extends EventObject {
 	
 	private boolean controlLineUpdate; //True if the source intends to set control line GUI display
 	private int activityMonitorReference; //Value 0 or 1 (write back stage doesn't use system bus) to determine which
-				//activity monitor sould display the update on the GUI in pipelined mode.
-	private boolean pipeliningEnabled; //For update from control line, set to true if constructor ModuleUpdateEvent(Object, 
+				//activity monitor should display the system bus activity commentary on the GUI in pipelined mode.
+	private boolean pipeliningEnabled; //For updates from control line, set to true if constructor ModuleUpdateEvent(Object, 
 									//boolean, int, String) is called, indicating pipelined mode.
 
+	
 	public ModuleUpdateEvent(Object source, String update) {
 		super(source);
 		this.update = update;
