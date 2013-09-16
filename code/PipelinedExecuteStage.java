@@ -6,14 +6,13 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.swing.SwingUtilities;
 
 public class PipelinedExecuteStage extends ExecuteStage {
-	private BlockingQueue<Instruction> fetchToExecuteQueue;
-	private BlockingQueue<Instruction> executeToWriteQueue;
-	//private boolean active;
+	private BlockingQueue<Instruction> fetchToExecuteQueue; //Also referenced by pipelined F/D stage
+	private BlockingQueue<Instruction> executeToWriteQueue; //Also referenced by pipelined WB stage
 	
-	private FetchDecodeStage fetchDecodeStage; //This has a field as reference is only needed in pipelined mode
-	private Thread fetchDecodeThread;
+	private FetchDecodeStage fetchDecodeStage; //For passing as parameter to fetchDecodeThread
+	private Thread fetchDecodeThread; //Managed by this stage
 	
-	private Thread writeBackThread; //Managed by this stage
+	private Thread writeBackThread; //Managed by this stage (superclass already has ref. to WB stage).
 	
 	
 	public PipelinedExecuteStage(BusController systemBus, InstructionRegister ir, ProgramCounter pc, RegisterFile genRegisters,
@@ -30,13 +29,11 @@ public class PipelinedExecuteStage extends ExecuteStage {
 	}
 	
 	public boolean instructionExecute(int opcode) {
-		//this.fireUpdate("\n** INSTRUCTION EXECUTION STAGE ** \n");
 		
 		switch (opcode) {
 		
 			case 1: //A LOAD instruction
-					
-					System.out.println("E: about to accesMemory()");
+				
 					boolean loadSuccessful = accessMemory(false, true, false, true); 
 					//For pipelined execution, there is the possibility of conflicts
 					//with the f/d stage, as both this operation and fetch operations in the f/d stage make use of the
@@ -44,23 +41,20 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					//only one of a LOAD, STORE or instruction fetch operation may take place at any one time.
 					return loadSuccessful;
 					
-
-					//break;
-					
 					
 			case 2: //A STORE instruction
 				
 					boolean storeSuccessful = accessMemory(false, false, true, true);	
 					return storeSuccessful;
-					//break;
+	
 					
 					
 			case 3: //A MOVE instruction (moving data between registers)
 					this.fireUpdate("> Executing MOVE instruction: \n");
 					
 					if (getIR().read(1).getField2() == 16) { //ConditionCodeRegister destination reference
-						getCC().write((Operand)getGenRegisters().read(getIR().read(1).getField1())); //Write operand from source register
-						//to condition/status register
+						getCC().write((Operand)getGenRegisters().read(getIR().read(1).getField1())); 
+						//Write operand from source register to rCC
 						
 						this.fireUpdate("> Loaded operand " + getGenRegisters().read(getIR().read(1).getField1()) + 
 								" into condition code register\n");
@@ -69,7 +63,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+							//e.printStackTrace();
 							setWaitStatus(false);
 							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
@@ -89,7 +83,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+						//	e.printStackTrace();
 							setWaitStatus(false);
 							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
@@ -103,7 +97,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+					//	e.printStackTrace();
 						setWaitStatus(false);
 						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
@@ -124,14 +118,12 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+					//	e.printStackTrace();
 						setWaitStatus(false);
 						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
 					setWaitStatus(false);
 					
-					//writeBackStage.receive(result); //Call write back stage to store result of addition
-					//writeBackStage.run();
 					boolean forwardSuccessful = this.forward(result);
 					if (!forwardSuccessful) { //Indicates interrupted
 						return false; //Stop execution
@@ -142,13 +134,13 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+					//	e.printStackTrace();
 						setWaitStatus(false);
 						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
 					setWaitStatus(false);
 					
-					ALU.clearFields();
+					ALU.clearFields(); //Rest ALU for GUI once operation complete
 					
 					break;
 					
@@ -162,22 +154,24 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					
 					setWaitStatus(true);
 					try {
-						wait(); //Makes more sense to place wait here than to complicate writeBack stage.
+						wait();
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+					//	e.printStackTrace();
 						setWaitStatus(false);
 						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
 					setWaitStatus(false);
 					
-					this.forward(result);
+					forwardSuccessful = this.forward(result);
+					if (!forwardSuccessful) { //Indicates interrupted
+						return false; //Stop execution
+					}					
 					
-					//Is this required?
 					setWaitStatus(true);
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+					//	e.printStackTrace();
 						setWaitStatus(false);
 						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
@@ -199,20 +193,22 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+					//	e.printStackTrace();
 						setWaitStatus(false);
 						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
 					setWaitStatus(false);
 					
-					this.forward(result);
-					
+					forwardSuccessful = this.forward(result);
+					if (!forwardSuccessful) { //Indicates interrupted
+						return false; //Stop execution
+					}						
 
 					setWaitStatus(true);
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+					//	e.printStackTrace();
 						setWaitStatus(false);
 						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
@@ -234,20 +230,22 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+					//	e.printStackTrace();
 						setWaitStatus(false);
 						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
 					setWaitStatus(false);
 					
-					this.forward(result);
+					forwardSuccessful = this.forward(result);
+					if (!forwardSuccessful) { //Indicates interrupted
+						return false; //Stop execution
+					}	
 					
-
 					setWaitStatus(true);
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+					//	e.printStackTrace();
 						setWaitStatus(false);
 						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
@@ -266,7 +264,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+					//	e.printStackTrace();
 						setWaitStatus(false);
 						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
@@ -281,7 +279,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+						//	e.printStackTrace();
 							setWaitStatus(false);
 							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
@@ -297,7 +295,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+					//	e.printStackTrace();
 						setWaitStatus(false);
 						return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					}
@@ -316,7 +314,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+						//	e.printStackTrace();
 							setWaitStatus(false);
 							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
@@ -331,7 +329,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 							try {
 								wait();
 							} catch (InterruptedException e) {
-								e.printStackTrace();
+						//		e.printStackTrace();
 								setWaitStatus(false);
 								return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 							}
@@ -348,7 +346,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+						//	e.printStackTrace();
 							setWaitStatus(false);
 							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
@@ -362,7 +360,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+					//		e.printStackTrace();
 							setWaitStatus(false);
 							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
@@ -379,7 +377,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+					//		e.printStackTrace();
 							setWaitStatus(false);
 							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
@@ -394,7 +392,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+						//	e.printStackTrace();
 							setWaitStatus(false);
 							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
@@ -411,7 +409,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+					//		e.printStackTrace();
 							setWaitStatus(false);
 							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 					  	}
@@ -426,7 +424,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+					//		e.printStackTrace();
 							setWaitStatus(false);
 							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
@@ -445,7 +443,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						 try {
 							 wait();
 						 } catch (InterruptedException e) {
-							 e.printStackTrace();
+						//	 e.printStackTrace();
 							 setWaitStatus(false);
 							 return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						 }
@@ -461,7 +459,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+						//	e.printStackTrace();
 							setWaitStatus(false);
 							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
@@ -478,7 +476,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+					//		e.printStackTrace();
 							setWaitStatus(false);
 							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
@@ -495,7 +493,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+						//	e.printStackTrace();
 							setWaitStatus(false);
 							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
@@ -512,7 +510,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+					//		e.printStackTrace();
 							setWaitStatus(false);
 							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
@@ -528,7 +526,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 							try {
 								wait();
 							} catch (InterruptedException e) {
-								e.printStackTrace();
+					//			e.printStackTrace();
 								setWaitStatus(false);
 								return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 							}
@@ -545,7 +543,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						try {
 							wait();
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+						//	e.printStackTrace();
 							setWaitStatus(false);
 							return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						}
@@ -562,7 +560,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 						 try {							 
 							wait();
 						 } catch (InterruptedException e) {
-							 e.printStackTrace();
+						//	 e.printStackTrace();
 							 setWaitStatus(false);
 							 return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 						 }
@@ -574,8 +572,7 @@ public class PipelinedExecuteStage extends ExecuteStage {
 			
 					 
 			case 13: //A HALT instruction (stops instruction cycle). For clarity, resets all registers.
-					 System.out.println("> HALT encountered.");
-					 fireUpdate("HALT instruction decoded; end of program");
+					 fireUpdate("> HALT instruction decoded; end of program");
 					 return false; //Signals end of instruction cycle		
 		}
 		return true;
@@ -584,11 +581,11 @@ public class PipelinedExecuteStage extends ExecuteStage {
 	
 	
 	/*
-	 * This can manage difference between a reset and pipeline flush interrupt to f/d stage? Perhaps not;
-	 * if reset is clicked -- THIS object will get the interrupt, either while it's waiting to take from the queue,
-	 * put something in the queue, or executing. The fetch and writeBack threads will continue unless directed
-	 * otherwise.  So, when THIS thread is interrupted, interrupt the others.  Otherwise, this thread will just
-	 * restart the other threads in the event of a pipeline flush.
+	 * If reset is clicked this object running the SwingWorker thread that will get the interrupt, either while 
+	 * it's waiting to take from the queue, put something in the queue, or executing. The fetch and writeBack threads 
+	 * will continue unless directed otherwise.  Thus, when this thread (SwingWorker) is interrupted, it interrupts the 
+	 * threads running in the F/D and WB stages. This thread simply interrupts and then restarts the F/D thread in the event 
+	 * of a pipeline flush.
 	 */
 	public synchronized void run() {
 		setActive(true);
@@ -610,37 +607,36 @@ public class PipelinedExecuteStage extends ExecuteStage {
 				int opcodeValue = instr.getOpcode().getValue();
 				fireUpdate("> Beginning execution of instruction " + instr.toString() + " received \nfrom F/D stage.\n");
 				
-				//System.out.println("Just taken " + instr + " from queue");
-				//System.out.println("IR at 1 " + getIR().read(1));
-				setActive(this.instructionExecute(opcodeValue));
-				//System.out.println("E: just returned from instructionExecute.");
-				if (!isActive()) {
-					System.out.println("Throwing homemade interrupt exception after returning false from execute.");
+		
+				setActive(this.instructionExecute(opcodeValue));				
+				if (!isActive()) { //May be false as result of instructionExecute(), in the event of reset being clicked
 					throw new InterruptedException(); //Prompt termination of other threads
 				}
-				getIR().clear(1); //Reset
+				
+				getIR().clear(1); //Reset for GUI display
 			}
 			catch (InterruptedException ex) {
-				ex.printStackTrace();
-				fetchDecodeThread.interrupt();
+			//	ex.printStackTrace();
+				fetchDecodeThread.interrupt(); //Interrupt the other threads if reset clicked
 				writeBackThread.interrupt();
 				if (((ReentrantLock) getLock()).isHeldByCurrentThread()) {//If interrupted during accessMemory(), must release lock
 					getLock().unlock();
 				}
-				System.out.println("!@!@!@!@" + ((ReentrantLock) getLock()).isLocked());
+				
 				setActive(false);
 				return;
 			}
 			
 		}
-		//Terminate other stages once this stage is no longer active; alternatively use static boolean for active
+		//Terminate other stages once this stage is no longer active
 		fetchDecodeThread.interrupt();
 		writeBackThread.interrupt();
 		return;
 	}
 
+	
 	@Override
-	public boolean forward(Operand result) {
+	public boolean forward(Operand result) { //Forwards result to WB stage via queue
 		try {
 			getWriteBackStage().receive(result); //Transfer result
 			fireUpdate("> Forwarding operand " + result + " to WB Stage.\n");
@@ -655,12 +651,11 @@ public class PipelinedExecuteStage extends ExecuteStage {
 
 	}
 	
-	
+	//Sequence of events that need to be carried out if branch is taken
 	public void pipelineFlush() {
 		((PipelinedFetchDecodeStage) fetchDecodeStage).setPipelineFlush(true); //Allows for differentiation between reset and flush
-		fetchDecodeThread.interrupt(); //Poll Thread.isInterrupted() at crucial points, incl. System Bus
-		getIR().clear(0); //Clear f/d and ex. IR registers (wb stage may be using third IR index).
-		//getIR().clear(1);
+		fetchDecodeThread.interrupt();
+		getIR().clear(0); //Clear index 0 of IR registers used by f/d stage (WB stage may be using third IR index).
 		while (fetchDecodeThread.isAlive()); //Wait for f/d thread to terminate
 		fetchDecodeThread = new Thread(fetchDecodeStage); //Must create new thread, as old one cannot be restarted
 		fetchDecodeThread.start(); //Restart f/d thread, which will fetch from new PC address value
@@ -668,8 +663,8 @@ public class PipelinedExecuteStage extends ExecuteStage {
 	}
 	
 	
-	//GUI events should not be handled from this thread but from EDT or SwingWorker
-	//This adds the update event to the EDT thread. Need to test this works on the GUI
+	//GUI events should not be handled from this thread but from EDT only.
+	//This adds the update event to the EDT thread.
 	@Override
 	public void fireUpdate(final String update) {
 		SwingUtilities.invokeLater(new Runnable() {
