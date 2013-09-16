@@ -3,7 +3,12 @@ package code;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-
+/*
+ * The super class of all stages. Contains all relevant register references and other fields
+ * common to all stages.  Most importantly, this class contains accessMemory(), used to make
+ * use of the MAR, MBR and system bus thread-safe. Thus, all code for interacting with the system
+ * bus from both the F/D stage and Ex. stage is encapsulated within.
+ */
 public abstract class Stage implements Runnable {
 	
 	private BusController systemBus;
@@ -36,12 +41,10 @@ public abstract class Stage implements Runnable {
 		this.genRegisters = genRegisters;
 		this.rCC = rCC;
 		
-		lock = new ReentrantLock();
-		
-	
-		
+		lock = new ReentrantLock();		
 	}
 	
+	//Static getter for the lock.
 	public static Lock getLock() {
 		return lock;
 	}
@@ -51,31 +54,32 @@ public abstract class Stage implements Runnable {
 	 * Contains code to fetch instructions or operands from memory,
 	 * protecting integrity of MAR and MBR registers during pipelined mode.
 	 * 
-	 * isInstructionFetch is used to signify if the operation is an instruction fetch
-	 * or operand fetch.
+	 * isInstructionFetch is used to signify if the operation is an instruction fetch, with
+	 * the other boolean parameters being used in the same way. This ensures the correct block
+	 * of code is excuted by the subclass using the method.
+	 * 
+	 * Load/Store code is always executed by SwingWorker thread, as this runs in the execute stage
+	 * during pipelined mode and through all stages in standard mode. It spawns two additional threads
+	 * in pipelined mode to operate in the F/D and WB stages.
 	 */
 	public synchronized boolean accessMemory(boolean isInstructionFetch, boolean isOperandLoad, boolean isOperandStore,
 			boolean isPipelined) {
 		
-		
+		//For activity monitor updates in pipelined mode.
 		String operation = "";
 		
-		if (isPipelined) {
-			
+		if (isPipelined) {		
 			
 			if (isInstructionFetch) {
 				operation = "instruction fetch";
-				//stage = "F/D Stage";
 			}
 			if (isOperandLoad) {
 				operation = "LOAD";
-			//	stage = "Ex. Stage";
 			}
 			if (isOperandStore) {
 				operation = "STORE";
-			//	stage = "Ex. Stage";
+
 			}
-//			if (pc.getValue() != 0) { //Prevent display of update below on first instruction fetch, as no wait will take place
 			if (((ReentrantLock) lock).isLocked()) {
 				System.out.println(getClass() + " lock is locked, should fire update.");
 				fireUpdate("> Pipeline delay: Waiting to acquire use of MAR, MBR and \nsystem bus to complete " + 
@@ -87,11 +91,9 @@ public abstract class Stage implements Runnable {
 		//Attempt to get lock to allow progression into body of accessMemory() method	
 		try {
 			lock.lockInterruptibly();
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			System.out.println(getClass() + " Caught at lockInterruptibly.");
-			//properLock.unlock();
+			//Interrupt signals reset operation; cancel execution (note isWaiting is NOT set here, as the thread is not at a wait()).
+		} catch (InterruptedException e1) { 
+			//e1.printStackTrace();	
 			active = false;
 			return false;
 		}
@@ -101,9 +103,11 @@ public abstract class Stage implements Runnable {
 			//Instruction fetch code; accessed in pipelined mode by a separate thread running in the F/D stage,
 			//therefore it is necessary to regularly poll for its interrupted status so that in the event that
 			//"reset" is clicked on the GUI (triggering SwingWorker thread running in the execute stage to issue
-			//an interrupt to the threads running in the F/D stage and WB stage), or in the event of a pipeline
+			//an interrupt to the threads running in the F/D and WB stages), or in the event of a pipeline
 			// flush (which is also signalled by an interrupt from the execute stage), this thread can return to 
 			//its run() method and terminate naturally without executing further code.
+			//Note the isInterrupted() polling blocks are not used when the wait() statements are active but are important
+			//for testing when the wait() statements are not used.
 			
 			
 			if (!isPipelined) {
@@ -116,27 +120,20 @@ public abstract class Stage implements Runnable {
 			
 			System.out.println ("PC value is: " + getPC().getValue() + " before wait 1");
 			
-			//Additional wait for clarity in pipelined mode, as PC incremented at different point (but don't wait on
-			//first instruction fetch as this causes an initial GUI gap).
-			if (isPipelined && pc.getValue() != 0) {
+			//Additional wait for clarity in pipelined mode, as PC incremented at different point to pipelined mode
+			if (isPipelined && pc.getValue() != 0) { //Don't wait on first instruction fetch (causes gap)
 				setWaitStatus(true);
 				try {
-					System.out.println("wait 1");
 					wait();
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					//e.printStackTrace();
 					active = false;
 					setWaitStatus(false);
 					return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 				}
 				setWaitStatus(false);
 			}
-			System.out.println("left wait 1");
-			
-			//When branch is taken: FD is held at above wait while PC is set by branch, so when this then leaves the wait
-			//and reads the PC, it's set to the new value when really we'd like it to be set to the old one to better
-			//demonstrate the pipeline flush.... it then is interrupted during wait2, and starts again, effectively repeating
-			//the placing mem addr from pc to mar.
+		
 			
 			getMAR().write(getPC().getValue()); //Write address value in PC to MAR.
 			
@@ -148,16 +145,15 @@ public abstract class Stage implements Runnable {
 			
 			setWaitStatus(true);
 			try {
-				System.out.println("wait 2");
 				wait();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 				active = false;
 				setWaitStatus(false);
 				return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 			}
 			setWaitStatus(false);
-			System.out.println("left wait 2");
+			
 			
 			if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
 				return false;
@@ -184,12 +180,11 @@ public abstract class Stage implements Runnable {
 			this.fireUpdate("> Contents of memory address " + getMAR().read() + " loaded into MBR \n");
 			
 			
-			
 			setWaitStatus(true);
 			try {
 				wait();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 				active = false;
 				setWaitStatus(false);
 				return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
@@ -197,80 +192,62 @@ public abstract class Stage implements Runnable {
 			setWaitStatus(false);
 			
 			if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
-				System.out.println("Entering interrupted block 5");
 				return false;
 			}
 			
 			
 			
-			//System.out.println("Ln102, attempting to cast: " + getMBR().read());
 			//A Data item should now be in MBR
-			getIR().loadIR((Instruction) getMBR().read()); //Cast required as mbr holds type data, IR type Instruction; May need to handle exception
-			System.out.println("Instruction: " + getMBR().read());
+			getIR().loadIR((Instruction) getMBR().read()); //Cast required as mbr holds type data, IR type Instruction; cast exception
+															//caught in CPUframe
 			this.fireUpdate("> Contents of MBR loaded into IR \n");
 			
 			if (Thread.currentThread().isInterrupted()) { //In event of pipeline flush from execute stage
-				//System.out.println("Entering interrupted block 6");
-//				if (pipelineFlush) {
-//					fireUpdate("** PIPELINE FLUSH ** \nFetch/decode of " + ir.read(0).toString() + " abandoned.");
-//				}
 				return false;
 			}
 			
 			
-			if (!isPipelined) { //Incrementing PC is next step in standard mode (not pipeliend mode), so a wait() is necessary
+			if (!isPipelined) { //Incrementing PC is next step in standard mode (not pipelined mode), so a wait() is necessary
 				setWaitStatus(true);
 				try {
 					wait();
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					//e.printStackTrace();
 					active = false;
 					setWaitStatus(false);
-	//				if (pipelineFlush) {
-	//					fireUpdate("** PIPELINE FLUSH ** \nFetch/decode of " + ir.read(0).toString() + " abandoned.");
-	//				}
 					return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 				}
 				setWaitStatus(false);
 			}
 			
 			getMAR().write(-1);//Reset MAR. Repositioned here for user clarity; mem. addr. remains in MAR until instr. in IR.		
-			getMBR().write(null); //Clear MBR to reflect that instruction has moved to IR (should it be reset earlier, to 
-			//better reflect movement?)
-			
-			//fireUpdate("Leaving Fetch block\n");
+			getMBR().write(null); //Clear MBR to reflect that instruction has moved to IR
+		
 		}
+		
 		
 		/*
 		 * LOAD instruction execution
 		 */		
 		else if (isOperandLoad) {
 			
-			//fireUpdate("Into isOperandLoad.\n");
-			//fireUpdate("Info: IR1 holding: " + ir.read(1).toString());
-			//System.out.println("IN ACCESS MEMORY METHOD: LOAD operation");
-			
 			fireUpdate("> Executing LOAD instruction; memory address " +	ir.read(1).getField1() + 
 					"\nplaced into MAR to initiate operand fetch \n");
 			mar.write(ir.read(1).getField1()); //Load mar with source address of instruction in IR
-			//Request a read from memory via system bus, with address contained in mar
+			//Request a read from memory via system bus after next wait(), with address contained in mar
 			
 			setWaitStatus(true);
 			try {
-				System.out.println("E: about to wait after loading MAR with source address of instruction.");
 				wait();
-				System.out.println("E: just left that wait.");
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 				active = false;
 				setWaitStatus(false);
-				//properLock.unlock();
 				return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
 			}
 			setWaitStatus(false);
 			
-			System.out.println("Instruction is: " + ir.read(1).toString());
-			System.out.println("Value on MAR at ln46:" + mar.read());
+			
 			if (isPipelined) { //Caller only used for pipelined mode
 				getSystemBus().setCaller(this); //Register object reference with system bus to enable updates to relevant 
 				//activity monitor
@@ -284,11 +261,12 @@ public abstract class Stage implements Runnable {
 			this.fireUpdate("> Operand " + mbr.read().toString() + " loaded from address " + ir.read(1).getField1() + 
 					" into MBR\n");
 			
+			
 			setWaitStatus(true);
 			try {
 				wait();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 				active = false;
 				setWaitStatus(false);
 				return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
@@ -307,7 +285,7 @@ public abstract class Stage implements Runnable {
 				try {
 					wait();
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+				//	e.printStackTrace();
 					active = false;
 					setWaitStatus(false);
 					return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
@@ -327,7 +305,7 @@ public abstract class Stage implements Runnable {
 				try {
 					wait();
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					//e.printStackTrace();
 					active = false;
 					setWaitStatus(false);
 					return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
@@ -346,12 +324,10 @@ public abstract class Stage implements Runnable {
 		 */
 		else if (isOperandStore) {
 			
-			if (!active) { //Swing worker ignores cancel if blocked on lock object
-				return false;
-			}
-			
-			//System.out.println("IN ACCESS MEMORY METHOD: STORE operation.");
-			
+//			if (!active) {
+//				return false;
+//			}
+						
 			this.fireUpdate("> Executing STORE instruction; destination memory \naddress " + getIR().read(1).getField2() + 
 				" placed into MAR \n");
 			getMAR().write(getIR().read(1).getField2()); //Load mar with destination (memory address)
@@ -360,7 +336,7 @@ public abstract class Stage implements Runnable {
 			try {
 				wait();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 				active = false;
 				setWaitStatus(false);
 				return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
@@ -376,7 +352,7 @@ public abstract class Stage implements Runnable {
 			try {
 				wait();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+			//	e.printStackTrace();
 				active = false;
 				setWaitStatus(false);
 				return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
@@ -402,7 +378,7 @@ public abstract class Stage implements Runnable {
 			try {
 				wait();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+			//	e.printStackTrace();
 				active = false;
 				setWaitStatus(false);
 				return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
@@ -411,8 +387,7 @@ public abstract class Stage implements Runnable {
 		
 		}
 		
-	//}
-		lock.unlock();
+		lock.unlock(); //Release lock upon leaving accessMemory()
 	
 		return true;
 	}
@@ -422,19 +397,27 @@ public abstract class Stage implements Runnable {
 	
 	protected abstract void fireUpdate(String update);
 	
-	//public abstract void setPipelineFlush(boolean isFlush);
 	
+	/*
+	 * Denotes that the instruction cycle is active; is set to false upon a HALT,
+	 * or if reset is clicked, cancelling execution.
+	 * 
+	 * @return boolean the status of the boolean active field.
+	 */
 	public boolean isActive() {
 		return this.active;
 	}
 	
+	
+	/*
+	 * Set the active field.
+	 * 
+	 * @param the value to be taken on by active.
+	 */
 	public void setActive(boolean active) {
 		this.active = active;
 	}
 	
-	public boolean isPipelineFlush() {
-		return this.pipelineFlush;
-	}
 	
 	/*
 	 * There must be a way to differentiate between interrupts generated by pipelining flushing
@@ -442,30 +425,52 @@ public abstract class Stage implements Runnable {
 	 * with the fetch/decode stage simply resetting itself, in the latter case execution should terminate
 	 * altogether.
 	 * 
+	 * @param boolean flush the value to be taken on by the pipelineFlush field.	 * 
 	 */
 	public void setPipelineFlush(boolean flush) {
 		this.pipelineFlush = flush;
 	}
 	
+	
 	/*
-	 * This boolean flag allows the GUI's SwingWorker thread to determine whether the thread is
-	 * waiting on this object. If so, notify() will be called on this object (and not otherwise).
+	 * Is set to true in the event of a pipeline flush caused
+	 * by execution of a branch instruction.
+	 * 
+	 * @return boolean the status of the pipelineFlush indicator field.
+	 */
+	public boolean isPipelineFlush() {
+		return this.pipelineFlush;
+	}
+	
+	
+	
+	/*
+	 * This boolean flag allows the GUI's event dispatch thread to determine whether the SwingWorker
+	 * thread is waiting on this object. If so, notify() will be called on this object (and not otherwise).
+	 * 
+	 * @return boolean the status of isWaiting.
 	 */
 	public boolean isWaiting() {
 		return this.isWaiting;
 	}
+	
 	
 	/*
 	 * This method is used when assembly program execution is reset/restarted midway through;
 	 * if isWaiting has just been set to false and the worker thread is cancelled, when it comes to
 	 * stepping through execution after the restart, the "Step" button won't work as it uses the status
 	 * of isWaiting to determine whether to resume execution or not.
+	 * 
+	 * @param boolean waiting the value to be taken on by the isWaiting field.
 	 */
 	public void setWaitStatus(boolean waiting) {
 		this.isWaiting = waiting;
 	}
 	
 	
+	/*
+	 * The following are getter methods for Stage fields.
+	 */
 	
 	public InstructionRegister getIR() {
 		return this.ir;
