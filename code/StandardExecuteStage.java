@@ -55,6 +55,25 @@ public class StandardExecuteStage extends ExecuteStage {
 						setWaitStatus(false);
 					}
 					
+					else if (getIR().read().getField1() == 16) { //ConditionCodeRegister source reference
+							getGenRegisters().write(getIR().read().getField2(), getCC().read());
+							//Write operand from rCC to general purpose register
+							
+							
+							this.fireUpdate("> Loaded operand " + getCC().read() + " from rCC" + 
+									" into r" + getGenRegisters().read(getIR().read().getField2()) + "\n");
+							
+							setWaitStatus(true);
+							try {
+								wait();
+							} catch (InterruptedException e) {
+							//	e.printStackTrace();
+								setWaitStatus(false);
+								return false; //Do not continue execution if interrupted (SwingWorker.cancel(true) is called).
+							}
+							setWaitStatus(false);
+					}
+					
 					else { //Register-register move
 					
 						getGenRegisters().write(getIR().read().getField2(), getGenRegisters().read(getIR().read().getField1()));
@@ -297,7 +316,7 @@ public class StandardExecuteStage extends ExecuteStage {
 			case 10: //A SKZ instruction (skip the next instruction (increment PC by one) if status register holds 0).
 					 if (getCC().read().unwrapInteger() == 0) {
 						 getPC().incrementPC();
-						 fireUpdate("> PC set to " + getIR().read().getField1() + " as result of " + getIR().read().getOpcode() + 
+						 fireUpdate("> PC incremented by 1 as result of " + getIR().read().getOpcode() + 
 								 " operation\n");
 						 
 			 			setWaitStatus(true);

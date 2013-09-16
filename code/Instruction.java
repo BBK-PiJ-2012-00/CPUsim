@@ -68,7 +68,7 @@ public abstract class Instruction implements Data {
 		//Arithmetic and MOVE instructions
 		if (OPCODE.getValue() > 2 && OPCODE.getValue() < 8) { 
 			if (this.getField1() == 16) { //Display condition code register as rCC rather than r16
-				return OPCODE.toString() + " rCC" + " r" + this.getField1();
+				return OPCODE.toString() + " rCC" + " r" + this.getField2();
 			}
 			if (this.getField2() == 16) { //Display condition code register as rCC rather than r16
 				return OPCODE.toString() + " r" + this.getField1() + " rCC";
